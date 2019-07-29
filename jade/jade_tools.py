@@ -92,11 +92,19 @@ def GetToday():
     pathname = otherStyleTime.split(" ")[0]
     return pathname
 #获取当前的时间
-def GetTime():
+def GetHourTime():
     now = datetime.datetime.now()
-    otherStyleTime = now.strftime("%Y-%m-%d %H:%M:%S")
+    otherStyleTime = now.strftime("%Y-%m-%d %H-%M-%S")
     pathname = otherStyleTime.split(" ")[1]
     return pathname
+
+
+def GetTime():
+    now = datetime.datetime.now()
+    otherStyleTime = now.strftime("%Y-%m-%d-%H-%M-%S")
+    pathname = otherStyleTime
+    return pathname
+
 
 
 

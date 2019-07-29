@@ -4,9 +4,6 @@ import numpy as np
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
 
-
-VOC_LABELS = GetVOC_Labels("/home/jade/Data/VOCdevkit/VOC2012/VOC.prototxt")
-
 def GetXmlClassesNames(xml_path):
     classnames = []
     # Read the XML annotation file.

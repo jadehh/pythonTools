@@ -1,1 +1,4 @@
 # pythonTools
+```
+python setup.py
+```
