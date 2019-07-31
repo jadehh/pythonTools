@@ -23,6 +23,29 @@ VOC_LABELS = ('__background__',  # always index 0
                'cow', 'diningtable', 'dog', 'horse',
                'motorbike', 'person', 'pottedplant',
                'sheep', 'sofa', 'train', 'tvmonitor')
+
+VOC_LABELS = {'__background__':(0, 'Background'),  # always index 0
+               'aeroplane':(1,'aeroplane'),
+              'bicycle':(2,'bicycle'),
+              'bird':(3,'bird'),
+              'boat':(4,'boat'),
+               'bottle':(5,'bottle'),
+              'bus':(6,'bus'),
+              'car':(7,'car'),
+              'cat':(8,'cat'),
+              'chair':(9,'chari'),
+               'cow':(10,'cow'),
+             'diningtable':(11,'diningtable'),
+              'dog':(12,'dog'),
+              'horse':(13,'horse'),
+               'motorbike':(14,'motorbike'),
+              'person':(15,'person'),
+              'pottedplant':(16,'pottedplant'),
+               'sheep':(17,'sheep'),
+              'sofa':(18,'sofa'),
+              'train':(19,'train'),
+              'tvmonitor':(20,'tvmonitor')}
+
 # VOC_CLASSES = ( '__background__', # always index 0
 #     'person')
 

@@ -70,7 +70,7 @@ def ProcessXml(xml_path):
             truncated.append('0')
 
         bbox = obj.find('bndbox')
-        bboxes.append((int(bbox.find('xmin').text) / shape[1] ,int(bbox.find('ymin').text) / shape[0],int(bbox.find('xmax').text)/shape[1],int(bbox.find('ymax').text)/shape[0]))
+        bboxes.append((int(bbox.find('xmin').text) / int(shape[1]) ,int(bbox.find('ymin').text) / int(shape[0]),int(bbox.find('xmax').text)/int(shape[1]),int(bbox.find('ymax').text)/int(shape[0])))
     imagename = GetLastDir(xml_path)[:-4]+'.jpg'
     return imagename,shape, bboxes, labels_text,labels, difficult, truncated
 
