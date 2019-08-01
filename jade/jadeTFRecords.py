@@ -17,9 +17,7 @@ import os
 from lxml import etree
 import PIL.Image
 import tensorflow as tf
-
 from object_detection.utils import dataset_util
-from object_detection.utils import label_map_util
 from jade import *
 
 
@@ -58,13 +56,13 @@ def CreateClassTFRecorder(classify_path, datasetname):
 
 
 def dict_voc_to_tf_example(data,
-                       dataset_directory,
-                       label_map_dict,
-                       xml_name,
-                       year,
-                       ignore_difficult_instances=False,
-                       image_subdirectory='JPEGImages'
-                       ):
+                           dataset_directory,
+                           label_map_dict,
+                           xml_name,
+                           year,
+                           ignore_difficult_instances=False,
+                           image_subdirectory='JPEGImages'
+                           ):
     """Convert XML derived dict to tf.Example proto.
 
     Notice that this function normalizes the bounding box coordinates provided
@@ -169,21 +167,116 @@ def main(FLAGS):
             data = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
 
             tf_example = dict_voc_to_tf_example(data, FLAGS.data_dir, label_map_dict, example, year,
-                                            True)
+                                                True)
             writer.write(tf_example.SerializeToString())
     writer.close()
 
-if __name__ == '__main__':
-    CreateClassTFRecorder("/home/jade/Data/sdfgoods10", "sdfgoods10")
 
-    flags = tf.app.flags
-    flags.DEFINE_string('data_dir', '/home/jade/Data/StaticDeepFreeze/', 'Root directory to raw PASCAL VOC dataset.')
-    flags.DEFINE_string('set', 'train', 'Convert training set, validation set or '
-                                        'merged set.')
-    flags.DEFINE_string('output_path', '/home/jade/Data/StaticDeepFreeze/1/Tfrecords/WildGoods_Train.tfrecord', 'Path to output TFRecord')
-    flags.DEFINE_string('label_map_path', "/home/jade/label_map/wild_goods.prototxt",
-                        'Path to label map proto')
-    flags.DEFINE_list('years',  ["2019-03-18_14-11-36"],
-                        'Path to label map proto')
-    FLAGS = flags.FLAGS
-    main(FLAGS)
+def vocTFRecordShow(tfrecord_path):
+    # categories, _ = ReadProTxt("/home/jade/label_map/hand.prototxt")
+    with tf.Session() as sess:
+        example = tf.train.Example()
+        # train_records 表示训练的tfrecords文件的路径
+        record_iterator = tf.python_io.tf_record_iterator(path=tfrecord_path)
+        for record in record_iterator:
+            example.ParseFromString(record)
+            f = example.features.feature
+            # 解析一个example
+            # image_name = f['image/filename'].bytes_list.value[0]
+            image_encode = f['image/encoded'].bytes_list.value[0]
+            image_height = f['image/height'].int64_list.value[0]
+            image_width = f['image/width'].int64_list.value[0]
+            xmin = f['image/object/bbox/xmin'].float_list.value
+            ymin = f['image/object/bbox/ymin'].float_list.value
+            xmax = f['image/object/bbox/xmax'].float_list.value
+            ymax = f['image/object/bbox/ymax'].float_list.value
+            labels = f['image/object/class/label'].int64_list.value
+            text = f['image/object/class/text'].bytes_list.value
+            image = io.BytesIO(image_encode)
+            labels = list(labels)
+            xmin = list(xmin)
+            ymin = list(ymin)
+            xmax = list(xmax)
+            ymax = list(ymax)
+            image = Image.open(image)
+
+            image = np.asarray(image)
+            bboxes = []
+            scores = []
+            label_texts = []
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            for i in range(len(xmin)):
+                if labels[i] != 0:
+                    print(labels[i])
+                    bboxes.append(
+                        (xmin[i] * image_width, ymin[i] * image_height, xmax[i] * image_width, ymax[i] * image_height))
+                    scores.append(1)
+                    # label_texts.append(categories[labels[i]]["display_name"])
+
+                # label_texts.append("good")
+            print("**********************")
+            CVShowBoxes(image, bboxes, label_texts, labels, scores=scores, waitkey=0)
+
+
+def parse_exmp(serial_exmp):
+    feats = tf.io.parse_single_example(serial_exmp,
+                                       features={'image/encoded': tf.io.FixedLenFeature([], tf.string),
+                                                 'image/object/class/label': tf.io.FixedLenFeature([], tf.int64)})
+    image = tf.io.decode_image(feats['image/encoded'])
+    label = feats['image/object/class/label']
+    img = tf.cast(image, tf.float32)
+    # height = 224
+    # width = 224
+    # # # Randomly crop a [height, width] section of the image.随机裁剪
+    # distorted_image = tf.image.random_crop(img, [height, width, 3])
+    # # Randomly flip the image horizontally.随机翻转
+    # distorted_image = tf.image.random_flip_left_right \
+    #     (distorted_image)
+    # # 改变亮度
+    # distorted_image = tf.image.random_brightness(distorted_image,
+    #                                              max_delta=63)
+    # # 改变对比度
+    # distorted_image = tf.image.random_contrast(distorted_image,
+    #                                            lower=0.2, upper=1.8)
+    # img = tf.image.per_image_standardization(distorted_image)
+    # img = tf.reshape(img, [224, 224, 3])
+    return  img,label
+
+
+
+
+
+def get_dataset(fname):
+    dataset = tf.data.TFRecordDataset(fname)
+    return dataset.map(parse_exmp)
+
+def loadClassifyTFRecord(tfrecord_path,batch_size=32,shuffle=True):
+    dataset = get_dataset(tfrecord_path)
+
+    if shuffle:
+        dataset = dataset.shuffle(10000)
+    dataset = dataset.repeat().batch(batch_size)
+    iterator = iter(dataset)
+    return iterator
+
+
+def classifyTFRecordShow(tfrecord_path):
+    print(get_dataset(tfrecord_path))
+
+
+if __name__ == '__main__':
+    # CreateClassTFRecorder("/home/jade/Data/sdfgoods10", "sdfgoods10")
+    #
+    # flags = tf.app.flags
+    # flags.DEFINE_string('data_dir', '/home/jade/Data/StaticDeepFreeze/', 'Root directory to raw PASCAL VOC dataset.')
+    # flags.DEFINE_string('set', 'train', 'Convert training set, validation set or '
+    #                                     'merged set.')
+    # flags.DEFINE_string('output_path', '/home/jade/Data/StaticDeepFreeze/1/Tfrecords/WildGoods_Train.tfrecord', 'Path to output TFRecord')
+    # flags.DEFINE_string('label_map_path', "/home/jade/label_map/wild_goods.prototxt",
+    #                     'Path to label map proto')
+    # flags.DEFINE_list('years',  ["2019-03-18_14-11-36"],
+    #                     'Path to label map proto')
+    # FLAGS = flags.FLAGS
+    # main(FLAGS)
+
+    loadClassifyTFRecord("/home/jade/Data/TFRecords/sdfgoods10.tfrecord")

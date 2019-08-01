@@ -2,9 +2,11 @@
 import datetime
 import sys
 import time
+import cv2
 import os
 import xlrd
 import os.path as ops
+from jade import *
 class ProcessBar():
     def __init__(self):
         self.count = 0
@@ -284,13 +286,28 @@ def GetModelStep(train_dir):
     return 0
 
 
+def ResizeClassifyDataset(classifyPath,size=224):
+    filenames = os.listdir(classifyPath)
+    processBar = ProcessBar()
+    processBar.count = len(filenames)
+    for filename in filenames:
+        processBar.start_time = time.time()
+        imagepaths = GetAllImagesPath(os.path.join(classifyPath, filename))
+        for imagepath in imagepaths:
+            image = cv2.imread(imagepath)
+            image = cv2.resize(image,(size,size))
+            newClassifyPath = CreateSavePath(classifyPath+"_resize")
+            filepath = CreateSavePath(os.path.join(newClassifyPath,filename))
+            cv2.imwrite(os.path.join(newClassifyPath,filename,GetLastDir(imagepath)),image)
+        NoLinePrint("writing images..",processBar)
+
 
 
 
 if __name__ == '__main__':
     #ReadProTxt("/home/jade/Data/StaticDeepFreeze/2019-03-18_14-11-36/wild_goods.prototxt")
-    GetModelStep("/home/jade/Models/Image_Classif/dfgoods_inception_resnet_v2_use_checkpoitns_2019-04-29")
-
+    #GetModelStep("/home/jade/Models/Image_Classif/dfgoods_inception_resnet_v2_use_checkpoitns_2019-04-29")
+    ResizeClassifyDataset("/home/jade/Data/sdfgoods10",224)
 
 
 
