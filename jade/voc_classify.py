@@ -8,7 +8,7 @@
 import os
 from jade.ReadVocData import *
 import cv2
-def voc_to_classify(VOC_PATH):
+def VOCTOClassify(VOC_PATH):
     xmlPaths = GetFilesWithLastNamePath(os.path.join(VOC_PATH,"Annotations",),".xml")
     save_path = GetPreviousDir(VOC_PATH)
     processbar = ProcessBar()

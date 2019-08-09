@@ -83,4 +83,5 @@ from jade.jade_processfile import *
 from jade.ReadVocData import *
 from jade.jade_image_processing import *
 from jade.clean_dataset import *
+from jade.voc_classify import *
 

@@ -173,7 +173,7 @@ def GetRootPath():
 
 
 #xml准换成prototxt
-def GeneratePrototxt(xlsx_path,protxt_name="ThirtyTypes"):
+def XMLTOPROTXT(xlsx_path,protxt_name="ThirtyTypes"):
     data = xlrd.open_workbook(xlsx_path)
     table_count = len(data.sheets())
     index = 0

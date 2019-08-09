@@ -16,7 +16,6 @@ import numpy as np
 from .voc_eval import voc_eval
 from jade.ReadVocData import ProcessXml
 from jade.jade_tools import GetLastDir,GetVOC_CLASSES
-import torch
 if sys.version_info[0] == 2:
     import xml.etree.cElementTree as ET
 else:
@@ -243,19 +242,19 @@ class VOCDetection():
         image_name, shape, bboxes, labels, labels_text, difficult, truncated = process_hand(os.path.join(img_id[0],DIRECTORY_ANNOTATIONS,img_id[1]+".xml"))
         return  bboxes, labels, labels_text, difficult,
 
-    def pull_tensor(self, index):
-        '''Returns the original image at an index in tensor form
-
-        Note: not using self.__getitem__(), as any transformations passed in
-        could mess up this functionality.
-
-        Argument:
-            index (int): index of img to show
-        Return:
-            tensorized version of img, squeezed
-        '''
-        to_tensor = transforms.ToTensor()
-        return torch.Tensor(self.pull_image(index)).unsqueeze_(0)
+    # def pull_tensor(self, index):
+    #     '''Returns the original image at an index in tensor form
+    #
+    #     Note: not using self.__getitem__(), as any transformations passed in
+    #     could mess up this functionality.
+    #
+    #     Argument:
+    #         index (int): index of img to show
+    #     Return:
+    #         tensorized version of img, squeezed
+    #     '''
+    #     to_tensor = transforms.ToTensor()
+    #     return torch.Tensor(self.pull_image(index)).unsqueeze_(0)
 
     def evaluate_detections(self, all_boxes):
         """
@@ -341,33 +340,33 @@ class VOCDetection():
         return aps, np.mean(aps)
     
     
-def detection_collate(batch):
-    """Custom collate fn for dealing with batches of images that have a different
-    number of associated object annotations (bounding boxes).
-
-    Arguments:
-        batch: (tuple) A tuple of tensor images and lists of annotations
-
-    Return:
-        A tuple containing:
-            1) (tensor) batch of images stacked on their 0 dim
-            2) (list of tensors) annotations for a given image are stacked on 0 dim
-    """
-    targets = []
-    imgs = []
-    for _, sample in enumerate(batch):
-        for _, tup in enumerate(sample):
-            if torch.is_tensor(tup):
-                imgs.append(np.transpose(tup.numpy(),[2,1,0]))
-            elif isinstance(tup, type(np.empty(0))):
-                #annos = torch.from_numpy(tup).float(
-                new_tup = []
-                for i in range(20):
-                    if i>tup.shape[0]-1:
-                        new_tup.append(np.array([0,0,0,0,0]))
-                    else:
-                        new_tup.append(np.array([tup[i,0],tup[i,1],tup[i,2],tup[i,3],tup[i,4]]))
-                targets.append(np.array(new_tup))
-
-
-    return (np.stack(imgs, 0), np.array(targets))
+# def detection_collate(batch):
+#     """Custom collate fn for dealing with batches of images that have a different
+#     number of associated object annotations (bounding boxes).
+#
+#     Arguments:
+#         batch: (tuple) A tuple of tensor images and lists of annotations
+#
+#     Return:
+#         A tuple containing:
+#             1) (tensor) batch of images stacked on their 0 dim
+#             2) (list of tensors) annotations for a given image are stacked on 0 dim
+#     """
+#     targets = []
+#     imgs = []
+#     for _, sample in enumerate(batch):
+#         for _, tup in enumerate(sample):
+#             if torch.is_tensor(tup):
+#                 imgs.append(np.transpose(tup.numpy(),[2,1,0]))
+#             elif isinstance(tup, type(np.empty(0))):
+#                 #annos = torch.from_numpy(tup).float(
+#                 new_tup = []
+#                 for i in range(20):
+#                     if i>tup.shape[0]-1:
+#                         new_tup.append(np.array([0,0,0,0,0]))
+#                     else:
+#                         new_tup.append(np.array([tup[i,0],tup[i,1],tup[i,2],tup[i,3],tup[i,4]]))
+#                 targets.append(np.array(new_tup))
+#
+#
+#     return (np.stack(imgs, 0), np.array(targets))

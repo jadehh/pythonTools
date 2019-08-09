@@ -44,16 +44,27 @@ def dict_to_tf_example(img_path,
 
 
 def CreateClassTFRecorder(classify_path, datasetname):
-    output_path = CreateSavePath(os.path.join(GetPreviousDir(classify_path), "TFRecords"))
-    output_path = output_path + "/" + datasetname + ".tfrecord"
-    writer = tf.io.TFRecordWriter(output_path)
-    filename = os.listdir(classify_path)
-    for i in range(len(filename)):
-        imagepaths = GetAllImagesPath(os.path.join(classify_path, filename[i]))
-        for imgpath in imagepaths:
-            tf_example = dict_to_tf_example(imgpath, i)
-            writer.write(tf_example.SerializeToString())
+    train_output_path = CreateSavePath(os.path.join(GetPreviousDir(classify_path), "TFRecords"))
+    train_output_path = train_output_path + "/" + datasetname + "_train.tfrecord"
+    train_writer = tf.io.TFRecordWriter(train_output_path)
 
+    test_output_path = CreateSavePath(os.path.join(GetPreviousDir(classify_path), "TFRecords"))
+    test_output_path = test_output_path + "/" + datasetname + "_test.tfrecord"
+    test_writer = tf.io.TFRecordWriter(test_output_path)
+    processBar = ProcessBar()
+    filename = os.listdir(classify_path)
+    processBar.count = len(filename)
+    for i in range(len(filename)):
+        processBar.start_time = time.time()
+        imagepaths = GetAllImagesPath(os.path.join(classify_path, filename[i]))
+        for j in range(len(imagepaths)):
+            tf_example = dict_to_tf_example(imagepaths[j], i)
+            if j < int(0.8*len(imagepaths)):
+                train_writer.write(tf_example.SerializeToString())
+            else:
+                test_writer.write(tf_example.SerializeToString())
+
+        NoLinePrint("Writing TFrecords ...",processBar)
 
 def dict_voc_to_tf_example(data,
                            dataset_directory,
@@ -250,12 +261,14 @@ def get_dataset(fname):
     dataset = tf.data.TFRecordDataset(fname)
     return dataset.map(parse_exmp)
 
-def loadClassifyTFRecord(tfrecord_path,batch_size=32,shuffle=True):
+def loadClassifyTFRecord(tfrecord_path,batch_size=32,shuffle=True,repeat=True):
     dataset = get_dataset(tfrecord_path)
 
     if shuffle:
         dataset = dataset.shuffle(10000)
-    dataset = dataset.repeat().batch(batch_size)
+    if repeat:
+        dataset = dataset.repeat()
+    dataset = dataset.batch(batch_size)
     iterator = iter(dataset)
     return iterator
 
