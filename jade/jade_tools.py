@@ -75,7 +75,7 @@ def GetAllImagesNames(dir):
     imagename_list = os.listdir(dir)
     image_list = []
     for image_name in imagename_list:
-        if image_name[-4:] == ".jpg" or image_name[-4:] == ".png":
+        if image_name[-4:].lower == ".jpg" or image_name[-4:].lower() == ".png":
             image_list.append(image_name)
     return (image_list)
 
@@ -84,7 +84,7 @@ def GetAllImagesPath(dir):
     imagename_list = os.listdir(dir)
     image_list = []
     for image_name in imagename_list:
-        if image_name[-4:] == ".jpg" or image_name[-4:] == ".png":
+        if image_name[-4:].lower() == ".jpg" or image_name[-4:].lower() == ".png":
             image_list.append(OpsJoin(dir,image_name))
     return (image_list)
 #获取今天的日期

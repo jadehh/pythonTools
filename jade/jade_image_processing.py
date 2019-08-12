@@ -473,18 +473,21 @@ def CVShowBoxes(image,boxes,labels_text=None,labels=None,scores=None,num_classes
             ymin = int(boxes[i][1])
             xmax = int(boxes[i][2])
             ymax = int(boxes[i][3])
+        if boxes is not None:
+            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
+            if labels_text is not None:
+                if scores is not None:
+                    image2 = Add_Chinese_Label(img=image2, label=str(labels_text[i]) + ":" + str(int(scores[i] * 100)),
+                                               pt1=(xmin, ymin))
+                else:
+                    image2 = Add_Chinese_Label(img=image2, label=str(labels_text[i]),
+                                               pt1=(xmin, ymin))
+                if labels is not None:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(labels[i])], 3, 3)
+                else:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
 
-        if len(labels_text) is not None :
-            if scores is not None:
-                image2 = Add_Chinese_Label(img=image2, label=str(labels_text[i]) + ":" + str(int(scores[i] * 100)),
-                                       pt1=(xmin, ymin))
-            else:
-                image2 = Add_Chinese_Label(img=image2, label=str(labels_text[i]),
-                                       pt1=(xmin, ymin))
-            if labels is not None:
-                image2 = cv2.rectangle(image2,(xmin,ymin),(xmax,ymax),colors[int(labels[i])],3,3)
-            else:
-                image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
+
     if waitkey >= 0:
         cv2.namedWindow(named_windows, 0)
         # cv2.resizeWindow("result", 840, 680)
