@@ -27,4 +27,4 @@ def videoToAvi(video_path):
         NoLinePrint("转码中",processBar)
 
 if __name__ == '__main__':
-    videoToAvi("/home/jade/Videos/IPS_2019-08-14.15.14.38.mp4")
+    videoToAvi("/home/jade/Videos/IPS_2019-08-14.14.22.14.mp4")

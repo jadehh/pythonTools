@@ -7,6 +7,7 @@ import os
 from PIL import Image,ImageFont,ImageDraw
 from threading import Thread
 import uuid
+import imageio
 
 class VideoCapture():
     def __init__(self,cv_videocapture_param):
@@ -161,7 +162,7 @@ class processImage:
         color_R = random.randint(1,254)
         color_G = random.randint(1,254)
         color_B = random.randint(1,255)
-        for point in point:
+        for point in points:
             self.img = cv2.circle(self.img,point,2,(color_R,color_G,color_B),2,2)
         return self.img
 
@@ -463,7 +464,7 @@ def CVShowBoxes(image,boxes,labels_text=None,labels=None,scores=None,num_classes
         image = cv2.imread(image)
     image2 = image.copy()
     for i in range(len(boxes)):
-        if boxes[i][0] < 1 and  boxes[i][1] < 1 and boxes[i][2] < 1 and boxes[i][3] < 1:
+        if boxes[i][0] <= 1 and  boxes[i][1] <= 1 and boxes[i][2] <= 1 and boxes[i][3] <= 1:
             xmin = int(boxes[i][0]*image.shape[1])
             ymin = int(boxes[i][1]*image.shape[0])
             xmax = int(boxes[i][2]*image.shape[1])
@@ -880,12 +881,14 @@ def ImShow(images,key=0):
         cv2.imshow(name, image)
     cv2.waitKey(key)
 
+def compose_gif(image_path_list,output_path):
+    gif_images = []
+    for path in image_path_list:
+        gif_images.append(imageio.imread(path))
+    imageio.mimsave(output_path,gif_images,fps=1)
+
 if __name__ == '__main__':
     # COLORS = [(183, 68, 69), (86, 1, 17), (179, 240, 121), 
     #           (97, 134, 238), (145, 152, 245), (170, 153, 97), 
     #           (124, 250, 3), (100, 151, 78), (177, 117, 215), (183, 70, 5)]
-    for i in range(11):
-        color = GetRandomColor()
-        COLORS.append(color)
-
-    print(COLORS)
+    credits()
