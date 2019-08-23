@@ -881,11 +881,11 @@ def ImShow(images,key=0):
         cv2.imshow(name, image)
     cv2.waitKey(key)
 
-def compose_gif(image_path_list,output_path):
+def compose_gif(image_path_list,output_path,fps=1):
     gif_images = []
     for path in image_path_list:
         gif_images.append(imageio.imread(path))
-    imageio.mimsave(output_path,gif_images,fps=1)
+    imageio.mimsave(output_path,gif_images,fps=fps)
 
 if __name__ == '__main__':
     # COLORS = [(183, 68, 69), (86, 1, 17), (179, 240, 121), 
