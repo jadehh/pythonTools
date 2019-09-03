@@ -457,12 +457,13 @@ def _to_color(indx, base):
     g = 2 - (indx % base2) % base
     return b * 127, r * 127, g * 127
 #opencv显示boxes
-def CVShowBoxes(image,boxes,labels_text=None,labels=None,scores=None,num_classes=90,waitkey=-1,named_windows="result"):
+def CVShowBoxes(image,detectresult:DetectResultModel,num_classes=90,waitkey=-1,named_windows="result"):
     base = int(np.ceil(pow(num_classes, 1. / 3)))
     colors = [_to_color(x, base) for x in range(num_classes)]
     if type(image) == str:
         image = cv2.imread(image)
     image2 = image.copy()
+    boxes = detectresult.boxes
     for i in range(len(boxes)):
         if boxes[i][0] <= 1 and  boxes[i][1] <= 1 and boxes[i][2] <= 1 and boxes[i][3] <= 1:
             xmin = int(boxes[i][0]*image.shape[1])
@@ -477,14 +478,14 @@ def CVShowBoxes(image,boxes,labels_text=None,labels=None,scores=None,num_classes
         if boxes is not None:
             image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
             if labels_text is not None:
-                if scores is not None:
-                    image2 = Add_Chinese_Label(img=image2, label=str(labels_text[i]) + ":" + str(int(scores[i] * 100)),
+                if detectresult.scores is not None:
+                    image2 = Add_Chinese_Label(img=image2, label=str(detectresult.label_texts[i]) + ":" + str(int(detectresult.scores[i] * 100)),
                                                pt1=(xmin, ymin))
                 else:
-                    image2 = Add_Chinese_Label(img=image2, label=str(labels_text[i]),
+                    image2 = Add_Chinese_Label(img=image2, label=str(detectresult.label_texts[i]),
                                                pt1=(xmin, ymin))
-                if labels is not None:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(labels[i])], 3, 3)
+                if detectresult.label_ids is not None:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(detectresult.label_ids[i])], 3, 3)
                 else:
                     image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
 

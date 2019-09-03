@@ -81,6 +81,7 @@ VOC_LABELS = {'__background__':(0, 'Background'),  # always index 0
 from jade.jade_tools import *
 from jade.jade_processfile import *
 from jade.ReadVocData import *
+from jade.jade_detect_results import DetectResultModel
 from jade.jade_image_processing import *
 from jade.clean_dataset import *
 from jade.voc_classify import *
