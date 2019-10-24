@@ -11,7 +11,7 @@ import imageio
 
 
 ##旋转图片
-def image_roate(image, angle):
+def Image_Roate(image, angle):
     # 获取图像的尺寸
     # 旋转中心
     (h, w) = image.shape[:2]
@@ -33,21 +33,23 @@ def image_roate(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def roate_videeo(video_path,save_video_path,angle):
+def Video_Roate(video_path,save_video_path,angle):
     video_capture = cv2.VideoCapture(video_path)
     fps = video_capture.get(cv2.CAP_PROP_FPS)
     ret,frame = video_capture.read()
-    height = frame.shape[0]
-    width = frame.shape[1]
+    roate_img = Image_Roate(frame, angle)
+    height = roate_img.shape[0]
+    width = roate_img.shape[1]
     fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
     videoWriter = cv2.VideoWriter(save_video_path, fourcc, fps, (width, height))
     while True:
-        frame = image_roate(frame,angle)
+        print("Writting ..")
+        frame = Image_Roate(frame,angle)
         videoWriter.write(frame)
         ret,frame = video_capture.read()
         if ret is not True:
             break
-    
+
 class VideoCapture():
     def __init__(self,cv_videocapture_param):
         self.cv_videocapture_param = cv_videocapture_param
