@@ -9,6 +9,45 @@ from threading import Thread
 import uuid
 import imageio
 
+
+##旋转图片
+def image_roate(image, angle):
+    # 获取图像的尺寸
+    # 旋转中心
+    (h, w) = image.shape[:2]
+    (cx, cy) = (w / 2, h / 2)
+
+    # 设置旋转矩阵
+    M = cv2.getRotationMatrix2D((cx, cy), -angle, 1.0)
+    cos = np.abs(M[0, 0])
+    sin = np.abs(M[0, 1])
+
+    # 计算图像旋转后的新边界
+    nW = int((h * sin) + (w * cos))
+    nH = int((h * cos) + (w * sin))
+
+    # 调整旋转矩阵的移动距离（t_{x}, t_{y}）
+    M[0, 2] += (nW / 2) - cx
+    M[1, 2] += (nH / 2) - cy
+
+    return cv2.warpAffine(image, M, (nW, nH))
+
+
+def roate_videeo(video_path,save_video_path,angle):
+    video_capture = cv2.VideoCapture(video_path)
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    ret,frame = video_capture.read()
+    height = frame.shape[0]
+    width = frame.shape[1]
+    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    videoWriter = cv2.VideoWriter(save_video_path, fourcc, fps, (width, height))
+    while True:
+        frame = image_roate(frame,angle)
+        videoWriter.write(frame)
+        ret,frame = video_capture.read()
+        if ret is not True:
+            break
+    
 class VideoCapture():
     def __init__(self,cv_videocapture_param):
         self.cv_videocapture_param = cv_videocapture_param
