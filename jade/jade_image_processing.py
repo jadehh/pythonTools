@@ -33,9 +33,8 @@ def Image_Roate(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def Video_Roate(video_path,save_video_path,angle):
+def Video_Roate(video_path,save_video_path,angle,fps=20):
     video_capture = cv2.VideoCapture(video_path)
-    fps = video_capture.get(cv2.CAP_PROP_FPS)
     ret,frame = video_capture.read()
     roate_img = Image_Roate(frame, angle)
     height = roate_img.shape[0]
