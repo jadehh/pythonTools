@@ -49,6 +49,38 @@ def Video_Roate(video_path,save_video_path,angle,fps=20):
         if ret is not True:
             break
 
+
+
+#分割视频
+def split_video(input_video_path, output_video_path, start_time, end_time):
+    """
+
+    :param input_video_path: 输入视频地址
+    :param output_video_path: 输出视频地址
+    :param start_time: 开始时间
+    :param end_time: 结束时间
+    :return:
+    """
+    video_capture = cv2.VideoCapture(input_video_path)
+    ret, frame = video_capture.read()
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    height = frame.shape[0]
+    width = frame.shape[1]
+    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    if int(fps) == 0:
+        fps = 15
+    video_writer = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+    index = 0
+    while True:
+        ret, frame = video_capture.read()
+        index = index + 1
+        current_time = index / fps
+        if current_time > start_time and current_time < end_time:
+            video_writer.write(frame)
+        if ret is False:
+            break
+
+
 class VideoCapture():
     def __init__(self,cv_videocapture_param):
         self.cv_videocapture_param = cv_videocapture_param
