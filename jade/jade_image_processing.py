@@ -77,6 +77,7 @@ def split_video(input_video_path, output_video_path, start_time, end_time):
         current_time = index / fps
         if current_time > start_time and current_time < end_time:
             video_writer.write(frame)
+            print("Writing Videos")
         if ret is False:
             break
 
