@@ -307,8 +307,11 @@ def ResizeClassifyDataset(classifyPath,size=224):
 if __name__ == '__main__':
     #ReadProTxt("/home/jade/Data/StaticDeepFreeze/2019-03-18_14-11-36/wild_goods.prototxt")
     #GetModelStep("/home/jade/Models/Image_Classif/dfgoods_inception_resnet_v2_use_checkpoitns_2019-04-29")
-    ResizeClassifyDataset("/home/jade/Data/sdfgoods10",224)
-
+    # ResizeClassifyDataset("/home/jade/Data/sdfgoods10",224)
+    processbar = ProcessBar()
+    processbar.count = 100
+    for i in range(100):
+        NoLinePrint("adasd",processbar=processbar)
 
 
 
