@@ -10,7 +10,6 @@ import time
 
 def JadeLog(content,DEUBG=False):
     if DEUBG:
-        print("线上模型，应该保存log日志")
         with open("log.txt",'a') as f:
             print(content)
             f.write(">>{} [JadeLog INFO]: ".format( time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))+content+"\n")
