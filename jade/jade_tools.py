@@ -108,6 +108,11 @@ def GetTime():
     return pathname
 
 
+def GetTimeStamp():
+    now = datetime.datetime.now()
+    otherStyleTime = now.strftime("%Y-%m-%d %H:%M:%S")
+    pathname = otherStyleTime
+    return pathname
 
 
 
