@@ -355,12 +355,11 @@ def CreateTestTxt(dir):
         train = f.read().split("\n")[:-1]
 
 
-def CreateYearsDatasets(dir, datasetname):
+def CreateYearsDatasets(dir):
     years = os.listdir(dir)
     for year in years:
-        if os.path.exists(dir, year, DIRECTORY_IMAGES) and os.path.exists(dir, year, DIRECTORY_ANNOTATIONS):
-            CreateVOCDataset(os.path.join(dir, year), year)
-
+        if os.path.exists(os.path.join(dir,year,DIRECTORY_IMAGES)) and os.path.exists(os.path.join(dir,year,DIRECTORY_ANNOTATIONS)):
+            CreateVOCDataset(os.path.join(dir,year),year)
 
 def CreateVOCDataset(dir, datasetname):
     root_path = dir
