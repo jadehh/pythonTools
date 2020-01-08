@@ -306,18 +306,20 @@ def ResizeClassifyDataset(classifyPath,size=224):
             cv2.imwrite(os.path.join(newClassifyPath,filename,GetLastDir(imagepath)),image)
         NoLinePrint("writing images..",processBar)
 
-
+def VideoToImages(video_path,save_img_path):
+    capture = cv2.VideoCapture(video_path)
+    ret,frame = capture.read()
+    index = 0
+    while ret:
+        if index % 5 == 0:
+            cv2.imwrite(os.path.join(save_img_path,str(uuid.uuid1()))+".jpg",frame)
+        print("*******正在写入中***************")
+        index = index + 1
+        ret,frame = capture.read()
 
 
 if __name__ == '__main__':
-    #ReadProTxt("/home/jade/Data/StaticDeepFreeze/2019-03-18_14-11-36/wild_goods.prototxt")
-    #GetModelStep("/home/jade/Models/Image_Classif/dfgoods_inception_resnet_v2_use_checkpoitns_2019-04-29")
-    # ResizeClassifyDataset("/home/jade/Data/sdfgoods10",224)
-    processbar = ProcessBar()
-    processbar.count = 100
-    for i in range(100):
-        NoLinePrint("adasd",processbar=processbar)
-
+    VideoToImages("/home/jade/sda2/Data/空箱视频/抓拍距离9米（箱7.5米）/192.168.35.66_01_20191129_123736-1.mp4","/home/jade/sda2/Data/空箱视频/抓拍距离9米（箱7.5米）/EmptyBoxData")
 
 
 
