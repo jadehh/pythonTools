@@ -11,10 +11,10 @@ import time
 def JadeLog(content,DEUBG=False):
     if DEUBG:
         with open("log.txt",'a') as f:
-            print(content)
+            print(">>{} [JadeLog INFO]: ".format( time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))+content+"\n")
             f.write(">>{} [JadeLog INFO]: ".format( time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))+content+"\n")
     else:
-        print(content)
+        print(">>{} [JadeLog INFO]: ".format( time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))+content+"\n")
 
 if __name__ == '__main__':
     JadeLog("qqq,aaa,cccc",True)
