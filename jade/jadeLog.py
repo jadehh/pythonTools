@@ -48,7 +48,7 @@ def JadeLog(log,content,Type="DEBUG"):
         log.logger.warning(content)
     elif Type == "error":
         log.logger.error(content)
-        Logger(os.path.join(log.path,"Error.log"), level="error").logger.error("error")
+        Logger(os.path.join(log.path,"Error.log"), level="error").logger.error(content)
     elif Type == 'critical':
         log.logger.critical(content)
 
