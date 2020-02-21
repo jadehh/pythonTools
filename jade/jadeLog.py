@@ -8,9 +8,9 @@
 # @Desc    :
 import time
 
-def JadeLog(content,DEUBG=False):
+def JadeLog(content,log_path,DEUBG=False):
     if DEUBG:
-        with open("log.txt",'a') as f:
+        with open(log_path,'a') as f:
             print(">>{} [JadeLog INFO]: ".format( time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))+content)
             f.write(">>{} [JadeLog INFO]: ".format( time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))+content+"\n")
     else:
