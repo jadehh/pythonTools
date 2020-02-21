@@ -8,7 +8,7 @@
 # @Desc    :
 import logging
 from logging import handlers
-from jade import GetLastDir
+from jade import GetPreviousDir
 import os
 class Logger(object):
     level_relations = {
@@ -26,7 +26,7 @@ class Logger(object):
         sh = logging.StreamHandler()#往屏幕上输出
         sh.setFormatter(format_str) #设置屏幕上显示的格式
         th = handlers.TimedRotatingFileHandler(filename=filename,when=when,backupCount=backCount,encoding='utf-8')#往文件里写入#指定间隔时间自动生成文件的处理器
-        path = GetLastDir(filename)
+        self.path = GetPreviousDir(filename)
         #实例化TimedRotatingFileHandler
         #interval是时间间隔，backupCount是备份文件的个数，如果超过这个个数，就会自动删除，when是间隔的时间单位，单位有以下几种：
         # S 秒
@@ -53,7 +53,7 @@ def JadeLog(log,content,Type="DEBUG"):
         log.logger.critical(content)
 
 if __name__ == '__main__':
-    log = Logger('all.log',level='debug')
+    log = Logger('/home/jade/PycharmProjects/Gitee/pythonTools/jade/all.log',level='debug')
     Logger('error.log', level='error').logger.error('error')
-    JadeLog(log,"123","warning")
+    JadeLog(log,"123","error")
 
