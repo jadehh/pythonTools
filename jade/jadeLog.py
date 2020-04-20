@@ -8,8 +8,7 @@
 # @Desc    :
 import logging
 import logging.config
-from logging import handlers
-from jade import GetPreviousDir
+import sys
 import os
 class Logger(object):
     level_relations = {
@@ -23,7 +22,11 @@ class Logger(object):
     def __init__(self,level='info',fmt='%(asctime)s - %(levelname)s: %(message)s'):
         if not os.path.exists(os.path.abspath(os.getcwd() + "/log")):
             os.makedirs(os.path.abspath(os.getcwd() + "/log"))
-        logging.config.fileConfig("logger_config.ini")
+        config_path = ""
+        for path in sys.path:
+            if 'site-packages' in path:
+                config_path = path+"/jade/"+"logger_config.ini"
+        logging.config.fileConfig(config_path)
         self.logger = logging.getLogger(name="root")
         format_str = logging.Formatter(fmt)#设置日志格式
         self.logger.setLevel(self.level_relations.get(level))#设置日志级别
