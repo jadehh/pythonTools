@@ -10,6 +10,11 @@ import logging
 import logging.config
 import sys
 import os
+DEBUG = "debug"
+ERROR = "error"
+INFO = "info"
+WARNING = "warning"
+CRITICAL = "critical"
 class Logger(object):
     level_relations = {
         'debug':logging.DEBUG,
