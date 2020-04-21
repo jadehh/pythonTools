@@ -37,11 +37,6 @@ class Logger(object):
         print(config_path)
         logging.config.fileConfig(config_path)
         self.logger = logging.getLogger(name="root")
-        format_str = logging.Formatter(fmt)#设置日志格式
-        self.logger.setLevel(self.level_relations.get(level))#设置日志级别
-        sh = logging.StreamHandler()#往屏幕上输出
-        sh.setFormatter(format_str) #设置屏幕上显示的格式
-        self.logger.addHandler(sh) #把对象加到logger里
 
 def JadeLog(log,content,Type="DEBUG"):
     if Type == "debug":
