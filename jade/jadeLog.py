@@ -31,6 +31,7 @@ class Logger(object):
         for path in sys.path:
             if 'site-packages' in path:
                 config_path = path+"/jade/"+"logger_config.ini"
+                break
         logging.config.fileConfig(config_path)
         self.logger = logging.getLogger(name="root")
         format_str = logging.Formatter(fmt)#设置日志格式
