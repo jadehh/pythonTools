@@ -28,10 +28,13 @@ class Logger(object):
         if not os.path.exists(os.path.abspath(os.getcwd() + "/log")):
             os.makedirs(os.path.abspath(os.getcwd() + "/log"))
         config_path = ""
+        site_packages_path = ""
         for path in sys.path:
             if 'site-packages' in path:
-                config_path = path+"/jade/"+"logger_config.ini"
+                site_packages_path = path
                 break
+        config_path = site_packages_path.split("site-packages")[0] + "site-packages/jade/logger_config.ini"
+        print(config_path)
         logging.config.fileConfig(config_path)
         self.logger = logging.getLogger(name="root")
         format_str = logging.Formatter(fmt)#设置日志格式
