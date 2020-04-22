@@ -106,7 +106,7 @@ def GetTime():
     otherStyleTime = now.strftime("%Y-%m-%d-%H-%M-%S")
     pathname = otherStyleTime
     data_ms = datetime.datetime.now().microsecond / 1000
-    time_stamp = "%s.%03d" % (pathname, data_ms)
+    time_stamp = "%s-%03d" % (pathname, data_ms)
     return time_stamp
 
 
