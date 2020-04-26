@@ -420,7 +420,7 @@ def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=
     pilimg = Image.fromarray(cv2img)
     # PIL图片上打印汉字
     draw = ImageDraw.Draw(pilimg)  # 图片上打印
-    font = ImageFont.truetype("/home/jade/anaconda3/lib/python3.6/site-packages/jade/simhei.ttf", font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+    font = ImageFont.truetype(GetSysPath()+"jade/simhei.ttf", font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
     draw.text(pt1, label,(color[0],color[1],color[2]), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
