@@ -7,7 +7,7 @@ import os
 from PIL import Image,ImageFont,ImageDraw
 from threading import Thread
 import uuid
-import imageio
+#import imageio
 
 
 ##旋转图片
