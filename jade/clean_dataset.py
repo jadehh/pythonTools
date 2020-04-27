@@ -361,6 +361,60 @@ def CreateYearsDatasets(dir):
         if os.path.exists(os.path.join(dir,year,DIRECTORY_IMAGES)) and os.path.exists(os.path.join(dir,year,DIRECTORY_ANNOTATIONS)):
             CreateVOCDataset(os.path.join(dir,year),year)
 
+
+
+def CreateVOCDataset(dir):
+    imagelist = []
+    xmllist = []
+
+    if os.path.exists(os.path.join(dir, "ImageSets", "Main")) is not True:
+        os.makedirs(os.path.join(dir, "ImageSets", "Main"))
+    else:
+        shutil.rmtree(os.path.join(dir, "ImageSets", "Main"))
+        os.makedirs(os.path.join(dir, "ImageSets", "Main"))
+    Main_path = os.path.join(dir, "ImageSets", "Main")
+    datasetnamelist = os.listdir(dir)
+    for datasetname in datasetnamelist:
+        if os.path.isfile(os.path.join(dir, datasetname)) is False and str.lower(datasetname) != "tfrecords" and str.lower(datasetname) != "lmdb":
+            imagelist.extend(GetAllImagesPath(os.path.join(datasetname, DIRECTORY_IMAGES)))
+            xmllist.extend(GetFilesWithLastNamePath(os.path.join(datasetname, DIRECTORY_ANNOTATIONS), ".xml"))
+
+    train_image_files = random.sample(imagelist, int(len(imagelist) * 0.9))
+    test_image_files = [file for file in imagelist if file not in train_image_files]
+    for train_image_file in train_image_files:
+        with open(os.path.join(Main_path, "train_var.txt"), "a") as f:
+            # with open(os.path.join(Main_path, "train.txt"), "a") as f:
+            image_file =  train_image_file
+            xml_file = train_image_file[:-4] + ".xml"
+            filename = train_image_file[:-4]
+            f.write(filename + "\n")
+            # f.write(image_file + " " + xml_file + "\n")
+
+    for test_image_file in test_image_files:
+        with open(os.path.join(Main_path, "test_var.txt"), "a") as f:
+            # with open(os.path.join(Main_path, "test.txt"), "a") as f:
+            image_file = test_image_file
+            xml_file = test_image_file[:-4] + ".xml"
+            filename = test_image_file[:-4]
+            f.write(filename + "\n")
+            # f.write(image_file + " " + xml_file + "\n")
+
+    for train_image_file in train_image_files:
+        with open(os.path.join(Main_path, "train.txt"), "a") as f:
+            # with open(os.path.join(Main_path, "train.txt"), "a") as f:
+            image_file =  train_image_file
+            xml_file =  train_image_file[:-4] + ".xml"
+            f.write(image_file + " " + xml_file + "\n")
+
+    for test_image_file in test_image_files:
+        with open(os.path.join(Main_path, "test.txt"), "a") as f:
+            # with open(os.path.join(Main_path, "test.txt"), "a") as f:
+            image_file =  test_image_file
+            xml_file = test_image_file[:-4] + ".xml"
+            # f.write(filename + "\n")
+            f.write(image_file + " " + xml_file + "\n")
+
+
 def CreateVOCDataset(dir, datasetname):
     root_path = dir
     dataset_name = datasetname
