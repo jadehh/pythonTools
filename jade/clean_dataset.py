@@ -363,7 +363,7 @@ def CreateYearsDatasets(dir):
 
 
 
-def CreateVOCDataset(dir):
+def CreateVOCDatasets(dir):
     imagelist = []
     xmllist = []
 
