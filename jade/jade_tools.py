@@ -57,7 +57,7 @@ def GetSysPath():
             break
         if  'dist-packages' in sys_path in sys_path and os.path.isdir(sys_path):
             syspath = sys_path.split("dist-packages")[0] + "dist-packages/"
-    return sys_path
+    return syspath
 
 
 #合并文件路径
