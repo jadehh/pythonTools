@@ -39,6 +39,7 @@ class Logger(object):
         self.logger = logging.getLogger(name="root")
 
 def JadeLog(log,content,Type="DEBUG"):
+    content = content.decode("utf-8")
     if Type == "debug":
         log.logger.debug(content)
     elif Type == "info":
