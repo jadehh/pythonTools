@@ -15,6 +15,8 @@ class ProcessBar():
         self.start_time = 0
 
 
+
+
 class ProTxt():
     def __init__(self):
         self.name = None
@@ -46,6 +48,17 @@ def ReadProTxt(file_path,id=True):
                 dics.update({name: dic})
 
     return dics,class_names
+
+def GetSysPath():
+    syspath = ""
+    for sys_path in sys.path:
+        if "site-packages" in sys_path in sys_path and os.path.isdir(sys_path):
+            syspath = sys_path.split("site-packages")[0] + "site-packages/"
+            break
+        if  'dist-packages' in sys_path in sys_path and os.path.isdir(sys_path):
+            syspath = sys_path.split("dist-packages")[0] + "dist-packages/"
+    return sys_path
+
 
 #合并文件路径
 def OpsJoin(path1,path2):
@@ -322,8 +335,7 @@ def VideoToImages(video_path,save_img_path):
 
 
 if __name__ == '__main__':
-    VideoToImages("/home/jade/sda2/Data/空箱视频/抓拍距离9米（箱7.5米）/192.168.35.66_01_20191129_123736-1.mp4","/home/jade/sda2/Data/空箱视频/抓拍距离9米（箱7.5米）/EmptyBoxData")
-
+    print(GetSysPath())
 
 
 
