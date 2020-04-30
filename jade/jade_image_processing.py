@@ -532,7 +532,7 @@ def _to_color(indx, base):
     g = 2 - (indx % base2) % base
     return b * 127, r * 127, g * 127
 #opencv显示boxes
-def CVShowBoxes(image,detectresult:DetectResultModel,num_classes=90,waitkey=-1,named_windows="result"):
+def CVShowBoxes(image,detectresult,num_classes=90,waitkey=-1,named_windows="result"):
     base = int(np.ceil(pow(num_classes, 1. / 3)))
     colors = [_to_color(x, base) for x in range(num_classes)]
     if type(image) == str:
