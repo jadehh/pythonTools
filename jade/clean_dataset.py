@@ -358,57 +358,9 @@ def CreateTestTxt(dir):
 def CreateYearsDatasets(dir):
     years = os.listdir(dir)
     for year in years:
-        if os.path.exists(os.path.join(dir,year,DIRECTORY_IMAGES)) and os.path.exists(os.path.join(dir,year,DIRECTORY_ANNOTATIONS)):
-            CreateVOCDataset(os.path.join(dir,year),year)
-
-
-
-def CreateVOCDatasets(dir):
-    imagelist = []
-    xmllist = []
-
-    if os.path.exists(os.path.join(dir, "ImageSets", "Main")) is not True:
-        os.makedirs(os.path.join(dir, "ImageSets", "Main"))
-    else:
-        shutil.rmtree(os.path.join(dir, "ImageSets", "Main"))
-        os.makedirs(os.path.join(dir, "ImageSets", "Main"))
-    Main_path = os.path.join(dir, "ImageSets", "Main")
-    datasetnamelist = os.listdir(dir)
-    for datasetname in datasetnamelist:
-        if os.path.isfile(os.path.join(dir, datasetname)) is False and str.lower(datasetname) != "tfrecords" and str.lower(datasetname) != "lmdb" and str.lower(datasetname) != "imagesets":
-            imagelist.extend(GetAllImagesPath(os.path.join(dir,datasetname, DIRECTORY_IMAGES)))
-            xmllist.extend(GetFilesWithLastNamePath(os.path.join(dir,datasetname, DIRECTORY_ANNOTATIONS), ".xml"))
-
-    train_image_files = random.sample(imagelist, int(len(imagelist) * 0.9))
-    test_image_files = [file for file in imagelist if file not in train_image_files]
-    for train_image_file in train_image_files:
-        with open(os.path.join(Main_path, "train_var.txt"), "a") as f:
-            filename = GetLastDir(train_image_file)[:-4]
-            f.write(filename + "\n")
-            # f.write(image_file + " " + xml_file + "\n")
-
-    for test_image_file in test_image_files:
-        with open(os.path.join(Main_path, "test_var.txt"), "a") as f:
-            filename = GetLastDir(train_image_file)[:-4]
-            f.write(filename + "\n")
-
-    for train_image_file in train_image_files:
-        with open(os.path.join(Main_path, "train.txt"), "a") as f:
-            # with open(os.path.join(Main_path, "train.txt"), "a") as f:
-            dataset_name = GetLastDir(GetPreviousDir(GetPreviousDir(train_image_file)))
-            image_file =  dataset_name + "/" + DIRECTORY_IMAGES + "/" + GetLastDir(train_image_file)
-            xml_file = dataset_name + "/" + DIRECTORY_ANNOTATIONS + "/" + GetLastDir(train_image_file[:-4]) + ".xml"
-            f.write(image_file + " " + xml_file + "\n")
-
-    for test_image_file in test_image_files:
-        with open(os.path.join(Main_path, "test.txt"), "a") as f:
-            # with open(os.path.join(Main_path, "test.txt"), "a") as f:
-            dataset_name = GetLastDir(GetPreviousDir(GetPreviousDir(test_image_file)))
-            image_file =  dataset_name + "/" + DIRECTORY_IMAGES + "/" + GetLastDir(test_image_file)
-            xml_file = dataset_name + "/" + DIRECTORY_ANNOTATIONS + "/" + GetLastDir(test_image_file[:-4]) + ".xml"
-            # f.write(filename + "\n")
-            f.write(image_file + " " + xml_file + "\n")
-
+        if len(year.split("-")) > 1 and os.path.isdir(os.path.join(dir, year)):
+            if os.path.exists(os.path.join(dir,year,DIRECTORY_IMAGES)) and os.path.exists(os.path.join(dir,year,DIRECTORY_ANNOTATIONS)):
+                CreateVOCDataset(os.path.join(dir,year),year)
 
 def CreateVOCDataset(dir, datasetname):
     root_path = dir
@@ -503,4 +455,22 @@ def VOCToImages(voc_root_path, save_path):
 
 if __name__ == '__main__':
     # RestoreInpaintingImages("/home/jade/Data/DeepFreeze/VocDataset/zdjj_voc","/home/jade/Data/DeepFreeze/VocDataset/zdjj_voc_voc_inpainting")
-    CreateVOCDatasets("/home/jade/sda2/Data/VOCdevkit/")
+
+    RestoreRandomMaskWithVOC("/home/jade/Data/Deep_Freeze/jj_VAR_VOC",
+                             "/home/jade/Data/Deep_Freeze/JJ_MASK_VOC2")
+    #
+    # create_voc_dataset("/home/jade/Data/Deep_Freeze/JJ_MASK_VOC2",
+    #                     "JJ_MASK_VOC2")
+    #
+    # restore_inpainting_images("/home/jade/Data/Deep_Freeze/JJ_MASK_VOC2",
+    #                           "/home/jade/Data/Deep_Freeze/JJ_Inpainting_VOC2")
+
+    # create_voc_dataset("/home/jade/Data/Deep_Freeze/JJ_Inpainting_VOC2",
+    #                    "JJ_Inpainting_VOC2")
+
+    # cut_images_with_box("/home/jade/Data/binggui/ASM_VOC_TEST","/home/jade/Data/binggui/ASM_TEST/image")
+
+    # erase_mask("/home/jade/Data/binggui/ASM_All/image","/home/jade/Data/binggui/ASM_All/mask")
+    # split_dataset("/home/jade/Data/binggui/ASM_All","/home/jade/Data/binggui/ASM")
+    # creat_flist("/home/jade/Data/binggui/ASM")
+    # reload_mask("/home/jade/Data/binggui/ASM/mask")
