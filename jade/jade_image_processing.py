@@ -554,10 +554,10 @@ def CVShowBoxes(image,detectresult,num_classes=90,waitkey=-1,named_windows="resu
             image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
             if detectresult.label_texts is not None:
                 if detectresult.scores is not None:
-                    image2 = Add_Chinese_Label(img=image2, label=str(detectresult.label_texts[i]) + ":" + str(int(detectresult.scores[i] * 100)),
+                    image2 = Add_Chinese_Label(img=image2, label=detectresult.label_texts[i] + ":" + str(int(detectresult.scores[i] * 100)),
                                                pt1=(xmin, ymin))
                 else:
-                    image2 = Add_Chinese_Label(img=image2, label=str(detectresult.label_texts[i]),
+                    image2 = Add_Chinese_Label(img=image2, label=detectresult.label_texts[i],
                                                pt1=(xmin, ymin))
                 if detectresult.label_ids is not None:
                     image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(detectresult.label_ids[i])], 3, 3)
