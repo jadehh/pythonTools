@@ -355,14 +355,14 @@ def CreateTestTxt(dir):
         train = f.read().split("\n")[:-1]
 
 
-def CreateYearsDatasets(dir):
+def CreateYearsDatasets(dir,rate=0.95):
     years = os.listdir(dir)
     for year in years:
         if len(year.split("-")) > 1 and os.path.isdir(os.path.join(dir, year)):
             if os.path.exists(os.path.join(dir,year,DIRECTORY_IMAGES)) and os.path.exists(os.path.join(dir,year,DIRECTORY_ANNOTATIONS)):
-                CreateVOCDataset(os.path.join(dir,year),year)
+                CreateVOCDataset(os.path.join(dir,year),year,rate)
 
-def CreateVOCDataset(dir, datasetname):
+def CreateVOCDataset(dir, datasetname,rate=0.95):
     root_path = dir
     dataset_name = datasetname
     Annotations = DIRECTORY_ANNOTATIONS
@@ -376,7 +376,7 @@ def CreateVOCDataset(dir, datasetname):
     Main_path = os.path.join(root_path, "ImageSets", "Main")
     image_files = os.listdir(os.path.join(root_path, JPEGImages))
 
-    train_image_files = random.sample(image_files, int(len(image_files) * 0.9))
+    train_image_files = random.sample(image_files, int(len(image_files) *rate))
     test_image_files = [file for file in image_files if file not in train_image_files]
 
     for train_image_file in train_image_files:
