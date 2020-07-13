@@ -488,6 +488,21 @@ def PltShowKeypointsBoxes(img_path,keypoints,bboxes=[],scores=[],waitkey=1):
     plt.close()
 
 
+def CVShowKeyPoints(image,keyPoints,waiktKey=1,named_windows="result"):
+    h,w = image.shape[0],image.shape[1]
+    for i in range(len(keyPoints)):
+        for j in range(len(keyPoints[i][0])):
+            image = cv2.circle(image,(int(keyPoints[i][0][j]*w),int(keyPoints[i][1][j]*h)),1,(255,0,0),3,3)
+
+    if waiktKey >= 0:
+        cv2.namedWindow(named_windows, 0)
+        # cv2.resizeWindow("result", 840, 680)
+        cv2.imshow(named_windows,image)
+        cv2.waitKey(waiktKey)
+    else:
+        return image
+
+
 #opencv显示关键点和矩形框
 def CVShowKeypointsBoxes(img_path,keypoints,bboxes=[],scores=[],waitkey=1):
     if type(img_path) == str:
