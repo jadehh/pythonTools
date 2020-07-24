@@ -421,10 +421,9 @@ def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=
     # PIL图片上打印汉字
     draw = ImageDraw.Draw(pilimg)  # 图片上打印
     font = ImageFont.truetype(GetSysPath()+"jade/simhei.ttf", font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
-    draw.text(pt1, label,(color[0],color[1],color[2]), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    draw.text(pt1, label,(int(color[0]),int(color[1]),int(color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
-
 
 
 
@@ -488,11 +487,30 @@ def PltShowKeypointsBoxes(img_path,keypoints,bboxes=[],scores=[],waitkey=1):
     plt.close()
 
 
-def CVShowKeyPoints(image,keyPoints,waiktKey=1,named_windows="result"):
+def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="result"):
+    base = int(np.ceil(pow(len(keyPoints), 1. / 3)))
+    colors = [_to_color(x, base) for x in range(len(keyPoints))]
     h,w = image.shape[0],image.shape[1]
     for i in range(len(keyPoints)):
-        for j in range(len(keyPoints[i][0])):
-            image = cv2.circle(image,(int(keyPoints[i][0][j]*w),int(keyPoints[i][1][j]*h)),1,(255,0,0),3,3)
+        for j in range(len(keyPoints[i])):
+            if keyPoints[i][j][0] < 0:
+                image = cv2.circle(image,(int(keyPoints[i][j][0]*w),int(keyPoints[i][j][1]*h)),1,colors[i],3,3)
+            else:
+                image = cv2.circle(image, (int(keyPoints[i][j][0]), int(keyPoints[i][j][1])), 1, colors[i], 3,
+                                   3)
+        point1 = (int(keyPoints[i][0][0]), int(keyPoints[i][0][1]))
+        point2 = (int(keyPoints[i][1][0]), int(keyPoints[i][1][1]))
+        point3 =  (int(keyPoints[i][2][0]), int(keyPoints[i][2][1]))
+        point4 =  (int(keyPoints[i][3][0]), int(keyPoints[i][3][1]))
+        image = cv2.line(image,point1,point2,colors[i], 2,2)
+        image = cv2.line(image,point2,point3,colors[i], 2,2)
+        image = cv2.line(image,point3,point4,colors[i], 2,2)
+        image = cv2.line(image,point4,point1,colors[i], 2,2)
+        if classes:
+            image = Add_Chinese_Label(image,classes[i],point1,colors[i],24)
+
+
+
 
     if waiktKey >= 0:
         cv2.namedWindow(named_windows, 0)
