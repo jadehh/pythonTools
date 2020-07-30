@@ -495,9 +495,12 @@ def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="resul
         for j in range(len(keyPoints[i])):
             if keyPoints[i][j][0] < 0:
                 image = cv2.circle(image,(int(keyPoints[i][j][0]*w),int(keyPoints[i][j][1]*h)),1,colors[i],3,3)
+                #image = Add_Chinese_Label(image, "{}".format(j), (int(keyPoints[i][j][0]*w),int(keyPoints[i][j][1]*h)), colors[i], 24)
             else:
                 image = cv2.circle(image, (int(keyPoints[i][j][0]), int(keyPoints[i][j][1])), 1, colors[i], 3,
                                    3)
+                #image = Add_Chinese_Label(image, "{}".format(j), (int(keyPoints[i][j][0]),int(keyPoints[i][j][1])), colors[i], 24)
+
         point1 = (int(keyPoints[i][0][0]), int(keyPoints[i][0][1]))
         point2 = (int(keyPoints[i][1][0]), int(keyPoints[i][1][1]))
         point3 =  (int(keyPoints[i][2][0]), int(keyPoints[i][2][1]))
@@ -509,15 +512,13 @@ def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="resul
         if classes:
             image = Add_Chinese_Label(image,classes[i],point1,colors[i],24)
 
-
-
-
     if waiktKey >= 0:
         cv2.namedWindow(named_windows, 0)
-        # cv2.resizeWindow("result", 840, 680)
         cv2.imshow(named_windows,image)
         cv2.waitKey(waiktKey)
     else:
+        return image
+
         return image
 
 
