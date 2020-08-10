@@ -7,6 +7,7 @@ import os
 from PIL import Image,ImageFont,ImageDraw
 from threading import Thread
 import uuid
+import base64
 #import imageio
 
 
@@ -520,6 +521,12 @@ def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="resul
         return image
 
         return image
+
+# opencv 转 base64
+def cv2_base64(image):
+  base64_str = cv2.imencode('.jpg',image)[1].tostring()
+  base64_str = base64.b64encode(base64_str)
+  return base64_str
 
 
 #opencv显示关键点和矩形框
