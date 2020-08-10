@@ -2,14 +2,14 @@
 import os
 import shutil
 import sys
+from jade import get_anaconda_envs_path
 def install():
-    for sys_path in sys.path:
-        if "site-packages" in sys_path or 'dist-packages' in sys_path and os.path.isdir(sys_path):
-            if os.path.exists(os.path.join(sys_path, "jade/")):
-                shutil.rmtree(os.path.join(sys_path, "jade/"))
-            shutil.copytree("jade/", os.path.join(sys_path, "jade/"))
-            print ("Install to "+sys_path)
-            break
+    envs_path_list = get_anaconda_envs_path()
+    for envs_path in envs_path_list:
+        if os.path.exists(os.path.join(envs_path, "jade/")):
+            shutil.rmtree(os.path.join(envs_path, "jade/"))
+        shutil.copytree("jade/", os.path.join(envs_path, "jade/"))
+        print("Install to " + envs_path)
 
 
 

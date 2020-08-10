@@ -333,9 +333,29 @@ def VideoToImages(video_path,save_img_path):
         index = index + 1
         ret,frame = capture.read()
 
+def get_sys_path():
+    for sys_path in sys.path:
+        if "site-packages" in sys_path or 'dist-packages' in sys_path and os.path.isdir(sys_path):
+            return sys_path
+def get_anaconda_envs():
+    sys_path = get_sys_path()
+    envs_path = sys_path.split("envs")[0] + "envs"
+    envs_list = os.listdir(envs_path)
+    return envs_list
+def get_anaconda_envs_path():
+    sys_path = get_sys_path()
+    envs_path = sys_path.split("envs")[0] + "envs"
+    envs_list = os.listdir(envs_path)
+    envs_path_list = []
+    for envs_name in envs_list:
+        envs_path_list.append(os.path.join(envs_path,envs_name+sys_path.split("envs")[1]))
+    envs_path_list.append(envs_path.split("anaconda3")[0] + "anaconda3/lib/python3.6/site-packages")
+    return envs_path_list
+
+
 
 if __name__ == '__main__':
-    print(GetSysPath())
+    print(get_anaconda_envs_path())
 
 
 
