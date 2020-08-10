@@ -342,20 +342,27 @@ def get_anaconda_envs():
     envs_path = sys_path.split("envs")[0] + "envs"
     envs_list = os.listdir(envs_path)
     return envs_list
+
+def get_envs_packages(python_path):
+    if "python2.7" in (os.listdir(python_path+"/lib/")):
+        return python_path + "/lib/python2.7/site-packages/"
+    if "python3.6" in (os.listdir(python_path+"/lib/")):
+        return python_path + "/lib/python3.6/site-packages/"
+
 def get_anaconda_envs_path():
     sys_path = get_sys_path()
     envs_path = sys_path.split("envs")[0] + "envs"
     envs_list = os.listdir(envs_path)
     envs_path_list = []
     for envs_name in envs_list:
-        envs_path_list.append(os.path.join(envs_path,envs_name+sys_path.split("envs")[1]))
-    envs_path_list.append(envs_path.split("anaconda3")[0] + "anaconda3/lib/python3.6/site-packages")
+        envs_path_list.append(get_envs_packages(os.path.join(envs_path,envs_name)))
+    envs_path_list.append(get_envs_packages(envs_path.split("anaconda3")[0]+"anaconda3"))
     return envs_path_list
 
 
 
 if __name__ == '__main__':
-    print(get_anaconda_envs_path())
+    (get_anaconda_envs_path())
 
 
 
