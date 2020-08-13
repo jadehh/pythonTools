@@ -359,10 +359,15 @@ def get_anaconda_envs_path():
     envs_path_list.append(get_envs_packages(envs_path.split("anaconda3")[0]+"anaconda3"))
     return envs_path_list
 
-
+def get_python_version():
+    if "python3.6" in get_sys_path():
+        return "python3"
+    if "python3.6" in get_sys_path():
+        return "python2.7"
 
 if __name__ == '__main__':
-    (get_anaconda_envs_path())
+
+    print(get_sys_path())
 
 
 
