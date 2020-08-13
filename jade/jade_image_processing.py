@@ -663,7 +663,7 @@ def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="resul
 def cv2_base64(image):
   base64_str = cv2.imencode('.jpg',image)[1].tostring()
   base64_str = base64.b64encode(base64_str)
-  return base64_str
+  return str(base64_str,encoding="utf-8")
 
 
 #opencv显示关键点和矩形框
@@ -1145,4 +1145,4 @@ if __name__ == '__main__':
     # COLORS = [(183, 68, 69), (86, 1, 17), (179, 240, 121), 
     #           (97, 134, 238), (145, 152, 245), (170, 153, 97), 
     #           (124, 250, 3), (100, 151, 78), (177, 117, 215), (183, 70, 5)]
-    credits()
+    cv2_base64()
