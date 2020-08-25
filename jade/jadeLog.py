@@ -26,9 +26,6 @@ class Logger(object):
     }#日志级别关系映射
 
     def __init__(self,level='info',fmt='%(asctime)s - %(levelname)s: %(message)s'):
-        if not os.path.exists(os.path.abspath(os.getcwd() + "/log")):
-            os.makedirs(os.path.abspath(os.getcwd() + "/log"))
-        config_path = ""
         site_packages_path = ""
         for path in sys.path:
             if 'site-packages' in path:
