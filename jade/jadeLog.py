@@ -10,6 +10,7 @@ import logging
 import logging.config
 import sys
 import os
+from jade import get_python_version
 DEBUG = "debug"
 ERROR = "error"
 INFO = "info"
@@ -39,7 +40,8 @@ class Logger(object):
         self.logger = logging.getLogger(name="root")
 
 def JadeLog(log,content,Type="DEBUG"):
-    content = content.decode("utf-8")
+    if "python2.7" == get_python_version():
+        content = content.decode("utf-8")
     if Type == "debug":
         log.logger.debug(content)
     elif Type == "info":
