@@ -362,7 +362,7 @@ def get_anaconda_envs_path():
 def get_python_version():
     if "python3.6" in get_sys_path():
         return "python3"
-    if "python3.6" in get_sys_path():
+    if "python2.7" in get_sys_path():
         return "python2.7"
 
 if __name__ == '__main__':
