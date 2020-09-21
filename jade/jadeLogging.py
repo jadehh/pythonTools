@@ -10,7 +10,6 @@ import time
 from concurrent.futures import  ThreadPoolExecutor
 from jade import get_python_version,CreateSavePath
 
-
 class JadeLogging:
     """
     TimedRotatingFileHandler 测试
@@ -32,9 +31,9 @@ class JadeLogging:
             'handlers': {
                 'file': {
                     'level': 'DEBUG',
-                    'class': 'logging.handlers.TimedRotatingFileHandler',
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'maxBytes': 5000000,
                     'backupCount': 1000,
-                    'when': 's',
                     'delay': True,
                     'filename': os.path.join(logging_path,"info.log"),
                     'encoding': 'utf-8',
