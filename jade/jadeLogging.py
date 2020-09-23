@@ -32,7 +32,7 @@ class JadeLogging:
                 'file': {
                     'level': 'DEBUG',
                     'class': 'logging.handlers.RotatingFileHandler',
-                    'maxBytes': 5000000,
+                    'maxBytes': 100000,
                     'backupCount': 1000,
                     'delay': True,
                     'filename': os.path.join(logging_path,"info.log"),
