@@ -33,7 +33,7 @@ class JadeLogging():
                 'file': {
                     'level': 'DEBUG',
                     'class': 'logging.handlers.TimedRotatingFileHandler',
-                    'when': 's',
+                    'when': 'd',
                     'backupCount': 1000,
                     'filename': os.path.join(logging_path,"info.log"),
                     'encoding': 'utf-8',
