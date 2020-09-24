@@ -9,15 +9,16 @@
 import time
 from concurrent.futures import  ThreadPoolExecutor
 from jade import get_python_version,CreateSavePath
-
-class JadeLogging:
+import logging.config
+import os
+from queue import Queue
+from threading import Thread
+class JadeLogging():
     """
     TimedRotatingFileHandler 测试
     """
-
     def __init__(self,logging_path="log"):
         CreateSavePath(logging_path)
-        import logging.config
         import os
         log_conf = {
             'version': 1,
@@ -31,10 +32,8 @@ class JadeLogging:
             'handlers': {
                 'file': {
                     'level': 'DEBUG',
-                    'class': 'logging.handlers.RotatingFileHandler',
-                    'maxBytes': 100000,
+                    'class': 'logging.handlers.TimedRotatingFileHandler',
                     'backupCount': 1000,
-                    'delay': True,
                     'filename': os.path.join(logging_path,"info.log"),
                     'encoding': 'utf-8',
                     'formatter': 'default',
@@ -46,7 +45,7 @@ class JadeLogging:
             },
         }
 
-        import os
+
         file_path = os.path.split(log_conf.get("handlers").get("file").get("filename"))[0]
         if not os.path.exists(file_path):
             os.makedirs(file_path)
@@ -57,7 +56,9 @@ class JadeLogging:
         logging.config.dictConfig(log_conf)
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(sh)  # 把对象加到logger里
-
+        self.logContent = Queue(maxsize=200)
+        getlogContentThread = GetLogContentThread(self.write_log,self.logContent)
+        getlogContentThread.start()
 
     def write_log(self,content, Type="debug"):
         if "python2.7" == get_python_version():
@@ -70,33 +71,26 @@ class JadeLogging:
             self.logger.warning(content)
         elif Type == "error":
             self.logger.error(content)
-            # Logger(os.path.join(log.path,"Error.log"), level="error").logger.error(content)
         elif Type == 'critical':
             self.logger.critical(content)
 
-    def mutil_thread_write_log(self):
-        with ThreadPoolExecutor(max_workers=100) as thread_pool:
-            for i in range(100):
-                thread_pool.submit(self.write_log, i,"debug").add_done_callback(self._executor_callback)
-
     def DEBUG(self,content):
-        with ThreadPoolExecutor(max_workers=100) as thread_pool:
-            thread_pool.submit(self.write_log, content,"debug").add_done_callback(self._executor_callback)
-
+        self.logContent.put((content,"debug"))
     def ERROR(self,content):
-        with ThreadPoolExecutor(max_workers=100) as thread_pool:
-            thread_pool.submit(self.write_log, content, "error").add_done_callback(self._executor_callback)
-
+        self.logContent.put((content,"error"))
     def INFO(self, content):
-        with ThreadPoolExecutor(max_workers=100) as thread_pool:
-            thread_pool.submit(self.write_log, content, "info").add_done_callback(self._executor_callback)
-
-    def _executor_callback(self, worker):
-        worker_exception = worker.exception()
-        if worker_exception:
-            print("Worker return exception: ", self.worker_exception)
+        self.logContent.put((content,"info"))
 
 
+class GetLogContentThread(Thread):
+    def __init__(self,jadeLog,logcontentQueue):
+        self.func = jadeLog
+        self.logcontentQueue = logcontentQueue
+        Thread.__init__(self)
+    def run(self):
+        while True:
+            content,log_type = self.logcontentQueue.get()
+            self.func(content,log_type)
 
 
 if __name__ == "__main__":
@@ -110,11 +104,13 @@ if __name__ == "__main__":
     # begin_time = time.time()
     # 每个进程100个线程共需写入所有日志，由于GIL原因，并发只存在一个线程，但是会存在线程上下文切换，同样需要锁机制防止脏数据和日志丢失
     jadeLog = JadeLogging()
-    jadeLog.mutil_thread_write_log()
-    time.sleep(2)
+
     jadeLog.INFO("123")
+    time.sleep(2)
     jadeLog.ERROR("ERROR")
     time.sleep(2)
     jadeLog.DEBUG("结束")
+
+
     use_time = time.time() - begin_time
     print("TimedRotatingFileHandler 耗时:%s秒" % use_time)
