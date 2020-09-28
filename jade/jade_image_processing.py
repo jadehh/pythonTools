@@ -627,7 +627,7 @@ def PltShowKeypointsBoxes(img_path,keypoints,bboxes=[],scores=[],waitkey=1):
 
 def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="result"):
     base = int(np.ceil(pow(len(keyPoints), 1. / 3)))
-    colors = [_to_color(x, base) for x in range(len(keyPoints))]
+    colors = [_to_color(x) for x in range(len(keyPoints))]
     h,w = image.shape[0],image.shape[1]
     for i in range(len(keyPoints)):
         for j in range(len(keyPoints[i])):
@@ -648,7 +648,7 @@ def CVShowKeyPoints(image,keyPoints,classes=None,waiktKey=1,named_windows="resul
         image = cv2.line(image,point3,point4,colors[i], 2,2)
         image = cv2.line(image,point4,point1,colors[i], 2,2)
         if classes:
-            image = Add_Chinese_Label(image,classes[i],point1,colors[i],24)
+            image = Add_Chinese_Label(image,classes[i],point1,colors[i],40)
 
     if waiktKey >= 0:
         cv2.namedWindow(named_windows, 0)
@@ -705,17 +705,16 @@ def CVShowKeypointsBoxes(img_path,keypoints,bboxes=[],scores=[],waitkey=1):
 
 
 
-def _to_color(indx, base):
+def _to_color(indx):
     """ return (b, r, g) tuple"""
-    base2 = base * base
-    b = 2 - indx / base2
-    r = 2 - (indx % base2) / base
-    g = 2 - (indx % base2) % base
-    return b * 127, r * 127, g * 127
+    b = random.randint(1,10) / 10
+    g = random.randint(1,10) / 10
+    r = random.randint(1,10) / 10
+    return b * 255, r * 255, g * 255
 #opencv显示boxes
 def CVShowBoxes(image,detectresult,num_classes=90,waitkey=-1,named_windows="result"):
     base = int(np.ceil(pow(num_classes, 1. / 3)))
-    colors = [_to_color(x, base) for x in range(num_classes)]
+    colors = [_to_color(x) for x in range(num_classes)]
     if type(image) == str:
         image = cv2.imread(image)
     image2 = image.copy()
