@@ -62,7 +62,7 @@ class JadeLogging():
         getlogContentThread.start()
 
     def write_log(self,content, Type="debug"):
-        if "python2.7" == get_python_version():
+        if "python2" == get_python_version():
             content = content.decode("utf-8")
         if Type == "debug":
             self.logger.debug(content)
