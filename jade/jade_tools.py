@@ -363,7 +363,7 @@ def get_python_version():
     if "python3.6" in get_sys_path():
         return "python3"
     if "python2.7" in get_sys_path():
-        return "python2.7"
+        return "python2"
 
 if __name__ == '__main__':
 
