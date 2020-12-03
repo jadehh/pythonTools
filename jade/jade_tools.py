@@ -365,6 +365,11 @@ def get_python_version():
     if "python2.7" in get_sys_path():
         return "python2"
 
+def clear_queue(queue):
+    qsize = queue.qsize()
+    for i in range(qsize):
+        queue.get()
+
 if __name__ == '__main__':
 
     print(get_sys_path())
