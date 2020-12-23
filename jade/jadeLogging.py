@@ -13,12 +13,17 @@ import logging.config
 import os
 from queue import Queue
 from threading import Thread
+
+from multiprocessing import Process
+
+
 class JadeLogging():
     """
     TimedRotatingFileHandler 测试
     """
-    def __init__(self,logging_path="log"):
+    def __init__(self,logging_path="log",showWindow = False):
         CreateSavePath(logging_path)
+        self.showWindow = showWindow
         import os
         log_conf = {
             'version': 1,
@@ -58,8 +63,12 @@ class JadeLogging():
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(sh)  # 把对象加到logger里
         self.logContent = Queue(maxsize=200)
-        getlogContentThread = GetLogContentThread(self.write_log,self.logContent)
-        getlogContentThread.start()
+        if self.showWindow:
+            getlogContentThread = GetLogContentProcess(self.write_log, self.logContent)
+            getlogContentThread.start()
+        else:
+            getlogContentThread = GetLogContentThread(self.write_log,self.logContent)
+            getlogContentThread.start()
 
     def write_log(self,content, Type="debug"):
         if "python2" == get_python_version():
@@ -93,7 +102,15 @@ class GetLogContentThread(Thread):
             content,log_type = self.logcontentQueue.get()
             self.func(content,log_type)
 
-
+class GetLogContentProcess(Process):
+    def __init__(self,jadeLog,logcontentQueue):
+        self.func = jadeLog
+        self.logcontentQueue = logcontentQueue
+        Thread.__init__(self)
+    def run(self):
+        while True:
+            content,log_type = self.logcontentQueue.get()
+            self.func(content,log_type)
 if __name__ == "__main__":
     print("50W日志写入测试")
     begin_time = time.time()
