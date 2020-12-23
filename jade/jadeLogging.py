@@ -106,7 +106,7 @@ class GetLogContentProcess(Process):
     def __init__(self,jadeLog,logcontentQueue):
         self.func = jadeLog
         self.logcontentQueue = logcontentQueue
-        Thread.__init__(self)
+        Process.__init__(self)
     def run(self):
         while True:
             content,log_type = self.logcontentQueue.get()
