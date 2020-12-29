@@ -62,8 +62,6 @@ class JadeLogging():
         getlogContentThread.start()
 
     def write_log(self,content, Type="debug"):
-        if "python2" == get_python_version():
-            content = content.decode("utf-8")
         if Type == "debug":
             self.logger.debug(content)
         elif Type == "info":
@@ -81,10 +79,6 @@ class JadeLogging():
         self.logContent.put((content,"error"))
     def INFO(self, content):
         self.logContent.put((content,"info"))
-
-
-
-
 
 
 class GetLogContentThread(Thread):
