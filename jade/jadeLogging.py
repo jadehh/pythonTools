@@ -80,6 +80,9 @@ class JadeLogging():
     def INFO(self, content):
         self.logContent.put((content,"info"))
 
+    def release(self):
+        self.logContent.put((False,"stop"))
+
 
 class GetLogContentThread(Thread):
     def __init__(self,jadeLog,logcontentQueue):
@@ -89,6 +92,8 @@ class GetLogContentThread(Thread):
     def run(self):
         while True:
             content,log_type = self.logcontentQueue.get()
+            if content is False:
+                break
             self.func(content,log_type)
 
 
