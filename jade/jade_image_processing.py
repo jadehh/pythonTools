@@ -1159,9 +1159,40 @@ def compose_gif(image_path_list, output_path, fps=1):
         gif_images.append(imageio.imread(path))
     imageio.mimsave(output_path, gif_images, fps=fps)
 
+class VideoCapture():
+    def __init__(self,image_path):
+        self.image_path = image_path
+        self._next_id = 0
+        self.image_list = os.listdir(image_path)
+        self.image_list.sort()
+
+    def isOpened(self):
+        if len(self.image_list) > 0:
+            return True
+        else:
+            return False
+
+    def read(self):
+        if self._next_id == len(self.image_list):
+            return False,None
+        frame = cv2.imread(os.path.join(self.image_path,self.image_list[self._next_id]))
+        self._next_id = self._next_id + 1
+        return True,frame
 
 if __name__ == '__main__':
-    # COLORS = [(183, 68, 69), (86, 1, 17), (179, 240, 121), 
-    #           (97, 134, 238), (145, 152, 245), (170, 153, 97), 
+    # COLORS = [(183, 68, 69), (86, 1, 17), (179, 240, 121),
+    #           (97, 134, 238), (145, 152, 245), (170, 153, 97),
     #           (124, 250, 3), (100, 151, 78), (177, 117, 215), (183, 70, 5)]
-    cv2_base64()
+    video_path = "/home/jade/Data/数据集/MOT16/test/MOT16-01/img1"
+    capture = VideoCapture(video_path)
+    if capture.isOpened():
+        print(
+            "相机打开成功,相机地址 = {}".format(video_path))
+        cv2.namedWindow("result",0)
+        while True:
+            ret, frame = capture.read()
+            if ret:
+                cv2.imshow("result",frame)
+                cv2.waitKey(27)
+            else:
+                break
