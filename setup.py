@@ -1,17 +1,27 @@
-"""Setup script for object_detection."""
-import os
-import shutil
-import sys
-from jade import get_anaconda_envs_path
-def install():
-    envs_path_list = get_anaconda_envs_path()
-    for envs_path in envs_path_list:
-        if os.path.exists(os.path.join(envs_path, "jade/")):
-            shutil.rmtree(os.path.join(envs_path, "jade/"))
-        shutil.copytree("jade/", os.path.join(envs_path, "jade/"))
-        print("Install to " + envs_path)
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File     : setup.py.py
+# @Author   : jade
+# @Date     : 2021/4/30 14:05
+# @Email    : jadehh@1ive.com
+# @Software : Samples
+# @Desc     :
+from setuptools import setup, find_packages
 
+setup(
+    name="jade",
+    version="0.1",
+    keywords=("pip", "jade", ""),
+    description="jade",
+    long_description="xxx",
+    license="MIT Licence",
 
+    url="https://jadehh@live.com",
+    author="jade",
+    author_email="jadehh@live.com",
 
-if __name__ == '__main__':
-    install()
+    packages=find_packages(),
+    include_package_data=True,
+    platforms="any",
+    install_requires=["numpy","xlrd"]  # 这个项目需要的第三方库
+)
