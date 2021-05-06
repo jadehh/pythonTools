@@ -8,7 +8,6 @@ import xml.etree.ElementTree as ET
 import os
 import pickle
 import numpy as np
-import pdb
 
 def parse_rec(filename):
     """ Parse a PASCAL VOC xml file """

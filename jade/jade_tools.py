@@ -4,7 +4,7 @@ import sys
 import time
 import cv2
 import os
-#import xlrd
+import xlrd
 import os.path as ops
 from jade import *
 class ProcessBar():

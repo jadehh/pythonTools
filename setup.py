@@ -23,5 +23,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     platforms="any",
-    install_requires=["numpy","xlrd"]  # 这个项目需要的第三方库
+    install_requires=["numpy","xlrd","pillow","imageio"]  # 这个项目需要的第三方库
 )

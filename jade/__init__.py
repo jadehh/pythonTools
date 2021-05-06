@@ -78,6 +78,8 @@ VOC_LABELS = {'__background__':(0, 'Background'),  # always index 0
 
 
 #coding=utf-8
+import sys
+sys.path.append("../lib/")
 from jade.jade_tools import *
 from jade.jade_processfile import *
 from jade.ReadVocData import *
