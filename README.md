@@ -21,7 +21,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     platforms="any",
-    install_requires=["numpy", "opencv-python","pillow","imageio"]  # 这个项目需要的第三方库
+    install_requires=["numpy","pillow","imageio"]  # 这个项目需要的第三方库
 )
 ```
 ## ３．打包为wheel文件
