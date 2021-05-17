@@ -7,6 +7,9 @@ import os
 import xlrd
 import os.path as ops
 from jade import *
+
+
+
 class ProcessBar():
     def __init__(self):
         self.count = 0
@@ -370,9 +373,23 @@ def clear_queue(queue):
     for i in range(qsize):
         queue.get()
 
+import os
+import re
+
+def get_Ip_address():
+    ipaddress = os.popen("ifconfig",'r')
+    for line in ipaddress:
+        if "broadcast" in line:
+            ip = line.split("inet")[1].split("netmask")[0]
+            if "168" in ip:
+                return ip
+
+
+
+
 if __name__ == '__main__':
 
-    print(get_sys_path())
+    print(get_Ip_address())
 
 
 
