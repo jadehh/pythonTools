@@ -382,7 +382,7 @@ def get_Ip_address():
         if "broadcast" in line:
             ip = line.split("inet")[1].split("netmask")[0]
             if "168" in ip:
-                return ip
+                return ip.strip()
 
 
 
