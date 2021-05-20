@@ -373,16 +373,24 @@ def clear_queue(queue):
     for i in range(qsize):
         queue.get()
 
-import os
-import re
 
 def get_Ip_address():
     ipaddress = os.popen("ifconfig",'r')
+    ifconfig_list = []
     for line in ipaddress:
-        if "broadcast" in line:
-            ip = line.split("inet")[1].split("netmask")[0]
-            if "168" in ip:
-                return ip.strip()
+        ifconfig_list.append(line)
+    wlan_list = []
+    config_tmp = ""
+    for config in ifconfig_list:
+        if config == "\n":
+            wlan_list.append(config_tmp)
+            config_tmp = ""
+        else:
+            config_tmp = config_tmp + config.split("\n")[0]
+
+    for wlan_config in wlan_list:
+        if "255.255." in wlan_config and "docker" not in wlan_config:
+            return wlan_config.split("inet")[1].split("netmask")[0].strip()
 
 
 
