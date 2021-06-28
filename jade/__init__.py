@@ -88,4 +88,6 @@ from jade.jade_image_processing import *
 from jade.clean_dataset import *
 from jade.voc_classify import *
 from jade.jadeLogging import *
+from jade.jade_visualize import *
+from jade.jade_get_device_info import *
 

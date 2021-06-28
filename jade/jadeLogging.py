@@ -17,7 +17,7 @@ class JadeLogging():
     """
     TimedRotatingFileHandler 测试
     """
-    def __init__(self,logging_path="log"):
+    def __init__(self,logging_path="log",max_count=180):
         CreateSavePath(logging_path)
         import os
         log_conf = {
@@ -34,7 +34,7 @@ class JadeLogging():
                     'level': 'DEBUG',
                     'class': 'logging.handlers.TimedRotatingFileHandler',
                     'when': 'd',
-                    'backupCount': 1000,
+                    'backupCount': max_count,
                     'filename': os.path.join(logging_path,"info.log"),
                     'encoding': 'utf-8',
                     'formatter': 'default',
