@@ -77,12 +77,14 @@ class DockerLogsThread(Thread):
         self.container_id = self.getContainerID()
         self.container_path = self.getContainerPath()
         self.txt_path = self.getLogPath()
-        if os.path.exists(os.path.join(self.save_path,"info.log")):
-            os.remove(os.path.join(self.save_path,"info.log"))
-        wm = pyinotify.WatchManager()
-        mask = pyinotify.IN_CREATE | pyinotify.IN_MODIFY  # 还有删除等，可以查看下官网资料
-        self.notifier = pyinotify.Notifier(wm, OnWriteHandler(self.txt_path,save_path))
-        wm.add_watch(self.txt_path, mask, rec=True, auto_add=True)
+        if self.txt_path:
+            if os.path.exists(os.path.join(self.save_path, "info.log")):
+                os.remove(os.path.join(self.save_path, "info.log"))
+            wm = pyinotify.WatchManager()
+            mask = pyinotify.IN_CREATE | pyinotify.IN_MODIFY  # 还有删除等，可以查看下官网资料
+            self.notifier = pyinotify.Notifier(wm, OnWriteHandler(self.txt_path, save_path))
+            wm.add_watch(self.txt_path, mask, rec=True, auto_add=True)
+
         super(DockerLogsThread, self).__init__()
 
     def getLogPath(self):
@@ -96,14 +98,26 @@ class DockerLogsThread(Thread):
         return str(result_bytes.stdout.readlines()[0], encoding="utf-8").split("\n")[0]
 
     def getContainerPath(self):
-        for filename in os.listdir(self.docker_root_path):
-            if self.container_id in filename:
-                return os.path.join(self.docker_root_path, filename)
+        try:
+            for filename in os.listdir(self.docker_root_path):
+                if self.container_id in filename:
+                    return os.path.join(self.docker_root_path, filename)
+        except Exception as e:
+            print(e)
     def run(self):
         while True:
+            if self.txt_path is None:
+                break
             try:
                 self.notifier.process_events()
                 if  self.notifier.check_events():
                     self.notifier.read_events()
             except KeyboardInterrupt:
                 continue
+
+
+if __name__ == '__main__':
+    container_name = "container_ocrV2.2-{}".format(1)
+    save_log_path = "/home/jade/sda2/LOG" + "_test"
+    dockerLogsThread = DockerLogsThread(container_name,save_log_path)
+    dockerLogsThread.start()

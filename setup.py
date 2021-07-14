@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="jade",
-    version="0.1.4",
+    version="0.1.5",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="xxx",
@@ -23,5 +23,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     platforms="any",
-    install_requires=["numpy","xlrd","pillow","imageio","pynvml","psutil"]  # 这个项目需要的第三方库
+    install_requires=["numpy","xlrd","pillow","imageio","pynvml","psutil","pyinotify"]  # 这个项目需要的第三方库
 )
