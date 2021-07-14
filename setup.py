@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="jade",
-    version="0.1.2",
+    version="0.1.4",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="xxx",
