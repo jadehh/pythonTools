@@ -7,13 +7,31 @@
 # @Software : Samples
 # @Desc     :
 from setuptools import setup, find_packages
+#Windows
+# setup(
+#     name="jade",
+#     version="0.1.5",
+#     keywords=("pip", "jade", ""),
+#     description="jade",
+#     long_description="",
+#     license="MIT Licence",
+#     url="https://jadehh@live.com",
+#     author="jade",
+#     author_email="jadehh@live.com",
+#
+#     packages=find_packages(),
+#     include_package_data=True,
+#     platforms="any",
+#     install_requires=["numpy","xlrd","pillow","imageio"]  # 这个项目需要的第三方库
+# )
 
+#Linux
 setup(
     name="jade",
     version="0.1.5",
     keywords=("pip", "jade", ""),
     description="jade",
-    long_description="xxx",
+    long_description="",
     license="MIT Licence",
 
     url="https://jadehh@live.com",

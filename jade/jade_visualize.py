@@ -51,8 +51,7 @@ def draw_box(im, results):
         w = float(xmax) - float(xmin)
         h = float(ymax) - float(ymin)
         if labels_text[i,] not in clsid2color:
-            for color in color_list:
-                clsid2color[labels_text[i,]] = color
+                clsid2color[labels_text[i,]] = color_list[i]
         color = tuple(clsid2color[labels_text[i,]])
 
         # draw bbox
