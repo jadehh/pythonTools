@@ -28,7 +28,7 @@ def get_color_map_list(num_classes):
     color_map = [color_map[i:i + 3] for i in range(0, len(color_map), 3)]
     return color_map
 
-def draw_box(im, results):
+def draw_box(im, results,show_score=True):
     """
     Args:
         im (PIL.Image.Image): PIL image
@@ -60,7 +60,10 @@ def draw_box(im, results):
              (xmin, ymin)],
             width=draw_thickness,
             fill=color)
-        text = "{} {:.4f}".format(labels_text[i,], scores[i,])
+        if show_score:
+            text = "{} {:.4f}".format(labels_text[i,], scores[i,])
+        else:
+            text = "{} ".format(labels_text[i,])
         tw, th = draw.textsize(text)
         draw.rectangle(
             [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
@@ -199,7 +202,7 @@ def draw_mask(im, np_boxes, np_masks, labels, resolution=14, threshold=0.5):
     return Image.fromarray(im.astype('uint8'))
 
 
-def visualize_box_mask(im, results, mask_resolution=14):
+def visualize_box_mask(im, results, mask_resolution=14,show_score=True):
     """
     Args:
         im (str/np.ndarray): path of image/np.ndarray read by cv2
@@ -225,7 +228,7 @@ def visualize_box_mask(im, results, mask_resolution=14):
             results["labels"],
             resolution=mask_resolution)
     if 'boxes' in results:
-        im = draw_box(im, results)
+        im = draw_box(im, results,show_score)
     if 'segm' in results:
         im = draw_segm(
             im,
@@ -239,10 +242,12 @@ def visualize_box_mask(im, results, mask_resolution=14):
 
 def visualize(image_file,
               results,
-              mask_resolution=14):
+              mask_resolution=14,
+              show_score=True):
     # visualize the predict result
     im = visualize_box_mask(
         image_file,
         results,
-        mask_resolution=mask_resolution)
+        mask_resolution=mask_resolution,
+        show_score=show_score)
     return  np.array(im)
