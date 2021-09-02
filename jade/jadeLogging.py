@@ -7,12 +7,16 @@
 # @Software: Samples
 # @Desc    :
 import time
-# from concurrent.futures import  ThreadPoolExecutor
-from jade import get_python_version,CreateSavePath
 import logging.config
 import os
 from queue import Queue
 from threading import Thread
+#新建目录
+def CreateSavePath(save_image_path):
+    if os.path.exists(save_image_path) is not True:
+        os.makedirs(save_image_path)
+    return save_image_path
+
 class JadeLogging():
     """
     TimedRotatingFileHandler 测试
