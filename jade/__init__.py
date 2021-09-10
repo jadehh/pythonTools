@@ -90,5 +90,16 @@ from jade.voc_classify import *
 from jade.jadeLogging import *
 from jade.jade_visualize import *
 from jade.jade_get_device_info import *
-from jade.jade_process import DockerLogsThread
+import platform
+print(platform.system())
+
+if(platform.system()=='Windows'):
+    pass
+elif (platform.system()=='Linux'):
+    from jade.jade_process import DockerLogsThread
+else:
+    pass
+
+
+
 
