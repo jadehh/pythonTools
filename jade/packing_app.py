@@ -75,6 +75,7 @@ def writePy(app_name):
                 "else:\n"
                 "    base_path = os.path.abspath('.')\n"
                 "sys.path.append(os.path.join(base_path,'lib'))\n"
+                "sys.path.append(os.path.join(base_path,'build/encryption'))\n"
                 "from samplesMain import main\n".encode("utf-8"))
         for import_src in import_list:
             f.write(import_src.encode("utf-8") + "\n".encode("utf-8"))
@@ -162,45 +163,36 @@ def build(args):
     os.mkdir("build/")
     print("ID = {}".format(ID))
 
-    build_path = "build/lib.linux-x86_64-3.6"
-    tmp_path = "build/temp.linux-x86_64-3.6"
     ep_build_path = "build/encryption/"
 
     if os.path.exists(ep_build_path):
         shutil.rmtree(ep_build_path)
     os.mkdir(ep_build_path)
     file_list = os.listdir("new_src")
-    for file_name in file_list:
-        if getOperationSystem() == "Windows":
-            os.system("{}/easycython.exe {}/{}".format(args.python_path,"new_src",file_name))
-        else:
-            os.system("{}/python setup.py build_ext".format(args.python_path))
-    if getOperationSystem() == "Windows":
-        build_file_list = os.listdir()
-        for build_file in build_file_list:
-            if build_file[-4:] == ".pyd":
-                if ID == 0:
-                    shutil.copy(build_file,
-                                os.path.join(ep_build_path, build_file.split(".")[0] + ".pyd"))
-                    os.remove(build_file)
-                else:
-                    os.system(
-                        "/home/jade/SoftWare/加密狗软件/Linux/VendorTools/Envelope/linuxenv -v:/home/jade/RGMGT.hvc -f:{} {} {}".format(
-                            ID, build_file,
-                            os.path.join(ep_build_path, build_file.split(".")[0] + ".pyd")))
-    else:
-        build_file_list = os.listdir(os.path.join(build_path))
-        for build_file in build_file_list:
-            if build_file[-3:] == ".so":
-                if ID == 0:
-                    shutil.copy(os.path.join(build_path, build_file),
-                                os.path.join(ep_build_path, build_file.split(".")[0] + ".so"))
-                else:
-                    os.system(
-                        "/home/jade/SoftWare/加密狗软件/Linux/VendorTools/Envelope/linuxenv -v:/home/jade/RGMGT.hvc -f:{} {} {}".format(
-                            ID, os.path.join(build_path, build_file),
-                            os.path.join(ep_build_path, build_file.split(".")[0] + ".so")))
+    bin_suffix = ""
 
+    if getOperationSystem() == "Windows":
+        bin_suffix= ".exe"
+    if getOperationSystem() == "Windows":
+        lib_suffix= "pyd"
+    else:
+        lib_suffix = "so"
+    for file_name in file_list:
+
+        os.system("{}/easycython{} {}/{}".format(args.python_path,bin_suffix,"new_src",file_name))
+
+    build_file_list = os.listdir()
+    for build_file in build_file_list:
+        if build_file.split(".")[-1] == lib_suffix:
+            if ID == 0:
+                shutil.copy(build_file,
+                            os.path.join(ep_build_path, build_file.split(".")[0] +"." + lib_suffix))
+                os.remove(build_file)
+            else:
+                os.system(
+                    "/home/jade/SoftWare/加密狗软件/Linux/VendorTools/Envelope/linuxenv -v:/home/jade/RGMGT.hvc -f:{} {} {}".format(
+                        ID, build_file,
+                        os.path.join(ep_build_path, build_file.split(".")[0] + ".pyd")))
 
     if os.path.exists("src_copy"):
         shutil.rmtree("src_copy")
@@ -289,22 +281,6 @@ def packAPP(args):
 
 
 
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--python_path", type=str,
-                        default="C:/Users\Administrator\.virtualenvs\dzww_algorithm-RhL9V4yi\Scripts/")
-    parser.add_argument('--ID', type=str,
-                        default="0")
-    parser.add_argument('--app_name', type=str,
-                        default="SamplesDaHuaOCRV1.0")  ##需要打包的文件名称
-    parser.add_argument('--name', type=str,
-                        default="三宝科技电子围网大华车牌识别V1.0")  ##需要打包的文件名称
-    parser.add_argument('--extra_path_list', type=list,
-                        default=["config","bin"])  ## 需要额外打包的路径
-    args = parser.parse_args()
 
-    build(args)
-    packAPP(args)
 
 
