@@ -86,7 +86,7 @@ def writePy(app_name):
 
 
 
-def writeSpec(app_name,extra_path_list=[]):
+def writeSpec(app_name,full=False,extra_path_list=[]):
     build_path = "build/encryption/"
     data_str = "datas=["
     file_list = os.listdir(build_path)
@@ -119,39 +119,76 @@ def writeSpec(app_name,extra_path_list=[]):
         else:
             binaries_str = binaries_str + "('icons/{}','{}'),".format(icon_list[i], "icons")
     icon_path = "icons/app_logo.ico"
-    with open("{}.spec".format(app_name), "wb") as f:
-        f.write("block_cipher = None\n"
-                "a = Analysis(['{}.py'],\n"
-                "             pathex=[''],\n"
-                "             {},\n"
-                "             {},\n"
-                "             hiddenimports=[],\n"
-                "             hookspath=[],\n"
-                "             runtime_hooks=[],\n"
-                "             excludes=[],\n"
-                "             win_no_prefer_redirects=False,\n"
-                "             win_private_assemblies=False,\n"
-                "             cipher=block_cipher,\n"
-                "             noarchive=False)\n"
-                "pyz = PYZ(a.pure, a.zipped_data,\n"
-                "             cipher=block_cipher)\n"
-                "exe1 = EXE(pyz,\n"
-                "          a.scripts,\n"
-                "          a.binaries,\n"
-                "          a.zipfiles,\n"
-                "          a.datas,\n"
-                "          [],\n"
-                "          name='{}',\n"
-                "          debug=False,\n"
-                "          bootloader_ignore_signals=False,\n"
-                "          strip=False,\n"
-                "          upx=True,\n"
-                "          upx_exclude=[],\n"
-                "          runtime_tmpdir=None,\n"
-                "          console=True,\n"
-                "          icon='{}'\n)\n".format(app_name, binaries_str, data_str, app_name, icon_path).encode(
-            "utf-8"))
-
+    if full is False:
+        with open("{}.spec".format(app_name), "wb") as f:
+            f.write("block_cipher = None\n"
+                    "a = Analysis(['{}.py'],\n"
+                    "             pathex=[''],\n"
+                    "             {},\n"
+                    "             {},\n"
+                    "             hiddenimports=[],\n"
+                    "             hookspath=[],\n"
+                    "             runtime_hooks=[],\n"
+                    "             excludes=[],\n"
+                    "             win_no_prefer_redirects=False,\n"
+                    "             win_private_assemblies=False,\n"
+                    "             cipher=block_cipher,\n"
+                    "             noarchive=False)\n"
+                    "pyz = PYZ(a.pure, a.zipped_data,\n"
+                    "             cipher=block_cipher)\n"
+                    "exe2 = EXE(pyz,\n"
+                    "          a.scripts,\n"
+                    "          [],\n"
+                    "          exclude_binaries=True,\n"
+                    "          name='{}',\n"
+                    "          debug=False,\n"
+                    "          bootloader_ignore_signals=False,\n"
+                    "          strip=False,\n"
+                    "          upx=True,\n"
+                    "          console=False,\n"
+                    "          icon='{}'\n)\n"
+                    "coll = COLLECT(exe2,\n"
+                    "          a.binaries,\n"
+                    "          a.zipfiles,\n"
+                    "          a.datas,\n"
+                    "          strip=False,\n"
+                    "          upx=True,\n"
+                    "          upx_exclude=[],\n"
+                    "          name='{}')\n".format(app_name, binaries_str, data_str, app_name, icon_path,
+                                                    app_name).encode("utf-8"))
+    else:
+        with open("{}.spec".format(app_name), "wb") as f:
+            f.write("block_cipher = None\n"
+                    "a = Analysis(['{}.py'],\n"
+                    "             pathex=[''],\n"
+                    "             {},\n"
+                    "             {},\n"
+                    "             hiddenimports=[],\n"
+                    "             hookspath=[],\n"
+                    "             runtime_hooks=[],\n"
+                    "             excludes=[],\n"
+                    "             win_no_prefer_redirects=False,\n"
+                    "             win_private_assemblies=False,\n"
+                    "             cipher=block_cipher,\n"
+                    "             noarchive=False)\n"
+                    "pyz = PYZ(a.pure, a.zipped_data,\n"
+                    "             cipher=block_cipher)\n"
+                    "exe1 = EXE(pyz,\n"
+                    "          a.scripts,\n"
+                    "          a.binaries,\n"
+                    "          a.zipfiles,\n"
+                    "          a.datas,\n"
+                    "          [],\n"
+                    "          name='{}',\n"
+                    "          debug=False,\n"
+                    "          bootloader_ignore_signals=False,\n"
+                    "          strip=False,\n"
+                    "          upx=True,\n"
+                    "          upx_exclude=[],\n"
+                    "          runtime_tmpdir=None,\n"
+                    "          console=True,\n"
+                    "          icon='{}'\n)\n".format(app_name, binaries_str, data_str, app_name, icon_path).encode(
+                "utf-8"))
 
 def build(args):
     writePy(args.app_name)
@@ -211,7 +248,18 @@ def build(args):
 def packAppImage(args):
     save_path = CreateSavePath(os.path.join("tmp"))
     save_bin_path = CreateSavePath(os.path.join(save_path, "usr/bin/"))
-    os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
+    if args.full is False:
+        os.system("cp -r dist/{}/* {}".format(args.app_name, save_bin_path))
+        ## 需要在AppRun中添加环境变量
+    else:
+        #打包成一个包环境变量就没了
+        save_lib_path = CreateSavePath(os.path.join(save_path, "usr/lib/"))
+        for lib_path in args.extra_path_list:
+            for lib_name in os.listdir(lib_path):
+                if "lib" in lib_name:
+                    shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
+        os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
+
     with open("AppRun", "r") as f:
         conetent_list = f.read().split("\n")
         for content in conetent_list:
@@ -237,7 +285,7 @@ def packAppImage(args):
 
 def packAPP(args):
     writePy(args.app_name)
-    writeSpec(args.app_name,args.extra_path_list)
+    writeSpec(args.app_name,args.full,args.extra_path_list)
     cmd_str = "{}/pyinstaller  {}.spec ".format(args.python_path, args.app_name)
     os.system(cmd_str)
     save_path = CreateSavePath(args.name)
