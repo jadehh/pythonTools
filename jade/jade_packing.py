@@ -57,7 +57,7 @@ def copyPy():
                                     if content not in import_list and "#" not in content and content[0] != " ":
                                         import_list.append(content)
                             elif "main" in content:
-                                f1.write((content + '    JadeLog.INFO("#####################版本更新时间为:{}#####################")\r'.format(
+                                f1.write((content + '    print("#####################版本更新时间为:{}#####################")\r'.format(
                                         GetTimeStamp())).encode("utf-8"))
                             else:
                                 f1.write((content + '\n').encode("utf-8"))
@@ -65,9 +65,9 @@ def copyPy():
     return import_list
 
 
-def writePy(app_name):
+def writePy(args):
     import_list = copyPy()
-    with open("{}.py".format(app_name), "wb") as f:
+    with open("{}.py".format(args.app_name), "wb") as f:
         f.write("import sys\n"
                 "import os\n"
                 "if getattr(sys, 'frozen', False): #是否Bundle Resource\n"
@@ -86,7 +86,7 @@ def writePy(app_name):
 
 
 
-def writeSpec(app_name,full=False,extra_path_list=[]):
+def writeSpec(args):
     build_path = "build/encryption/"
     data_str = "datas=["
     file_list = os.listdir(build_path)
@@ -95,17 +95,17 @@ def writeSpec(app_name,full=False,extra_path_list=[]):
         file_path_str = ("'{}'".format(file_path))
         file_path_list_str = "({},'.')".format(file_path_str)
         data_str = data_str + file_path_list_str + ","
-    if len(extra_path_list) == 0:
+    if len(args.extra_path_list) == 0:
         data_str = data_str + "]"
     else:
-        for i in range(len(extra_path_list)):
-            bin_path = extra_path_list[i]
+        for i in range(len(args.extra_path_list)):
+            bin_path = args.extra_path_list[i][0]
             data_list = os.listdir(bin_path)
             for j in range(len(data_list)):
                 file_path = bin_path + "/" + data_list[j]
                 file_path_str = ("'{}'".format(file_path))
-                file_path_list_str = "({},'{}')".format(file_path_str, bin_path)
-                if j == len(data_list) - 1 and i == len(extra_path_list) - 1 :
+                file_path_list_str = "({},'{}')".format(file_path_str, args.extra_path_list[i][1])
+                if j == len(data_list) - 1 and i == len(args.extra_path_list) - 1 :
                     data_str = data_str + file_path_list_str + "]"
                 else:
                     data_str = data_str + file_path_list_str + ","
@@ -119,8 +119,8 @@ def writeSpec(app_name,full=False,extra_path_list=[]):
         else:
             binaries_str = binaries_str + "('icons/{}','{}'),".format(icon_list[i], "icons")
     icon_path = "icons/app_logo.ico"
-    if full is False:
-        with open("{}.spec".format(app_name), "wb") as f:
+    if args.full is False:
+        with open("{}.spec".format(args.app_name), "wb") as f:
             f.write("block_cipher = None\n"
                     "a = Analysis(['{}.py'],\n"
                     "             pathex=[''],\n"
@@ -145,7 +145,7 @@ def writeSpec(app_name,full=False,extra_path_list=[]):
                     "          bootloader_ignore_signals=False,\n"
                     "          strip=False,\n"
                     "          upx=True,\n"
-                    "          console=True,\n"
+                    "          console={},\n"
                     "          icon='{}'\n)\n"
                     "coll = COLLECT(exe2,\n"
                     "          a.binaries,\n"
@@ -154,10 +154,10 @@ def writeSpec(app_name,full=False,extra_path_list=[]):
                     "          strip=False,\n"
                     "          upx=True,\n"
                     "          upx_exclude=[],\n"
-                    "          name='{}')\n".format(app_name, binaries_str, data_str, app_name, icon_path,
-                                                    app_name).encode("utf-8"))
+                    "          name='{}')\n".format(args.app_name, binaries_str, data_str, args.app_name,args.console, icon_path,
+                                                    args.app_name).encode("utf-8"))
     else:
-        with open("{}.spec".format(app_name), "wb") as f:
+        with open("{}.spec".format(args.app_name), "wb") as f:
             f.write("block_cipher = None\n"
                     "a = Analysis(['{}.py'],\n"
                     "             pathex=[''],\n"
@@ -186,12 +186,12 @@ def writeSpec(app_name,full=False,extra_path_list=[]):
                     "          upx=True,\n"
                     "          upx_exclude=[],\n"
                     "          runtime_tmpdir=None,\n"
-                    "          console=True,\n"
-                    "          icon='{}'\n)\n".format(app_name, binaries_str, data_str, app_name, icon_path).encode(
+                    "          console={},\n"
+                    "          icon='{}'\n)\n".format(args.app_name, binaries_str, data_str, args.app_name,args.console, icon_path).encode(
                 "utf-8"))
 
 def build(args):
-    writePy(args.app_name)
+    writePy(args)
     ID = int(args.ID)
     if os.path.exists("build"):
         shutil.rmtree("build")
@@ -255,7 +255,7 @@ def packAppImage(args):
         #打包成一个包环境变量就没了
         save_lib_path = CreateSavePath(os.path.join(save_path, "usr/lib/"))
         for lib_path in args.extra_path_list:
-            for lib_name in os.listdir(lib_path):
+            for lib_name in os.listdir(lib_path[0]):
                 if "lib" in lib_name:
                     shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
         os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
@@ -284,8 +284,8 @@ def packAppImage(args):
     return "{}.AppImage".format(args.app_name)
 
 def packAPP(args):
-    writePy(args.app_name)
-    writeSpec(args.app_name,args.full,args.extra_path_list)
+    writePy(args)
+    writeSpec(args)
     cmd_str = "{}/pyinstaller  {}.spec ".format(args.python_path, args.app_name)
     os.system(cmd_str)
     save_path = CreateSavePath(args.name)
@@ -327,29 +327,31 @@ def packAPP(args):
         shutil.rmtree("tmp")
 
 
+
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     if getOperationSystem() == "Windows":
         parser.add_argument("--python_path", type=str,
-                            default="C:/Users\Administrator\.virtualenvs\dzww_algorithm-RhL9V4yi\Scripts/")
+                            default="C:/Users\Administrator\.virtualenvs\container_ocr-74eFLEue\Scripts/")
     else:
         parser.add_argument("--python_path", type=str,
-                            default="/home/jade/.local/share/virtualenvs/dzww_algorithm-6DaxYyLZ/bin/")
+                            default="/home/jade/.local/share/virtualenvs/opencv-5U9n4S0-/bin/")
     parser.add_argument('--extra_path_list', type=list,
-                        default=["bin/{}/".format(getOperationSystem())])  ## 需要额外打包的路径
+                        default=[("data/pymssql","pymssql"),("data/xpinyin","xpinyin")])  ## 需要额外打包的路径,指定打包后的存储路径
     parser.add_argument('--ID', type=str,
                         default="0")
     parser.add_argument('--full', type=bool,
                         default=True)  ## 打包成一个完成的包
+    parser.add_argument('--console', type=str,
+                        default="False")  ## 是否显示命令行窗口,只针对与Windows有效
     parser.add_argument('--app_name', type=str,
-                        default="SamplesStitchingServiceV1.0")  ##需要打包的文件名称
+                        default="ContainerAppV2.4.1")  ##需要打包的文件名称
     parser.add_argument('--name', type=str,
-                        default="三宝科技视频拼接服务V1.0")  ##需要打包的文件名称
+                        default="箱号识别服务前端配置程序V2.4.1")  ##需要打包的文件名称
 
     args = parser.parse_args()
     build(args)
     packAPP(args)
-
-
-
