@@ -327,8 +327,29 @@ def packAPP(args):
         shutil.rmtree("tmp")
 
 
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    if getOperationSystem() == "Windows":
+        parser.add_argument("--python_path", type=str,
+                            default="C:/Users\Administrator\.virtualenvs\dzww_algorithm-RhL9V4yi\Scripts/")
+    else:
+        parser.add_argument("--python_path", type=str,
+                            default="/home/jade/.local/share/virtualenvs/dzww_algorithm-6DaxYyLZ/bin/")
+    parser.add_argument('--extra_path_list', type=list,
+                        default=["bin/{}/".format(getOperationSystem())])  ## 需要额外打包的路径
+    parser.add_argument('--ID', type=str,
+                        default="0")
+    parser.add_argument('--full', type=bool,
+                        default=True)  ## 打包成一个完成的包
+    parser.add_argument('--app_name', type=str,
+                        default="SamplesStitchingServiceV1.0")  ##需要打包的文件名称
+    parser.add_argument('--name', type=str,
+                        default="三宝科技视频拼接服务V1.0")  ##需要打包的文件名称
 
-
+    args = parser.parse_args()
+    build(args)
+    packAPP(args)
 
 
 
