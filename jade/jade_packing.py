@@ -1,12 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File     : jade_packing_windows_app.py.py
+# @Author   : jade
+# @Date     : 2021/9/22 11:54
+# @Email    : jadehh@1ive.com
+# @Software : Samples
+# @Desc     :
 from jade import CreateSavePath, GetTimeStamp
 import os
 import shutil
 import platform
 
-
 def getOperationSystem():
     return platform.system()
-
 
 def copyPy():
     new_src_path = CreateSavePath("new_src")
@@ -70,7 +76,7 @@ def writePy(args):
                 "    base_path = sys._MEIPASS\n"
                 "else:\n"
                 "    base_path = os.path.abspath('.')\n"
-                "sys.path.append(os.path.join(base_path,'{}'))\n"
+                "sys.path.append('{}')\n"
                 "sys.path.append(os.path.join(base_path,'build/encryption'))\n".format(args.lib_path).encode("utf-8"))
 
         for extra_sys_path in args.extra_sys_list:
@@ -88,9 +94,9 @@ def writeSpec(args):
     if args.lib_path:
         pass
     else:
-        file_list = os.listdir(args.lib_path)
+        file_list = os.listdir("build/encryption")
         for i in range(len(file_list)):
-            file_path = os.path.join(args.lib_path, file_list[i])
+            file_path = os.path.join("build/encryption", file_list[i])
             file_path_str = ("'{}'".format(file_path))
             file_path_list_str = "({},'.')".format(file_path_str)
             data_str = data_str + file_path_list_str + ","
@@ -286,15 +292,16 @@ def packAppImage(args):
     return "{}.AppImage".format(args.app_name)
 
 
-def copy_dir(save_path, source_dir):
+def copy_dir(source_dir, save_path):
     try:
-        shutil.rmtree("{}/{}".format(save_path, source_dir))
+        shutil.rmtree("{}/{}".format(save_path,source_dir))
     except:
         pass
     try:
-        shutil.copytree(source_dir, "{}/{}".format(save_path, source_dir))
-    except:
+        shutil.copytree(source_dir, "{}/{}".format(save_path,source_dir))
+    except :
         pass
+
 
 
 def packAPP(args):
@@ -307,7 +314,8 @@ def packAPP(args):
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
     save_bin_path = CreateSavePath("{}/{}".format(save_path, getOperationSystem()))
     copy_dir("config", save_bin_path)
-    copy_dir(args.lib_path, save_bin_path)
+    if args.lib_path:
+        copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
         shutil.copy("dist/{}.exe".format(args.app_name), "{}/".format(save_bin_path))
     else:
@@ -339,10 +347,8 @@ def packAPP(args):
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
 
-
 if __name__ == '__main__':
     from packing_app import *
-
     if __name__ == '__main__':
         import argparse
 
@@ -352,27 +358,29 @@ if __name__ == '__main__':
                                 default=r"C:\Users\Administrator\.virtualenvs\SuzhouPark5GAI-ioO_3PBQ\Scripts/")
         else:
             parser.add_argument("--python_path", type=str,
-                                default="/home/jade/.local/share/virtualenvs/SuzhouPark5GAI-oaurvAjI//bin/")
+                                default="/home/jade/.local/share/virtualenvs/dzww_algorithm-6DaxYyLZ/bin/")
         parser.add_argument('--extra_path_list', type=list,
-                            default=["bin/{}/".format(getOperationSystem())])  ## 需要额外打包的路径
+                            default=[])  ## 需要额外打包的路径
         parser.add_argument('--ID', type=str,
                             default="0")
         parser.add_argument('--full', type=bool,
                             default=True)  ## 打包成一个完成的包
         parser.add_argument('--app_name', type=str,
-                            default="SuzhouPlateServiceV1.0")  ##需要打包的文件名称
+                            default="AlgorithmManageServiceV1.0")  ##需要打包的文件名称
         parser.add_argument('--name', type=str,
-                            default="苏州车牌识别服务V1.0")  ##需要打包的文件名称
+                            default="三宝科技算法管理服务V1.0")  ##需要打包的文件名称
         parser.add_argument('--appimage', type=bool,
-                            default=False)  ## 是否打包成AppImage
-        parser.add_argument('--lib_path', type=str, default="plate_service_lib64")  ## 是否lib包分开打包
+                            default=True)  ## 是否打包成AppImage
+        parser.add_argument('--lib_path', type=str, default="")  ## 是否lib包分开打包
         parser.add_argument('--extra_sys_list', type=list,
-                            default=['sys.path.append("/usr/local/suzhou_park-1.0/python_lib/")', ])  ## 需要额外打包的路径
+                            default=[])  ## 需要额外打包的路径
 
         args = parser.parse_args()
-
         build(args)
         packAPP(args)
+
+
+
 
 
 
