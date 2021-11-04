@@ -58,7 +58,7 @@ def copyPy():
                                         import_list.append(content)
                             elif "main" in content:
                                 f1.write((
-                                                     content + '    JadeLog.INFO("#####################版本更新时间为:{}#####################")\r'.format(
+                                                     content + '\n    JadeLog.INFO("#####################版本更新时间为:{}#####################")\r'.format(
                                                  GetTimeStamp())).encode("utf-8"))
                             else:
                                 f1.write((content + '\n').encode("utf-8"))
@@ -309,7 +309,7 @@ def packAPP(args):
     writeSpec(args)
     cmd_str = "{}/pyinstaller  {}.spec ".format(args.python_path, args.app_name)
     os.system(cmd_str)
-    save_path = CreateSavePath(args.name)
+    save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
     save_bin_path = CreateSavePath("{}/{}".format(save_path, getOperationSystem()))
@@ -347,41 +347,35 @@ def packAPP(args):
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
 
+
+
 if __name__ == '__main__':
-    from packing_app import *
-    if __name__ == '__main__':
-        import argparse
+    import argparse
 
-        parser = argparse.ArgumentParser()
-        if getOperationSystem() == "Windows":
-            parser.add_argument("--python_path", type=str,
-                                default=r"C:\Users\Administrator\.virtualenvs\SuzhouPark5GAI-ioO_3PBQ\Scripts/")
-        else:
-            parser.add_argument("--python_path", type=str,
-                                default="/home/jade/.local/share/virtualenvs/dzww_algorithm-6DaxYyLZ/bin/")
-        parser.add_argument('--extra_path_list', type=list,
-                            default=[])  ## 需要额外打包的路径
-        parser.add_argument('--ID', type=str,
-                            default="0")
-        parser.add_argument('--full', type=bool,
-                            default=True)  ## 打包成一个完成的包
-        parser.add_argument('--app_name', type=str,
-                            default="AlgorithmManageServiceV1.0")  ##需要打包的文件名称
-        parser.add_argument('--name', type=str,
-                            default="三宝科技算法管理服务V1.0")  ##需要打包的文件名称
-        parser.add_argument('--appimage', type=bool,
-                            default=True)  ## 是否打包成AppImage
-        parser.add_argument('--lib_path', type=str, default="")  ## 是否lib包分开打包
-        parser.add_argument('--extra_sys_list', type=list,
-                            default=[])  ## 需要额外打包的路径
+    parser = argparse.ArgumentParser()
+    if getOperationSystem() == "Windows":
+        parser.add_argument("--python_path", type=str,
+                            default=r"C:\Users\Administrator\.virtualenvs\SuzhouPark5GAI-ioO_3PBQ\Scripts/")
+    else:
+        parser.add_argument("--python_path", type=str,
+                            default="/home/jade/.local/share/virtualenvs/SuzhouPark5GAI-oaurvAjI//bin/")
+    parser.add_argument('--extra_path_list', type=list,
+                        default=["bin/{}/".format(getOperationSystem())])  ## 需要额外打包的路径
+    parser.add_argument('--ID', type=str,
+                        default="0")
+    parser.add_argument('--full', type=bool,
+                        default=True)  ## 打包成一个完成的包
+    parser.add_argument('--app_name', type=str,
+                        default="SuzhouDCDetServiceV1.0")  ##需要打包的文件名称
+    parser.add_argument('--name', type=str,
+                        default="苏州电子围网检测服务V1.0")  ##需要打包的文件名称
+    parser.add_argument('--appimage', type=bool,
+                        default=False)  ## 是否打包成AppImage
+    parser.add_argument('--lib_path', type=str, default="dc_detect_service_lib64")  ## 是否lib包分开打包
+    parser.add_argument('--extra_sys_list', type=list,
+                        default=['sys.path.append("/usr/local/suzhou_park-1.0/python_lib/")', ])  ## 需要额外打包的路径
 
-        args = parser.parse_args()
-        build(args)
-        packAPP(args)
+    args = parser.parse_args()
 
-
-
-
-
-
-
+    build(args)
+    # packAPP(args)
