@@ -58,7 +58,7 @@ def copyPy():
                                         import_list.append(content)
                             elif "main" in content:
                                 f1.write((
-                                                     content + '\n    JadeLog.INFO("#####################版本更新时间为:{}#####################")\r'.format(
+                                                     content + '\n    print("#####################版本更新时间为:{}#####################")\r'.format(
                                                  GetTimeStamp())).encode("utf-8"))
                             else:
                                 f1.write((content + '\n').encode("utf-8"))
@@ -105,12 +105,17 @@ def writeSpec(args):
         data_str = data_str + "]"
     else:
         for i in range(len(args.extra_path_list)):
-            bin_path = args.extra_path_list[i]
+            if type(args.extra_path_list[i]) == tuple:
+                bin_path = args.extra_path_list[i][0]
+                save_path = args.extra_path_list[i][1]
+            else:
+                bin_path = args.extra_path_list[i]
+                save_path = args.extra_path_list[i]
             data_list = os.listdir(bin_path)
             for j in range(len(data_list)):
                 file_path = bin_path + "/" + data_list[j]
                 file_path_str = ("'{}'".format(file_path))
-                file_path_list_str = "({},'{}')".format(file_path_str, bin_path)
+                file_path_list_str = "({},'{}')".format(file_path_str, save_path)
                 if j == len(data_list) - 1 and i == len(args.extra_path_list) - 1:
                     data_str = data_str + file_path_list_str + "]"
                 else:
@@ -150,7 +155,7 @@ def writeSpec(args):
                     "          bootloader_ignore_signals=False,\n"
                     "          strip=False,\n"
                     "          upx=True,\n"
-                    "          console=False,\n"
+                    "          console={},\n"
                     "          icon='{}'\n)\n"
                     "coll = COLLECT(exe2,\n"
                     "          a.binaries,\n"
@@ -159,7 +164,7 @@ def writeSpec(args):
                     "          strip=False,\n"
                     "          upx=True,\n"
                     "          upx_exclude=[],\n"
-                    "          name='{}')\n".format(args.app_name, binaries_str, data_str, args.app_name, icon_path,
+                    "          name='{}')\n".format(args.app_name, binaries_str, data_str, args.app_name,args.console, icon_path,
                                                     args.app_name).encode("utf-8"))
     else:
         with open("{}.spec".format(args.app_name), "wb") as f:
@@ -191,9 +196,8 @@ def writeSpec(args):
                     "          upx=True,\n"
                     "          upx_exclude=[],\n"
                     "          runtime_tmpdir=None,\n"
-                    "          console=True,\n"
-                    "          icon='{}'\n)\n".format(args.app_name, binaries_str, data_str, args.app_name,
-                                                      icon_path).encode(
+                    "          console={},\n"
+                    "          icon='{}'\n)\n".format(args.app_name, binaries_str, data_str, args.app_name,args.console,icon_path).encode(
                 "utf-8"))
 
 
@@ -262,10 +266,14 @@ def packAppImage(args):
     else:
         # 打包成一个包环境变量就没了
         save_lib_path = CreateSavePath(os.path.join(save_path, "usr/lib/"))
-        for lib_path in args.extra_path_list:
-            for lib_name in os.listdir(lib_path):
-                if "lib" in lib_name:
-                    shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
+        if args.extra_path_list:
+            for i in range(len(args.extra_path_list)):
+                lib_path = args.extra_path_list[i]
+                if type(lib_path) == tuple:
+                    lib_path = lib_path[0]
+                for lib_name in os.listdir(lib_path):
+                    if "lib" in lib_name:
+                        shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))          
         os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
 
     with open("AppRun", "r") as f:
@@ -312,12 +320,15 @@ def packAPP(args):
     save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
-    save_bin_path = CreateSavePath("{}/{}".format(save_path, getOperationSystem()))
+    save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
     copy_dir("config", save_bin_path)
     if args.lib_path:
         copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
-        shutil.copy("dist/{}.exe".format(args.app_name), "{}/".format(save_bin_path))
+        if args.full is False:
+            os.system("xcopy dist\\{} {} /s/y".format(args.app_name,save_bin_path))
+        else:
+            shutil.copy("dist\\{}.exe".format(args.app_name), "{}/".format(save_bin_path))
     else:
         if args.appimage:
             app_name = packAppImage(args)
@@ -346,6 +357,7 @@ def packAPP(args):
 
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
+
 
 
 
