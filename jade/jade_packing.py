@@ -1,11 +1,13 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @File     : jade_packing_windows_app.py.py
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+##########################################
+# @File     : jade_packing.py
 # @Author   : jade
-# @Date     : 2021/9/22 11:54
+# @Date     : 2021/11/09 03:19:05
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+##########################################
 from jade import CreateSavePath, GetTimeStamp
 import os
 import shutil
@@ -56,7 +58,7 @@ def copyPy():
                                     f1.write((content + '\n').encode("utf-8"))
                                     if content not in import_list and "#" not in content and content[0] != " ":
                                         import_list.append(content)
-                            elif "main" in content:
+                            elif "def main():" in content:
                                 f1.write((
                                                      content + '\n    print("#####################版本更新时间为:{}#####################")\r'.format(
                                                  GetTimeStamp())).encode("utf-8"))
@@ -320,15 +322,12 @@ def packAPP(args):
     save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
-    save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
+    save_bin_path = CreateSavePath("{}/{}".format(save_path, getOperationSystem()))
     copy_dir("config", save_bin_path)
     if args.lib_path:
         copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
-        if args.full is False:
-            os.system("xcopy dist\\{} {} /s/y".format(args.app_name,save_bin_path))
-        else:
-            shutil.copy("dist\\{}.exe".format(args.app_name), "{}/".format(save_bin_path))
+        shutil.copy("dist/{}.exe".format(args.app_name), "{}/".format(save_bin_path))
     else:
         if args.appimage:
             app_name = packAppImage(args)
@@ -357,37 +356,3 @@ def packAPP(args):
 
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
-
-
-
-
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    if getOperationSystem() == "Windows":
-        parser.add_argument("--python_path", type=str,
-                            default=r"C:\Users\Administrator\.virtualenvs\SuzhouPark5GAI-ioO_3PBQ\Scripts/")
-    else:
-        parser.add_argument("--python_path", type=str,
-                            default="/home/jade/.local/share/virtualenvs/SuzhouPark5GAI-oaurvAjI//bin/")
-    parser.add_argument('--extra_path_list', type=list,
-                        default=["bin/{}/".format(getOperationSystem())])  ## 需要额外打包的路径
-    parser.add_argument('--ID', type=str,
-                        default="0")
-    parser.add_argument('--full', type=bool,
-                        default=True)  ## 打包成一个完成的包
-    parser.add_argument('--app_name', type=str,
-                        default="SuzhouDCDetServiceV1.0")  ##需要打包的文件名称
-    parser.add_argument('--name', type=str,
-                        default="苏州电子围网检测服务V1.0")  ##需要打包的文件名称
-    parser.add_argument('--appimage', type=bool,
-                        default=False)  ## 是否打包成AppImage
-    parser.add_argument('--lib_path', type=str, default="dc_detect_service_lib64")  ## 是否lib包分开打包
-    parser.add_argument('--extra_sys_list', type=list,
-                        default=['sys.path.append("/usr/local/suzhou_park-1.0/python_lib/")', ])  ## 需要额外打包的路径
-
-    args = parser.parse_args()
-
-    build(args)
-    # packAPP(args)
