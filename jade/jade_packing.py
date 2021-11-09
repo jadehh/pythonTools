@@ -3,7 +3,7 @@
 ##########################################
 # @File     : jade_packing.py
 # @Author   : jade
-# @Date     : 2021/11/09 03:19:05
+# @Date     : 2021/11/08 01:17:06
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
@@ -322,12 +322,15 @@ def packAPP(args):
     save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
-    save_bin_path = CreateSavePath("{}/{}".format(save_path, getOperationSystem()))
+    save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
     copy_dir("config", save_bin_path)
     if args.lib_path:
         copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
-        shutil.copy("dist/{}.exe".format(args.app_name), "{}/".format(save_bin_path))
+        if args.full is False:
+            os.system("xcopy dist\\{} {} /s/y".format(args.app_name,save_bin_path))
+        else:
+            shutil.copy("dist\\{}.exe".format(args.app_name), "{}/".format(save_bin_path))
     else:
         if args.appimage:
             app_name = packAppImage(args)
@@ -356,3 +359,36 @@ def packAPP(args):
 
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    if getOperationSystem() == "Windows":
+        parser.add_argument("--python_path", type=str,
+                            default="C:/Users\Administrator\.virtualenvs\container_ocr-74eFLEue\Scripts/")
+    else:
+        parser.add_argument("--python_path", type=str,
+                            default="/home/jade/.local/share/virtualenvs/opencv-5U9n4S0-/bin/")
+    parser.add_argument('--extra_path_list', type=list,
+                        default=[("data/pymssql","pymssql"),("data/xpinyin","xpinyin")])  ## 需要额外打包的路径,指定打包后的存储路径
+    parser.add_argument('--ID', type=str,
+                        default="0")
+    parser.add_argument('--full', type=bool,
+                        default=False)  ## 打包成一个完成的包
+    parser.add_argument('--console', type=str,
+                        default="True")  ## 是否显示命令行窗口,只针对与Windows有效
+    parser.add_argument('--app_name', type=str,
+                        default="ContainerAppV2.4.0")  ##需要打包的文件名称
+    parser.add_argument('--name', type=str,
+                        default="箱号识别服务前端配置程序V2.4.0")  ##需要打包的文件名称
+    parser.add_argument('--appimage', type=bool,
+                        default=True)  ## 是否打包成AppImage
+    parser.add_argument('--lib_path', type=str, default="lib")  ## 是否lib包分开打包
+    parser.add_argument('--extra_sys_list', type=list,
+                        default=[])  ## 需要额外打包的路径
+
+    args = parser.parse_args()
+
+    args = parser.parse_args()
+    build(args)
+    # packAPP(args)
