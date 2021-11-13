@@ -13,6 +13,7 @@ import os
 import shutil
 import platform
 
+
 def getOperationSystem():
     return platform.system()
 
@@ -257,6 +258,9 @@ def build(args):
 
     if os.path.exists("{}.spec".format(args.app_name)):
         os.remove("{}.spec".format(args.app_name))
+    if args.lib_path:
+        if os.path.exists("build"):
+            shutil.rmtree("build")
 
 
 def packAppImage(args):
@@ -275,7 +279,7 @@ def packAppImage(args):
                     lib_path = lib_path[0]
                 for lib_name in os.listdir(lib_path):
                     if "lib" in lib_name:
-                        shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))          
+                        shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
         os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
 
     with open("AppRun", "r") as f:
@@ -359,6 +363,7 @@ def packAPP(args):
 
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
+
 
 if __name__ == '__main__':
     import argparse
