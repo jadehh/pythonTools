@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @File    : jadeLogging.py
+# @File    : jade_logging.py
 # @Author  : jade
 # @Date    : 20-9-14 上午9:36
 # @Mailbox : jadehh@live.com
@@ -11,11 +11,6 @@ import logging.config
 import os
 from queue import Queue
 from threading import Thread
-#新建目录
-def CreateSavePath(save_image_path):
-    if os.path.exists(save_image_path) is not True:
-        os.makedirs(save_image_path)
-    return save_image_path
 
 class JadeLogging():
     """

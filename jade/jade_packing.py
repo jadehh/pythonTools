@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
-##########################################
-# @File     : jade_packing.py
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File     : packing_app.py.py
 # @Author   : jade
-# @Date     : 2021/11/08 01:17:06
+# @Date     : 2021/11/27 14:25
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
-##########################################
 from jade import CreateSavePath, GetTimeStamp
 import os
 import shutil
@@ -60,9 +58,7 @@ def copyPy():
                                     if content not in import_list and "#" not in content and content[0] != " ":
                                         import_list.append(content)
                             elif "def main():" in content:
-                                f1.write((
-                                                     content + '\n    print("#####################版本更新时间为:{}#####################")\r'.format(
-                                                 GetTimeStamp())).encode("utf-8"))
+                                f1.write(("JadeLog.INFO('#'*30 + '版本更新时间为:{}'+'#'*30)\r" + content).format(GetTimeStamp()).encode("utf-8"))
                             else:
                                 f1.write((content + '\n').encode("utf-8"))
 
@@ -114,15 +110,25 @@ def writeSpec(args):
             else:
                 bin_path = args.extra_path_list[i]
                 save_path = args.extra_path_list[i]
-            data_list = os.listdir(bin_path)
-            for j in range(len(data_list)):
-                file_path = bin_path + "/" + data_list[j]
+            if os.path.isdir(bin_path):
+                data_list = os.listdir(bin_path)
+                for j in range(len(data_list)):
+                    file_path = bin_path + "/" + data_list[j]
+                    file_path_str = ("'{}'".format(file_path))
+                    file_path_list_str = "({},'{}')".format(file_path_str, save_path)
+                    if j == len(data_list) - 1 and i == len(args.extra_path_list) - 1:
+                        data_str = data_str + file_path_list_str + "]"
+                    else:
+                        data_str = data_str + file_path_list_str + ","
+            else:
+                file_path = bin_path
                 file_path_str = ("'{}'".format(file_path))
                 file_path_list_str = "({},'{}')".format(file_path_str, save_path)
-                if j == len(data_list) - 1 and i == len(args.extra_path_list) - 1:
+                if  i == len(args.extra_path_list) - 1:
                     data_str = data_str + file_path_list_str + "]"
                 else:
                     data_str = data_str + file_path_list_str + ","
+
 
     binaries_str = "binaries=["
     icon_list = os.listdir("icons")
@@ -321,13 +327,13 @@ def copy_dir(source_dir, save_path):
 def packAPP(args):
     writePy(args)
     writeSpec(args)
-    cmd_str = "{}/pyinstaller  {}.spec ".format(args.python_path, args.app_name)
+    cmd_str = "{}/pyinstaller  {}.spec  --additional-hooks-dir hooks".format(args.python_path, args.app_name)
     os.system(cmd_str)
     save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
     save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
-    copy_dir("config", save_bin_path)
+    # copy_dir("config", save_bin_path)
     if args.lib_path:
         copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
@@ -363,37 +369,44 @@ def packAPP(args):
 
     if os.path.exists("tmp"):
         shutil.rmtree("tmp")
-
-
 if __name__ == '__main__':
     import argparse
+
     parser = argparse.ArgumentParser()
     if getOperationSystem() == "Windows":
         parser.add_argument("--python_path", type=str,
-                            default="C:/Users\Administrator\.virtualenvs\container_ocr-74eFLEue\Scripts/")
+                            default=r"C:\Users\Administrator\.virtualenvs\SuzhouPark5GAI-ioO_3PBQ\Scripts/")
+        parser.add_argument('--extra_sys_list', type=list,
+                            default=[])  ## 需要额外打包的路径
+        parser.add_argument('--extra_path_list', type=list,
+                            default=["bin/{}/".format(getOperationSystem()), ])
+        # (r"D:/Libs/paddle/v2.1/",
+        #  ".")])  ## 需要额外打包的路径
+
     else:
         parser.add_argument("--python_path", type=str,
-                            default="/home/jade/.local/share/virtualenvs/opencv-5U9n4S0-/bin/")
-    parser.add_argument('--extra_path_list', type=list,
-                        default=[("data/pymssql","pymssql"),("data/xpinyin","xpinyin")])  ## 需要额外打包的路径,指定打包后的存储路径
+                            default="/home/jade/.local/share/virtualenvs/container_ocr-OdTDZGFh/bin/")
+
+        parser.add_argument('--extra_sys_list', type=list,
+                            default=['sys.path.append("/usr/local/conta_detect-1.0/python_lib")'])  ## sys.path.append需要额外打包的路径
+
+        parser.add_argument('--extra_path_list', type=list,
+                            default=[])  ## 需要额外打包的路径
+
     parser.add_argument('--ID', type=str,
                         default="0")
     parser.add_argument('--full', type=bool,
-                        default=False)  ## 打包成一个完成的包
+                        default=True)  ## 打包成一个完成的包
     parser.add_argument('--console', type=str,
-                        default="True")  ## 是否显示命令行窗口,只针对与Windows有效
+                        default="False")  ## 是否显示命令行窗口,只针对与Windows有效
     parser.add_argument('--app_name', type=str,
-                        default="ContainerAppV2.4.0")  ##需要打包的文件名称
+                        default="conta_detectV2.4.2")  ##需要打包的文件名称
     parser.add_argument('--name', type=str,
-                        default="箱号识别服务前端配置程序V2.4.0")  ##需要打包的文件名称
+                        default="视频流箱门检测服务V2.4.2")  ##需要打包的文件名称
     parser.add_argument('--appimage', type=bool,
-                        default=True)  ## 是否打包成AppImage
-    parser.add_argument('--lib_path', type=str, default="lib")  ## 是否lib包分开打包
-    parser.add_argument('--extra_sys_list', type=list,
-                        default=[])  ## 需要额外打包的路径
-
-    args = parser.parse_args()
+                        default=False)  ## 是否打包成AppImage
+    parser.add_argument('--lib_path', type=str, default="conta_detect_lib64")  ## 是否lib包分开打包
 
     args = parser.parse_args()
     build(args)
-    # packAPP(args)
+    packAPP(args)

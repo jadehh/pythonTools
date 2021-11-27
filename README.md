@@ -1,4 +1,6 @@
-# Python使用pip管理，打包成wheel
+##  python tools V1.0.1
+* 不使用第三方wheel包
+
 
 ## 1.编写python文件
 
