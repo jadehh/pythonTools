@@ -6,6 +6,7 @@
 # @Mailbox : jadehh@live.com
 # @Software: Samples
 # @Desc    :
+from jade.jade_tools import CreateSavePath, GetTimeStamp
 import time
 import logging.config
 import os

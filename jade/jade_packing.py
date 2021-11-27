@@ -6,7 +6,7 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
-from jade import CreateSavePath, GetTimeStamp
+from jade.jade_tools import CreateSavePath, GetTimeStamp
 import os
 import shutil
 import platform
@@ -15,7 +15,7 @@ import platform
 def getOperationSystem():
     return platform.system()
 
-def copyPy():
+def copyPy(args):
     new_src_path = CreateSavePath("new_src")
     src_path = "src"
     import_list = []
@@ -58,7 +58,11 @@ def copyPy():
                                     if content not in import_list and "#" not in content and content[0] != " ":
                                         import_list.append(content)
                             elif "def main():" in content:
-                                f1.write(("JadeLog.INFO('#'*30 + '版本更新时间为:{}'+'#'*30)\r" + content).format(GetTimeStamp()).encode("utf-8"))
+                                if args.use_jade_log:
+                                    f1.write(("JadeLog.INFO('#'*30 + '版本更新时间为:{}'+'#'*30)\r" + content).format(GetTimeStamp()).encode("utf-8"))
+                                else:
+                                    f1.write(("print('#'*30 + '版本更新时间为:{}'+'#'*30)\r" + content).format(GetTimeStamp()).encode("utf-8"))
+
                             else:
                                 f1.write((content + '\n').encode("utf-8"))
 
@@ -66,7 +70,7 @@ def copyPy():
 
 
 def writePy(args):
-    import_list = copyPy()
+    import_list = copyPy(args)
 
     with open("{}.py".format(args.app_name), "wb") as f:
         f.write("import sys\n"
@@ -392,7 +396,8 @@ if __name__ == '__main__':
 
         parser.add_argument('--extra_path_list', type=list,
                             default=[])  ## 需要额外打包的路径
-
+    parser.add_argument('--use_jade_log', type=bool,
+                        default=True)
     parser.add_argument('--ID', type=str,
                         default="0")
     parser.add_argument('--full', type=bool,
