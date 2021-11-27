@@ -76,7 +76,8 @@ class JadeLogging():
             self.logger.error(content)
         elif Type == 'critical':
             self.logger.critical(content)
-
+    def WARNING(self,content):
+        self.logContent.put((content, "warning"))
     def DEBUG(self,content):
         self.logContent.put((content,"debug"))
     def ERROR(self,content):
