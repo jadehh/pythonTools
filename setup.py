@@ -21,6 +21,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     platforms="any",
-    install_requires=[]  # 这个项目需要的第三方库
+    install_requires=["easycython==1.0.7","pyinstaller==4.6"]  # 这个项目需要的第三方库
 )
 
