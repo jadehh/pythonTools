@@ -12,6 +12,18 @@ import os
 from queue import Queue
 from threading import Thread
 
+logging.getLogger("requests").setLevel(logging.ERROR)
+logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
+logging.getLogger("spyne").setLevel(logging.ERROR)
+logging.getLogger("spyne.application").setLevel(logging.ERROR)
+logging.getLogger("spyne.application.client").setLevel(logging.ERROR)
+logging.getLogger("spyne.application.server").setLevel(logging.ERROR)
+logging.getLogger("suds").setLevel(logging.ERROR)
+logging.getLogger("tornado.access").disabled = True
+logging.getLogger("tornado.application").disabled = True
+logging.getLogger("tornado.general").disabled = True
+
+
 class JadeLogging():
     """
     TimedRotatingFileHandler 测试
