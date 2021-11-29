@@ -54,7 +54,7 @@ class JadeLogging():
             },
             'root': {
                 'handlers': ['file'],
-                'level': 'DEBUG',
+                'level': Level,
             },
         }
 

@@ -9,6 +9,8 @@
 import os
 import sys
 import datetime
+import time
+
 def zh_ch(string):
     """
     解决cv2.namedWindow中文乱码问题
@@ -151,7 +153,7 @@ def GetTime():
 
 #合并文件路径
 def OpsJoin(path1,path2):
-    return ops.join(path1,path2)
+    return os.path.join(path1,path2)
 
 #返回上一层目录
 def GetPreviousDir(savepath):
@@ -202,57 +204,5 @@ def GetHourTime():
     pathname = otherStyleTime.split(" ")[1]
     return pathname
 
-class ProgressBar:
-    """A progress bar which can print the progress.终端进度条"""
-
-    def __init__(self, task_num=0, bar_width=50, start=True, file=sys.stdout):
-        self.task_num = task_num
-        self.bar_width = bar_width
-        self.completed = 0
-        self.file = file
-        if start:
-            self.start()
-
-    @property
-    def terminal_width(self):
-        width, _ = get_terminal_size()
-        return width
-
-    def start(self):
-        if self.task_num > 0:
-            self.file.write(f'[{" " * self.bar_width}] 0/{self.task_num}, '
-                            '花费了: 0s, 预计还剩:')
-        else:
-            self.file.write('完成: 0, 共花费: 0s')
-        self.file.flush()
-        self.timer = Timer()
-
-    def update(self, num_tasks=1):
-        assert num_tasks > 0
-        self.completed += num_tasks
-        elapsed = self.timer.since_start()
-        if elapsed > 0:
-            fps = self.completed / elapsed
-        else:
-            fps = float('inf')
-        if self.task_num > 0:
-            percentage = self.completed / float(self.task_num)
-            eta = int(elapsed * (1 - percentage) / percentage + 0.5)
-            msg = f'\r[{{}}] {self.completed}/{self.task_num}, ' \
-                  f'{fps:.1f} task/s, 花费了: {int(elapsed + 0.5)}s, ' \
-                  f'预计还剩: {eta:5}s'
-
-            bar_width = min(self.bar_width,
-                            int(self.terminal_width - len(msg)) + 2,
-                            int(self.terminal_width * 0.6))
-            bar_width = max(2, bar_width)
-            mark_width = int(bar_width * percentage)
-            bar_chars = '>' * mark_width + ' ' * (bar_width - mark_width)
-            self.file.write(msg.format(bar_chars))
-        else:
-            self.file.write(
-                f'完成: {self.completed}, 共花费: {int(elapsed + 0.5)}s,'
-                f' {fps:.1f} tasks/s')
-        self.file.flush()
 
 

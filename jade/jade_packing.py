@@ -59,10 +59,8 @@ def copyPy(args):
                                         import_list.append(content)
                             elif "def main():" in content:
                                 if args.use_jade_log:
-                                    f1.write(("JadeLog.INFO('#'*30 + '版本更新时间为:{}'+'#'*30)\r" + content).format(GetTimeStamp()).encode("utf-8"))
-                                else:
-                                    f1.write(("print('#'*30 + '版本更新时间为:{}'+'#'*30)\r" + content).format(GetTimeStamp()).encode("utf-8"))
-
+                                    update_log ="JadeLog.INFO('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,GetTimeStamp())
+                                    f1.write((update_log+ content).encode("utf-8"))
                             else:
                                 f1.write((content + '\n').encode("utf-8"))
 

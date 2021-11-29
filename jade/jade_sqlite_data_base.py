@@ -16,13 +16,14 @@ class JadeSqliteDataBase(object):
         self._db_name = os.path.join(root_path, db_name)
         self.table_name = talbe_name
         self.JadeLog = JadeLog
+        self.lock = threading.Lock()
         # 使用cursor()方法获取操作游标,连接数据库
         self.db = sqlite3.connect(self._db_name, check_same_thread=False)
         self.cursor = self.db.cursor()
         self.JadeLog.DEBUG(
             "#"*30+"{}数据库连接成功".format(talbe_name)+"#"*30
         )
-        super(SamplesSqliteDataBase, self).__init__()
+        super(JadeSqliteDataBase, self).__init__()
 
         # 重新连接
 
@@ -79,8 +80,10 @@ class JadeSqliteDataBase(object):
                     if len(data[data_key]) > 0:
                         sql_str = sql_str + "'{}'".format(data[data_key]) + ","
             sql_str = sql_str[:-1] + ")"
+            self.lock.acquire()
             self.cursor.execute(sql_str)
             self.db.commit()
+            self.lock.release()
         except Exception as e:
             self.JadeLog.ERROR("插入数据表失败,失败原因为{},sql语句为{}".format(e, sql_str))
 
@@ -93,12 +96,16 @@ class JadeSqliteDataBase(object):
         sql_str = "SELECT * FROM {} where  rec_date >'{}' and rec_date<'{}'".format(self.table_name, start_time,
                                                                                     end_time)
         try:
-
+            self.lock.acquire()
             self.cursor.execute(sql_str)
             results = self.cursor.fetchall()
+            self.lock.release()
             return results
         except Exception as e:
             self.JadeLog.ERROR("查询表失败,失败原因为{},sql语句为{}".format(e, sql_str))
             pass
+
+
+
 
 
