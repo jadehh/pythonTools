@@ -6,6 +6,7 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+from jade import AppRunPath
 from jade.jade_tools import CreateSavePath, GetTimeStamp
 import os
 import shutil
@@ -290,7 +291,7 @@ def packAppImage(args):
                         shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
         os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
 
-    with open("AppRun", "r") as f:
+    with open(AppRunPath, "r") as f:
         conetent_list = f.read().split("\n")
         for content in conetent_list:
             with open(os.path.join(save_path, "AppRun"), "a", encoding="utf-8") as f:
