@@ -16,6 +16,7 @@ from PIL import Image, ImageFont, ImageDraw
 import os
 import time
 import uuid
+from opencv_tools import DIRECTORY_IMAGES,DIRECTORY_ANNOTATIONS,DIRECTORY_PREANNOTATIONS
 
 
 ##旋转图片
