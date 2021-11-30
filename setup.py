@@ -7,7 +7,10 @@
 # @Software : Samples
 # @Desc     :
 from setuptools import setup, find_packages
-setup(
+if __name__ == '__main__':
+    pack_list = ["opencv_tools"]
+    find_packages("opencv_tools", pack_list)
+    setup(
     name="opencv_tools",
     version="1.0.0",
     keywords=("pip", "opencv_tools", ""),
@@ -18,7 +21,9 @@ setup(
     author="opencv_tools",
     author_email="jadehh@live.com",
 
-    packages=find_packages(),
+    packages=pack_list,
+    package_data={'': ['*.ttf']},
+
     include_package_data=True,
     platforms="any",
     install_requires=["easycython==1.0.7","pyinstaller==4.6","numpy","pillow","opencv-python"]  # 这个项目需要的第三方库
