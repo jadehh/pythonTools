@@ -11,7 +11,6 @@ import numpy as np
 import cv2
 import math
 from PIL import Image, ImageFont, ImageDraw
-from opencv_tools import font_path
 
 def get_color_map_list(num_classes):
     """
@@ -298,7 +297,7 @@ def str_count(s):
 
 
 # OCR识别结果
-def draw_ocr(image, boxes, txts, scores, draw_txt=True, drop_score=0.5):
+def draw_ocr(image, boxes, txts, scores,font_path, draw_txt=True, drop_score=0.5):
     """
     Visualize the results of OCR detection and recognition
     args:
@@ -322,12 +321,12 @@ def draw_ocr(image, boxes, txts, scores, draw_txt=True, drop_score=0.5):
     if draw_txt:
         img = np.array(resize_img(image, input_size=600))
         txt_img = text_visual(
-            txts, scores, img_h=img.shape[0], img_w=600, threshold=drop_score)
+            txts, scores,font_path ,img_h=img.shape[0], img_w=600, threshold=drop_score)
         img = np.concatenate([np.array(img), np.array(txt_img)], axis=1)
         return img
     return image
 
-def text_visual(texts, scores, img_h=400, img_w=600, threshold=0.):
+def text_visual(texts, scores,font_path, img_h=400, img_w=600, threshold=0.):
     """
     create new blank img and draw txt on it
     args:
@@ -400,7 +399,7 @@ def text_visual(texts, scores, img_h=400, img_w=600, threshold=0.):
 
 
 
-def draw_text_list(img, label_list, pt_list=[], color_list=[], font_size_list=[]):
+def draw_text_list(img,font_path, label_list, pt_list=[], color_list=[], font_size_list=[]):
     cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
     pilimg = Image.fromarray(cv2img)
     # PIL图片上打印汉字

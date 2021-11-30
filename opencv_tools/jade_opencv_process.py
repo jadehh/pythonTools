@@ -15,7 +15,6 @@ import random
 from PIL import Image, ImageFont, ImageDraw
 import os
 import time
-from opencv_tools import font_path
 import uuid
 
 
@@ -311,7 +310,7 @@ class processImage:
         return rotated
 
     # 添加中文label
-    def add_chinese_label(self, label, pt1=(0, 0), color=(255, 0, 0), font_size=15):
+    def add_chinese_label(self,font_path, label, pt1=(0, 0), color=(255, 0, 0), font_size=15):
         cv2img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
         pilimg = Image.fromarray(cv2img)
         # PIL图片上打印汉字
@@ -422,7 +421,7 @@ def Add_Title_Image(image, title):
 
 
 # 添加中文label
-def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=24):
+def Add_Chinese_Label(img,font_path, label, pt1=(0, 0), color=GetRandomColor(), font_size=24):
     cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
     pilimg = Image.fromarray(cv2img)
     # PIL图片上打印汉字
@@ -432,7 +431,7 @@ def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
 
-def draw_text_list(img, label_list, pt_list=[], color_list=[], font_size_list=[]):
+def draw_text_list(img, font_path,label_list, pt_list=[], color_list=[], font_size_list=[]):
     cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
     pilimg = Image.fromarray(cv2img)
     # PIL图片上打印汉字
