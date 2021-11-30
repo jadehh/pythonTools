@@ -1,5 +1,7 @@
 #coding=utf-8
-AppRunPath = "jade/AppRun"
+import os
+file_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+AppRunPath = "/AppRun".format(file_path)
 DIRECTORY_ANNOTATIONS = 'Annotations/'
 DIRECTORY_IMAGES = 'JPEGImages/'
 DIRECTORY_PREANNOTATIONS = "PredictAnnotations/"

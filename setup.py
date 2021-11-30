@@ -7,7 +7,11 @@
 # @Software : Samples
 # @Desc     :
 from setuptools import setup, find_packages
-setup(
+if __name__ == '__main__':
+    pack_list = ["jade"]
+    find_packages("jade", pack_list)
+
+    setup(
     name="jade",
     version="1.0.1",
     keywords=("pip", "jade", ""),
@@ -18,7 +22,8 @@ setup(
     author="jade",
     author_email="jadehh@live.com",
 
-    packages=find_packages(),
+    packages=pack_list,
+    package_data={'': ['*.Run']},
     include_package_data=True,
     platforms="any",
     install_requires=["easycython==1.0.7","pyinstaller==4.6"]  # 这个项目需要的第三方库
