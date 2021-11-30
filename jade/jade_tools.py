@@ -137,9 +137,10 @@ def timeint_to_timestr(timeInt):
     otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
     return otherStyleTime
 
+
 def GetChineseTimeStamp():
     now = datetime.datetime.now()
-    otherStyleTime = now.strftime("%Y年%m月%d日 %H:%M:%S")
+    otherStyleTime = now.strftime("%Y{y}%m{m}%d{d} %H:%M:%S").format(y='年',m='月',d='日')
     pathname = otherStyleTime
     return pathname
 
