@@ -1,5 +1,5 @@
-jade/jade_tools.pyc
-jade/__init__.pyc
+dataset_tools/jade_tools.pyc
+dataset_tools/__init__.pyc
 wheel_dir/imageio-2.9.0-py3-none-any.whl
 wheel_dir/Pillow-8.3.2-cp36-cp36m-win_amd64.whl
 wheel_dir/numpy-1.19.5-cp36-cp36m-win_amd64.whl

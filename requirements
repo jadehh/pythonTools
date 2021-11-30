@@ -1,0 +1,6 @@
+pycocotools=2.0.3
+scikit-image=0.17.2
+opencv_python=4.5.4.60
+lxml=4.6.4
+tqdm=4.62.3
+numpy=1.19
