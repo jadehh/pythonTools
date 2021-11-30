@@ -431,3 +431,32 @@ def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=
     draw.text(pt1, label, (int(color[0]), int(color[1]), int(color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
+
+def draw_text_list(img, label_list, pt_list=[], color_list=[], font_size_list=[]):
+    cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
+    pilimg = Image.fromarray(cv2img)
+    # PIL图片上打印汉字
+    draw = ImageDraw.Draw(pilimg)  # 图片上打印
+    for (label, pt, color, font_size) in zip(label_list, pt_list, color_list, font_size_list):
+        font = ImageFont.truetype(font_path, font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+        draw.text(pt, label, color, font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
+    return cv2charimg
+
+
+
+
+def draw_text_det_res(img, dt_boxes, txts=None):
+    if isinstance(img, str):
+        src_im = cv2.imread(img)
+    else:
+        src_im = img.copy()
+    if txts is None:
+        txts = [None] * len(dt_boxes)
+    for idx, (box, txt) in enumerate(zip(dt_boxes, txts)):
+        box = np.array(box).astype(np.int32).reshape(-1, 2)
+        if txt:
+            src_im = draw_text_list(src_im, [txt[0]], [(box[0, 0], box[3, 1])], [(0, 0, 255)], font_size_list=[54])
+        cv2.polylines(src_im, [box], True, color=(0, 0, 255), thickness=2)
+    return src_im
+
