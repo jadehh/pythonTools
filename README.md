@@ -17,7 +17,7 @@ setup(
     license="MIT Licence",
 
     url="https://jadehh@live.com",
-    author="jade",
+    author="opencv_tools",
     author_email="jadehh@live.com",
 
     packages=find_packages(),
