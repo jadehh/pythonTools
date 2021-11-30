@@ -23,7 +23,7 @@ if __name__ == '__main__':
     author_email="jadehh@live.com",
 
     packages=pack_list,
-    package_data={'': ['*.Run']},
+    package_data={'': ['*Run']},
     include_package_data=True,
     platforms="any",
     install_requires=["easycython==1.0.7","pyinstaller==4.6"]  # 这个项目需要的第三方库
