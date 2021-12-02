@@ -17,7 +17,7 @@ import os
 import time
 import uuid
 from opencv_tools import DIRECTORY_IMAGES,DIRECTORY_ANNOTATIONS,DIRECTORY_PREANNOTATIONS
-
+import base64
 
 ##旋转图片
 def Image_Roate(image, angle):
@@ -460,3 +460,9 @@ def draw_text_det_res(img, dt_boxes, txts=None):
         cv2.polylines(src_im, [box], True, color=(0, 0, 255), thickness=2)
     return src_im
 
+
+
+def opencv_to_base64(image):
+    image_byte = cv2.imencode('.jpg', image)[1].tobytes()
+    base64_str = str(base64.b64encode(image_byte), encoding='utf-8')
+    return base64_str
