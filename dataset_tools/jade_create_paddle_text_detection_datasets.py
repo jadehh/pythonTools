@@ -9,8 +9,10 @@
 from jade import *
 import json
 import base64
+from opencv_tools.jade_opencv_process import opencv_to_base64
 import shutil
 import cv2
+import random
 
 
 def sortPoints(points, label):
@@ -135,7 +137,7 @@ def dettojson(root_path, save_path):
                     shutil.copy(image_path, os.path.join(save_path, GetLastDir(image_name)))
                     image = cv2.imread(image_path)
                     height, width = image.shape[0], image.shape[1]
-                    image_base64 = cv2_base64(image)
+                    image_base64 = opencv_to_base64(image)
                     json_content = {
                         "version": "4.4.0",
                         "flags": {},
@@ -265,10 +267,13 @@ def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
     for image_path in test_image_files:
         shutil.copyfile(image_path, os.path.join(save_image_path, GetLastDir(image_path)))
         result = readjsonContent(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
-
         with open(os.path.join(save_path, "test_icdar2015_label.txt"), "a") as f:
             content = "image/" + GetLastDir(image_path) + "\t" + result
             f.write(content + "\n")
         progresstestBar.update()
     createDatasets(save_root_path)
 
+def create_text_detection_datasets(root_path,save_path,split_rate=0.95):
+    file_list = os.listdir(root_path)
+    for file_name in file_list:
+        CreateTextDetDatasets(os.path.join(root_path, file_name),save_path,split_rate)
