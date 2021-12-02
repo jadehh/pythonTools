@@ -21,7 +21,7 @@ def RenameVOCDataSets(voc_path,save_path):
 
     for image_path in image_path_list:
         file_name = image_path.split(".")[0]
-        shutil.
+
 
 
 

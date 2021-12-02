@@ -12,6 +12,7 @@ from jade import ProgressBar,GetLastDir
 import shutil
 import random
 import xml.etree.ElementTree as ET
+
 def ProcessXml(xml_path):
     # Read the XML annotation file.
     tree = ET.parse(xml_path)
