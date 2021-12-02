@@ -466,3 +466,4 @@ def opencv_to_base64(image):
     image_byte = cv2.imencode('.jpg', image)[1].tobytes()
     base64_str = str(base64.b64encode(image_byte), encoding='utf-8')
     return base64_str
+
