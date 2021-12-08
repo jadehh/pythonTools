@@ -10,6 +10,12 @@ from jade import *
 import json
 import math
 import re
+import cv2
+import uuid
+import numpy as np
+from opencv_tools.jade_opencv_process import Image_Roate
+
+
 class ContaNumber(object):
     def __init__(self):
         self._OWNER_CODES = []
@@ -91,7 +97,7 @@ class ContaNumber(object):
 
         return False
 
-    def check_well_model(self,conta_model):
+    def check_well_model(self, conta_model):
         self.model_list = ["G", "V", "B", "S", "R", "H", "U", "P", "T", "A",
                            "K"]  ##箱型校验规则,一共四位数,第三位为英文字母满足一定规则,第四位为0-9的数字
         try:
@@ -101,7 +107,6 @@ class ContaNumber(object):
                 return False
         except Exception:
             return False
-
 
     def check_conta(self, conta_num):
 
@@ -163,7 +168,7 @@ class ContaNumber(object):
 
         return conta_num, 0
 
-    def get_match_best_text(self,results):
+    def get_match_best_text(self, results):
         max_key_val = 0
         match_best_text = None
         for k in results.keys():
@@ -178,27 +183,28 @@ class ContaNumber(object):
             if conta_wrong_number:
                 if len(conta_wrong_number) < 8:
                     conta_wrong_number = ""
-            return "",conta_wrong_number ,max_key_val
+            return "", conta_wrong_number, max_key_val
         for k in results.keys():
             if results[k]["score"] == max_key_val:
                 match_best_text = k
-        return match_best_text,"",max_key_val
-
+        return match_best_text, "", max_key_val
 
 
 class CreatePaddleOCRDatasets(object):
-    def __init__(self,root_path,save_path,dataset_type=None):
+    def __init__(self, root_path, save_path, dataset_type=None):
         self.root_path = root_path
         self.save_path = save_path
         self.conta_check_model = ContaNumber()
         self.dataset_type = dataset_type  ## 数据集类型,如车牌数据集,箱号数据集
         label_list = self.get_label_text_path()
+
         for label_path in label_list:
             self.createOCRDatasets(label_path)
 
+        self.createDatasets(os.path.join(self.save_path, "OCRH"))
+        self.createDatasets(os.path.join(self.save_path, "OCRV"))
 
-
-    def verification_rules(self,res_str):
+    def verification_rules(self, res_str):
         if self.dataset_type == "箱号数据集":
             if len(res_str) == 11:
                 is_check = self.conta_check_model.check_well_conta(res_str)
@@ -222,7 +228,7 @@ class CreatePaddleOCRDatasets(object):
         else:
             return res_str
 
-    def get_rotate_crop_image(self,img, points):
+    def get_rotate_crop_image(self, img, points):
         '''
         img_height, img_width = img.shape[0:2]
         left = int(np.min(points[:, 0]))
@@ -248,7 +254,7 @@ class CreatePaddleOCRDatasets(object):
 
         return dst_img
 
-    def sorted_boxes(self,dt_boxes):
+    def sorted_boxes(self, dt_boxes):
         """
         Sort text boxes in order from top to bottom, left to right
         args:
@@ -283,17 +289,15 @@ class CreatePaddleOCRDatasets(object):
             _boxes.append(box)
         return np.array(_boxes)
 
-
     def get_label_text_path(self):
         file_name_list = os.listdir(self.root_path)
         label_path_list = []
         for filename in file_name_list:
             if ".txt" in filename:
-                label_path_list.append(os.path.join(self.root_path,filename))
+                label_path_list.append(os.path.join(self.root_path, filename))
         return label_path_list
 
-
-    def createOCRDatasets(self,label_txt_path):
+    def createOCRDatasets(self, label_txt_path):
         save_h_path = CreateSavePath(os.path.join(self.save_path, "OCRH"))
         save_v_path = CreateSavePath(os.path.join(self.save_path, "OCRV"))
         istrain = False
@@ -303,6 +307,7 @@ class CreatePaddleOCRDatasets(object):
         with open(label_txt_path, "r") as f:
             content_list = f.read().split("\n")[:-1]
             index = 0
+            processBar = ProgressBar(len(content_list))
             for content in content_list:
                 save_h_detail_path = CreateSavePath(os.path.join(save_h_path, content.split("/")[0]))
                 save_v_detail_path = CreateSavePath(os.path.join(save_v_path, content.split("/")[0]))
@@ -371,8 +376,9 @@ class CreatePaddleOCRDatasets(object):
                             print("txt = {}. pass image path = {}".format(txts[i], image_path))
 
                 index = index + 1
+                processBar.update()
 
-    def createDatasets(self,root_path):
+    def createDatasets(self, root_path):
         if os.path.exists(os.path.join(root_path, "rec_gt_train.txt")) is True:
             os.remove(os.path.join(root_path, "rec_gt_train.txt"))
         if os.path.exists(os.path.join(root_path, "rec_gt_test.txt")) is True:
@@ -381,13 +387,15 @@ class CreatePaddleOCRDatasets(object):
         with open(os.path.join(root_path, "rec_gt_train.txt"), "w") as f1:
             for year in years:
                 if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
-                    with open(os.path.join(root_path, year, "rec_gt_train.txt"), "r") as f:
-                        content_list = (f.read().split("\n"))[:-1]
-                        processBar = ProgressBar(len(content_list))
-                        for content in content_list:
-                            new_c = year + "/" + content
-                            f1.write(new_c + "\n")
-                            processBar.update()
+                    if os.path.exists(os.path.join(root_path, year, "rec_gt_train.txt")):
+                        with open(os.path.join(root_path, year, "rec_gt_train.txt"), "r") as f:
+                            content_list = (f.read().split("\n"))[:-1]
+                            processBar = ProgressBar(len(content_list))
+                            for content in content_list:
+                                new_c = year + "/" + content
+                                f1.write(new_c + "\n")
+                                processBar.update()
+
 
         with open(os.path.join(root_path, "rec_gt_test.txt"), "w") as f1:
             for year in years:
@@ -395,13 +403,12 @@ class CreatePaddleOCRDatasets(object):
                     if os.path.exists(os.path.join(root_path, year, "rec_gt_test.txt")):
                         with open(os.path.join(root_path, year, "rec_gt_test.txt"), "r") as f:
                             content_list = (f.read().split("\n"))[:-1]
-                            processBar = ProgressBar(content_list)
+                            processBar = ProgressBar(len(content_list))
                             for content in content_list:
                                 new_c = year + "/" + content
                                 f1.write(new_c + "\n")
                                 processBar.update()
 
 
-
 if __name__ == '__main__':
-    CreatePaddleOCRDatasets(root_path="E:\Data\字符检测识别数据集\镇江大港厂内车牌关键点检测数据集",save_path="E:\Data\OCR\镇江大港厂内车牌识别数据集")
+    CreatePaddleOCRDatasets(root_path="E:\Data\字符检测识别数据集\箱号关键点数据集", save_path="E:\Data\OCR\箱号识别数据集",dataset_type="箱号数据集")
