@@ -171,23 +171,23 @@ def createDatasets(root_path):
     if os.path.exists(os.path.join(root_path, "test_icdar2015_label.txt")) is True:
         os.remove(os.path.join(root_path, "test_icdar2015_label.txt"))
     years = os.listdir(root_path)
-    with open(os.path.join(root_path, "train_icdar2015_label.txt"), "w") as f1:
+    with open(os.path.join(root_path, "train_icdar2015_label.txt"), "wb") as f1:
         for year in years:
             if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
-                with open(os.path.join(root_path, year, "train_icdar2015_label.txt"), "r") as f:
-                    content_list = (f.read().split("\n"))[:-1]
+                with open(os.path.join(root_path, year, "train_icdar2015_label.txt"), "rb") as f:
+                    content_list = f.readlines()
                     for content in content_list:
-                        new_c = year + "/" + content
-                        f1.write(new_c + "\n")
+                        new_c = year + "/" + str(content,encoding="utf-8").strip()
+                        f1.write((new_c + "\n").encode("utf-8"))
 
-    with open(os.path.join(root_path, "test_icdar2015_label.txt"), "w") as f1:
+    with open(os.path.join(root_path, "test_icdar2015_label.txt"), "wb") as f1:
         for year in years:
             if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
-                with open(os.path.join(root_path, year, "test_icdar2015_label.txt"), "r") as f:
-                    content_list = (f.read().split("\n"))[:-1]
+                with open(os.path.join(root_path, year, "test_icdar2015_label.txt"), "rb") as f:
+                    content_list = f.readlines()
                     for content in content_list:
-                        new_c = year + "/" + content
-                        f1.write(new_c + "\n")
+                        new_c = year + "/" + str(content,encoding="utf-8").strip()
+                        f1.write((new_c + "\n").encode("utf-8"))
 
 
 def removeNolabelDatasets(root_path):
@@ -258,18 +258,18 @@ def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
         shutil.copyfile(image_path, os.path.join(save_image_path, GetLastDir(image_path)))
         result = readjsonContent(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
 
-        with open(os.path.join(save_path, "train_icdar2015_label.txt"), "a") as f:
+        with open(os.path.join(save_path, "train_icdar2015_label.txt"), "ab") as f:
             content = "image/" + GetLastDir(image_path) + "\t" + result
-            f.write(content + "\n")
+            f.write((content + "\n").encode("utf-8"))
         progressBar.update()
 
     progresstestBar = ProgressBar(len(test_image_files))
     for image_path in test_image_files:
         shutil.copyfile(image_path, os.path.join(save_image_path, GetLastDir(image_path)))
         result = readjsonContent(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
-        with open(os.path.join(save_path, "test_icdar2015_label.txt"), "a") as f:
+        with open(os.path.join(save_path, "test_icdar2015_label.txt"), "ab") as f:
             content = "image/" + GetLastDir(image_path) + "\t" + result
-            f.write(content + "\n")
+            f.write((content + "\n").encode("utf-8"))
         progresstestBar.update()
     createDatasets(save_root_path)
 
