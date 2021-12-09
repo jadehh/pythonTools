@@ -9,7 +9,7 @@
 ##旋转图片
 import cv2
 import numpy as np
-from jade import ProgressBar
+from jade import ProgressBar,getOperationSystem
 import threading
 import random
 from PIL import Image, ImageFont, ImageDraw
@@ -438,12 +438,18 @@ def Add_Chinese_Label(img,font_path, label, pt1=(0, 0), color=GetRandomColor(), 
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
 
-def draw_text_list(img, font_path,label_list, pt_list=[], color_list=[], font_size_list=[]):
+def draw_text_list(img,label_list, pt_list=[], color_list=[], font_size_list=[],font_path=None):
     cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
     pilimg = Image.fromarray(cv2img)
     # PIL图片上打印汉字
     draw = ImageDraw.Draw(pilimg)  # 图片上打印
     for (label, pt, color, font_size) in zip(label_list, pt_list, color_list, font_size_list):
+        if font_path is None:
+            if getOperationSystem() == "Windows":
+                font_path = r'C:\Windows\Fonts\SIMLI.TTF'
+            else:
+                font_path = r'C:\Windows\Fonts\SIMLI.TTF'
+
         font = ImageFont.truetype(font_path, font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
         draw.text(pt, label, color, font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
@@ -452,7 +458,7 @@ def draw_text_list(img, font_path,label_list, pt_list=[], color_list=[], font_si
 
 
 
-def draw_text_det_res(img, dt_boxes, txts=None):
+def draw_text_det_res(img, dt_boxes, txts=None,font_path=None,):
     if isinstance(img, str):
         src_im = cv2.imread(img)
     else:
@@ -462,7 +468,7 @@ def draw_text_det_res(img, dt_boxes, txts=None):
     for idx, (box, txt) in enumerate(zip(dt_boxes, txts)):
         box = np.array(box).astype(np.int32).reshape(-1, 2)
         if txt:
-            src_im = draw_text_list(src_im, [txt[0]], [(box[0, 0], box[3, 1])], [(0, 0, 255)], font_size_list=[54])
+            src_im = draw_text_list(src_im,[txt[0]], [(box[0, 0], box[3, 1])], [(0, 0, 255)], font_size_list=[54],font_path=font_path)
         cv2.polylines(src_im, [box], True, color=(0, 0, 255), thickness=2)
     return src_im
 
