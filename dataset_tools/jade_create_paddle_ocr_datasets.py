@@ -225,8 +225,12 @@ class CreatePaddleOCRDatasets(object):
                 return res_str
             else:
                 return None
-        else:
-            return res_str
+        elif self.dataset_type == "镇江厂内车牌数据集":
+            if len(res_str) == 5:
+                return res_str
+            else:
+                return None
+
 
     def get_rotate_crop_image(self, img, points):
         '''
@@ -304,11 +308,15 @@ class CreatePaddleOCRDatasets(object):
         if "train" in label_txt_path:
             istrain = True
         privous_dir = GetPreviousDir(label_txt_path)
-        with open(label_txt_path, "r") as f:
-            content_list = f.read().split("\n")[:-1]
+        all_image_width = 0
+        all_image_height = 0
+        all_image_count = 0
+        with open(label_txt_path, "rb") as f:
+            content_list = f.readlines()
             index = 0
             processBar = ProgressBar(len(content_list))
-            for content in content_list:
+            for content_byte in content_list:
+                content = str(content_byte,"utf-8").strip()
                 save_h_detail_path = CreateSavePath(os.path.join(save_h_path, content.split("/")[0]))
                 save_v_detail_path = CreateSavePath(os.path.join(save_v_path, content.split("/")[0]))
                 save_h_detail_train_path = CreateSavePath(os.path.join(save_h_detail_path, "train"))
@@ -331,9 +339,7 @@ class CreatePaddleOCRDatasets(object):
                     else:
                         txt_tags.append(False)
                 wordBBs = self.sorted_boxes(np.array(wordBBs, dtype=np.float32))
-                txt_tags = np.array(txt_tags, dtype=np.bool)
-                # image = CVShowKeyPoints(image,wordBBs,waiktKey=-1)
-                # cv2.imshow("result2",image)
+
                 for i in range(wordBBs.shape[0]):
                     txt_img = self.get_rotate_crop_image(image, wordBBs[i])
                     h, w = txt_img.shape[0], txt_img.shape[1]
@@ -342,35 +348,47 @@ class CreatePaddleOCRDatasets(object):
                     txt = self.verification_rules(txt_orignal)
                     if txt:
                         if istrain is False:
-                            if h < w:
+                            if h < w: ## 水平
                                 cv2.imencode('.jpg', txt_img * 255)[1].tofile(
                                     os.path.join(save_h_detail_test_path, image_name))
-                                with open(os.path.join(save_h_detail_path, "rec_gt_test.txt"), "a") as f:
+                                all_image_width = all_image_width + txt_img.shape[1]
+                                all_image_height = all_image_height + txt_img.shape[0]
+                                all_image_count = all_image_count + 1
+                                with open(os.path.join(save_h_detail_path, "rec_gt_test.txt"), "ab") as f:
                                     content = "test/" + image_name + "\t   " + txt
-                                    f.write(content + "\n")
+                                    f.write((content + "\n").encode("utf-8"))
                             else:
                                 txt_img = (txt_img * 255).astype("uint8")
                                 txt_img = Image_Roate(txt_img, 270)
                                 cv2.imencode('.jpg', txt_img)[1].tofile(
                                     os.path.join(save_v_detail_test_path, image_name))
-                                with open(os.path.join(save_v_detail_path, "rec_gt_test.txt"), "a") as f:
+                                all_image_width = all_image_width + txt_img.shape[1]
+                                all_image_height = all_image_height + txt_img.shape[0]
+                                all_image_count = all_image_count + 1
+                                with open(os.path.join(save_v_detail_path, "rec_gt_test.txt"), "ab") as f:
                                     content = "test/" + image_name + "\t   " + txt
-                                    f.write(content + "\n")
+                                    f.write((content + "\n").encode("utf-8"))
                         else:
                             if h < w:
                                 cv2.imencode('.jpg', txt_img * 255)[1].tofile(
                                     os.path.join(save_h_detail_train_path, image_name))
-                                with open(os.path.join(save_h_detail_path, "rec_gt_train.txt"), "a") as f:
+                                all_image_width = all_image_width + txt_img.shape[1]
+                                all_image_height = all_image_height + txt_img.shape[0]
+                                all_image_count = all_image_count + 1
+                                with open(os.path.join(save_h_detail_path, "rec_gt_train.txt"), "ab") as f:
                                     content = "train/" + image_name + "\t   " + txt
-                                    f.write(content + "\n")
+                                    f.write((content + "\n").encode("utf-8"))
                             else:
                                 txt_img = (txt_img * 255).astype("uint8")
                                 txt_img = Image_Roate(txt_img, 270)
+                                all_image_width = all_image_width + txt_img.shape[1]
+                                all_image_height = all_image_height + txt_img.shape[0]
+                                all_image_count = all_image_count + 1
                                 cv2.imencode('.jpg', txt_img)[1].tofile(
                                     os.path.join(save_v_detail_train_path, image_name))
-                                with open(os.path.join(save_v_detail_path, "rec_gt_train.txt"), "a") as f:
+                                with open(os.path.join(save_v_detail_path, "rec_gt_train.txt"), "ab") as f:
                                     content = "train/" + image_name + "\t   " + txt
-                                    f.write(content + "\n")
+                                    f.write((content + "\n").encode("utf-8"))
                     else:
                         if txt_orignal != "difficult":
                             print("txt = {}. pass image path = {}".format(txts[i], image_path))
@@ -378,37 +396,41 @@ class CreatePaddleOCRDatasets(object):
                 index = index + 1
                 processBar.update()
 
+        print("平均高度为:{},平均宽度为:{}".format(all_image_height / all_image_count,all_image_width / all_image_count))
+
     def createDatasets(self, root_path):
         if os.path.exists(os.path.join(root_path, "rec_gt_train.txt")) is True:
             os.remove(os.path.join(root_path, "rec_gt_train.txt"))
         if os.path.exists(os.path.join(root_path, "rec_gt_test.txt")) is True:
             os.remove(os.path.join(root_path, "rec_gt_test.txt"))
         years = os.listdir(root_path)
-        with open(os.path.join(root_path, "rec_gt_train.txt"), "w") as f1:
+        with open(os.path.join(root_path, "rec_gt_train.txt"), "wb") as f1:
             for year in years:
                 if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
                     if os.path.exists(os.path.join(root_path, year, "rec_gt_train.txt")):
-                        with open(os.path.join(root_path, year, "rec_gt_train.txt"), "r") as f:
-                            content_list = (f.read().split("\n"))[:-1]
+                        with open(os.path.join(root_path, year, "rec_gt_train.txt"), "rb") as f:
+                            content_list = f.readlines()
                             processBar = ProgressBar(len(content_list))
-                            for content in content_list:
+                            for content_byte in content_list:
+                                content = str(content_byte,"utf-8").strip()
                                 new_c = year + "/" + content
-                                f1.write(new_c + "\n")
+                                f1.write((new_c + "\n").encode("utf-8"))
                                 processBar.update()
 
 
-        with open(os.path.join(root_path, "rec_gt_test.txt"), "w") as f1:
+        with open(os.path.join(root_path, "rec_gt_test.txt"), "wb") as f1:
             for year in years:
                 if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
                     if os.path.exists(os.path.join(root_path, year, "rec_gt_test.txt")):
-                        with open(os.path.join(root_path, year, "rec_gt_test.txt"), "r") as f:
-                            content_list = (f.read().split("\n"))[:-1]
+                        with open(os.path.join(root_path, year, "rec_gt_test.txt"), "rb") as f:
+                            content_list = f.readlines()
                             processBar = ProgressBar(len(content_list))
-                            for content in content_list:
+                            for content_byte in content_list:
+                                content  = str(content_byte,encoding="utf-8").strip()
                                 new_c = year + "/" + content
-                                f1.write(new_c + "\n")
+                                f1.write((new_c + "\n").encode("utf-8"))
                                 processBar.update()
 
 
 if __name__ == '__main__':
-    CreatePaddleOCRDatasets(root_path="E:\Data\字符检测识别数据集\箱号关键点数据集", save_path="E:\Data\OCR\箱号识别数据集",dataset_type="箱号数据集")
+    CreatePaddleOCRDatasets(root_path="E:\Data\字符检测识别数据集\镇江大港厂内车牌关键点检测数据集", save_path="E:\Data\OCR\镇江大港厂内车牌识别数据集",dataset_type="镇江厂内车牌数据集")
