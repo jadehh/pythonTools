@@ -448,7 +448,7 @@ def draw_text_list(img,label_list, pt_list=[], color_list=[], font_size_list=[],
             if getOperationSystem() == "Windows":
                 font_path = r'C:\Windows\Fonts\SIMLI.TTF'
             else:
-                font_path = r'C:\Windows\Fonts\SIMLI.TTF'
+                font_path = r'/usr/fonts/simhei.ttf'
 
         font = ImageFont.truetype(font_path, font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
         draw.text(pt, label, color, font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
