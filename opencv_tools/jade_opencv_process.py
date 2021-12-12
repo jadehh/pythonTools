@@ -446,7 +446,7 @@ def draw_text_list(img,label_list, pt_list=[], color_list=[], font_size_list=[],
     for (label, pt, color, font_size) in zip(label_list, pt_list, color_list, font_size_list):
         if font_path is None:
             if getOperationSystem() == "Windows":
-                font_path = r'C:\Windows\Fonts\SIMLI.TTF'
+                font_path = r'C:\Windows\Fonts\simhei.ttf'
             else:
                 font_path = r'/usr/fonts/simhei.ttf'
 
