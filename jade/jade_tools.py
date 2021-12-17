@@ -10,6 +10,8 @@ import os
 import sys
 import datetime
 import time
+import shutil
+from jade.jade_progress_bar import ProgressBar
 
 def zh_ch(string):
     """
@@ -93,7 +95,7 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-def getSeqNumber():
+def GetSeqNumber():
     """
     返回序列号,精确到s
     :param string:
@@ -198,12 +200,14 @@ def GetAllImagesPath(dir):
         if image_name[-4:].lower() == ".jpg" or image_name[-4:].lower() == ".png":
             image_list.append(OpsJoin(dir,image_name))
     return (image_list)
+
 #获取今天的日期
 def GetToday():
     now = datetime.datetime.now()
     otherStyleTime = now.strftime("%Y-%m-%d %H:%M:%S")
     pathname = otherStyleTime.split(" ")[0]
     return pathname
+
 #获取当前的时间
 def GetHourTime():
     now = datetime.datetime.now()
@@ -211,5 +215,17 @@ def GetHourTime():
     pathname = otherStyleTime.split(" ")[1]
     return pathname
 
+
+
+##文件夹下文件重新命名
+def RenameImageWithDir(dir):
+    image_path_list = GetAllImagesPath(dir)
+    progressBar = ProgressBar(len(image_path_list))
+    for image_path in image_path_list:
+        shutil.copy(image_path,os.path.join(dir,GetSeqNumber()+".jpg"))
+        os.remove(image_path)
+        progressBar.update()
+if __name__ == '__main__':
+    RenameImageWithDir(r"F:\现场数据\镇江大港\车牌图片\2021-12-15")
 
 

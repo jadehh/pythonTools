@@ -20,9 +20,11 @@ class JadeSqliteDataBase(object):
         # 使用cursor()方法获取操作游标,连接数据库
         self.db = sqlite3.connect(self._db_name, check_same_thread=False)
         self.cursor = self.db.cursor()
-        self.JadeLog.DEBUG(
-            "#"*30+"{}数据库连接成功".format(talbe_name)+"#"*30
-        )
+        if self.JadeLog:
+            self.JadeLog.DEBUG(
+                "#" * 30 + "{}数据库连接成功".format(talbe_name) + "#" * 30
+            )
+
         super(JadeSqliteDataBase, self).__init__()
 
         # 重新连接
@@ -59,7 +61,8 @@ class JadeSqliteDataBase(object):
             if "exists" in str(e):
                 pass
             else:
-                self.JadeLog.ERROR("创建表失败,失败原因为{}".format(e))
+                if self.JadeLog:
+                    self.JadeLog.ERROR("创建表失败,失败原因为{}".format(e))
 
 
     def insert(self, data):
@@ -85,7 +88,9 @@ class JadeSqliteDataBase(object):
             self.db.commit()
             self.lock.release()
         except Exception as e:
-            self.JadeLog.ERROR("插入数据表失败,失败原因为{},sql语句为{}".format(e, sql_str))
+            if  self.JadeLog:
+                self.JadeLog.ERROR("插入数据表失败,失败原因为{},sql语句为{}".format(e, sql_str))
+
 
     def query(self, start_time, end_time):
         """:查询所有的数据
@@ -102,7 +107,8 @@ class JadeSqliteDataBase(object):
             self.lock.release()
             return results
         except Exception as e:
-            self.JadeLog.ERROR("查询表失败,失败原因为{},sql语句为{}".format(e, sql_str))
+            if self.JadeLog:
+                self.JadeLog.ERROR("查询表失败,失败原因为{},sql语句为{}".format(e, sql_str))
             pass
 
 
