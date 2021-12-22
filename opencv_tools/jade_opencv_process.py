@@ -1139,3 +1139,19 @@ def compose_gif(image_path_list, output_path, fps=1):
     for path in image_path_list:
         gif_images.append(imageio.imread(path))
     imageio.mimsave(output_path, gif_images, fps=fps)
+
+
+def overlay_image(image_path1,image_path2,boxes):
+    background_image = ReadChinesePath(image_path1)
+    image = ReadChinesePath(image_path2)
+    image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+    width = boxes[3]
+    height = boxes[2]
+    background_image[boxes[0]:boxes[0]+boxes[2],boxes[1]:boxes[1]+boxes[3],:] = cv2.resize(image,(width,height))
+    cv2.namedWindow("result",0)
+    cv2.imshow("result",background_image)
+    cv2.waitKey(0)
+    return background_image
+
+if __name__ == '__main__':
+    overlay_image(r"F:\现场数据\镇江大港\车牌图片\2021-12-15\20211215150146781771.jpg",r"C:\Users\Administrator\Desktop\联图二维码.png",[880,1380,150,150])
