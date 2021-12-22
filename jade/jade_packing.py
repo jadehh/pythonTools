@@ -12,60 +12,102 @@ import os
 import shutil
 import platform
 
+def ui_to_py():
+    view_path = "view"
+    view_file_list = os.listdir(view_path)
+    for view_name in view_file_list:
+        if "ui" in view_name:
+            view_file = os.path.join(view_path,view_name)
+            os.system("pyuic5 -o {}.py {}".format(view_file.split(".ui")[0],view_file))
 
 def getOperationSystem():
     return platform.system()
 
 def copyPy(args):
     new_src_path = CreateSavePath("new_src")
-    src_path = "src"
+    if args.is_qt is False:
+        src_path_list = ["src"]
+        src_import_list = ["src."]
+    else:
+        src_path_list = ["src","view","view/customView","controller"]
+        src_import_list = ["src.","view.","view.customView.","controller."]
     import_list = []
-    for file_name in os.listdir(src_path):
-        if "py" in file_name and "init" not in file_name and os.path.isfile(os.path.join(src_path, file_name)):
-            if file_name != "samplesMain.py":
-                with open(os.path.join(new_src_path, file_name), "wb") as f1:
-                    with open(os.path.join(src_path, file_name), "rb") as f:
-                        content_list = str(f.read(), encoding="utf-8").split("\n")
-                        for content in content_list:
-                            if "import" in content or ("from" in content and "import" in content):
+    for src_path in src_path_list:
+        for file_name in os.listdir(src_path):
+            if "py" in file_name and "init" not in file_name and os.path.isfile(os.path.join(src_path, file_name)):
+                if file_name != "samplesMain.py":
+                    with open(os.path.join(new_src_path, file_name), "wb") as f1:
+                        with open(os.path.join(src_path, file_name), "rb") as f:
+                            content_list = str(f.read(), encoding="utf-8").split("\n")
+                            for content in content_list:
+                                if "import" in content or ("from" in content and "import" in content):
+                                    edit = False
+                                    for src_import in src_import_list:
+                                        if "from" in content:
+                                            prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
+                                            prefix = ""
+                                            if len(prefix_list) > 0:
+                                                for text in prefix_list:
+                                                    prefix =prefix + text + "."
+                                            if src_import == prefix.strip():
+                                                new_content = content.split(src_import)[0] + \
+                                                              content.split(src_import)[1]
+                                                f1.write((new_content + '\n').encode("utf-8"))
+                                                if new_content not in import_list and "#" not in new_content and \
+                                                        new_content[
+                                                            0] != " ":
+                                                    import_list.append(new_content)
+                                                edit = True
+                                                break
 
-                                if "src." in content:
-                                    new_content = content.split("src.")[0] + content.split("src.")[1]
-                                    f1.write((new_content + '\n').encode("utf-8"))
-                                    if new_content not in import_list and "#" not in new_content and new_content[
-                                        0] != " ":
-                                        import_list.append(new_content)
+                                    if edit is False:
+                                        f1.write((content + '\n').encode("utf-8"))
+                                        if content not in import_list and "#" not in content and content[0] != " ":
+                                            import_list.append(content)
+
+
+                                else:
+                                    f1.write((content + "\n").encode("utf-8"))
+                else:
+                    with open(os.path.join(new_src_path, file_name), "wb") as f1:
+                        with open(os.path.join(src_path, file_name), "rb") as f:
+                            content_list = str(f.read(), encoding="utf-8").split("\n")
+                            for content in content_list:
+                                if "import" in content or ("from" in content and "import" in content):
+                                    edit = False
+                                    for src_import in src_import_list:
+                                        if "from" in content:
+                                            prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
+                                            prefix = ""
+                                            if len(prefix_list) > 0:
+                                                for text in prefix_list:
+                                                    prefix =prefix + text + "."
+                                            if src_import == prefix.strip():
+                                                new_content = content.split(src_import)[0] + \
+                                                              content.split(src_import)[1]
+                                                f1.write((new_content + '\n').encode("utf-8"))
+                                                if new_content not in import_list and "#" not in new_content and \
+                                                        new_content[
+                                                            0] != " ":
+                                                    import_list.append(new_content)
+                                                edit = True
+                                                break
+
+                                    if edit is False:
+                                        f1.write((content + '\n').encode("utf-8"))
+                                        if content not in import_list and "#" not in content and content[0] != " ":
+                                            import_list.append(content)
+
+                                elif "def main():" in content:
+                                    if args.use_jade_log:
+                                        update_log = "JadeLog.INFO('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,
+                                                                                                            GetTimeStamp())
+                                        f1.write((update_log + content).encode("utf-8"))
+                                    else:
+                                        f1.write((content).encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
-                                    if content not in import_list and "#" not in content and content[0] != " ":
-                                        import_list.append(content)
-                            else:
-                                f1.write((content + "\n").encode("utf-8"))
-            else:
-                with open(os.path.join(new_src_path, file_name), "wb") as f1:
-                    with open(os.path.join(src_path, file_name), "rb") as f:
-                        content_list = str(f.read(), encoding="utf-8").split("\n")
-                        for content in content_list:
-                            if "import" in content or ("from" in content and "import" in content):
 
-                                if "src." in content:
-                                    new_content = content.split("src.")[0] + content.split("src.")[1]
-                                    f1.write((new_content + '\n').encode("utf-8"))
-                                    if new_content not in import_list and "#" not in new_content and new_content[
-                                        0] != " ":
-                                        import_list.append(new_content)
-                                else:
-                                    f1.write((content + '\n').encode("utf-8"))
-                                    if content not in import_list and "#" not in content and content[0] != " ":
-                                        import_list.append(content)
-                            elif "def main():" in content:
-                                if args.use_jade_log:
-                                    update_log ="JadeLog.INFO('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,GetTimeStamp())
-                                    f1.write((update_log+ content).encode("utf-8"))
-                                else:
-                                    f1.write(( content).encode("utf-8"))
-                            else:
-                                f1.write((content + '\n').encode("utf-8"))
 
     return import_list
 
@@ -412,6 +454,7 @@ if __name__ == '__main__':
     parser.add_argument('--appimage', type=bool,
                         default=False)  ## 是否打包成AppImage
     parser.add_argument('--lib_path', type=str, default="conta_detect_lib64")  ## 是否lib包分开打包
+    parser.add_argument('--is_qt', type=bool, default=False)  ## 是否lib包分开打包
 
     args = parser.parse_args()
     build(args)
