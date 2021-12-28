@@ -7,11 +7,12 @@
 # @Software : Samples
 # @Desc     :
 from jade import AppRunPath
-from jade.jade_tools import CreateSavePath, GetTimeStamp
+from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir
+from jade.jade_progress_bar import ProgressBar
 import os
 import shutil
 import platform
-
+import subprocess
 def ui_to_py():
     view_path = "view"
     view_file_list = os.listdir(view_path)
@@ -257,6 +258,8 @@ def writeSpec(args):
                 "utf-8"))
 
 
+
+
 def build(args):
     writePy(args)
     ID = int(args.ID)
@@ -284,9 +287,10 @@ def build(args):
         lib_suffix = "pyd"
     else:
         lib_suffix = "so"
+    progressBar = ProgressBar(len(file_list))
     for file_name in file_list:
-        os.system("{}/easycython{} {}/{}".format(args.python_path, bin_suffix, "new_src", file_name))
-
+        subprocess.run("{}/easycython{} {}/{}".format(args.python_path, bin_suffix, "new_src", file_name), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        progressBar.update()
     build_file_list = os.listdir()
     for build_file in build_file_list:
         if build_file.split(".")[-1] == lib_suffix:
@@ -454,7 +458,6 @@ if __name__ == '__main__':
     parser.add_argument('--appimage', type=bool,
                         default=False)  ## 是否打包成AppImage
     parser.add_argument('--lib_path', type=str, default="conta_detect_lib64")  ## 是否lib包分开打包
-    parser.add_argument('--is_qt', type=bool, default=False)  ## 是否lib包分开打包
 
     args = parser.parse_args()
     build(args)
