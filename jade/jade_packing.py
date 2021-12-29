@@ -262,14 +262,11 @@ def writeSpec(args):
 
 def build(args):
     writePy(args)
-    ID = int(args.ID)
     if os.path.exists("build"):
         shutil.rmtree("build")
     if os.path.exists("dist"):
         shutil.rmtree("dist")
     os.mkdir("build/")
-    print("ID = {}".format(ID))
-
     if args.lib_path:
         ep_build_path = args.lib_path
     else:
@@ -287,22 +284,33 @@ def build(args):
         lib_suffix = "pyd"
     else:
         lib_suffix = "so"
-    progressBar = ProgressBar(len(file_list))
+
+    if len(args.specify_files) > 0:
+        progressBar = ProgressBar(len(args.specify_files))
+    else:
+        progressBar = ProgressBar(len(file_list))
+
     for file_name in file_list:
-        subprocess.run("{}/easycython{} {}/{}".format(args.python_path, bin_suffix, "new_src", file_name), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        progressBar.update()
+        if len(args.specify_files) > 0:
+            if file_name in args.specify_files:
+                cmd_str = "easycython {}/{}".format( "new_src", file_name)
+                subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                progressBar.update()
+            else:
+                pass
+        else:
+            cmd_str = "easycython {}/{}".format( "new_src", file_name)
+            subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            progressBar.update()
+
     build_file_list = os.listdir()
     for build_file in build_file_list:
         if build_file.split(".")[-1] == lib_suffix:
-            if ID == 0:
-                shutil.copy(build_file,
-                            os.path.join(ep_build_path, build_file.split(".")[0] + "." + lib_suffix))
-                os.remove(build_file)
-            else:
-                os.system(
-                    "/home/jade/SoftWare/加密狗软件/Linux/VendorTools/Envelope/linuxenv -v:/home/jade/RGMGT.hvc -f:{} {} {}".format(
-                        ID, build_file,
-                        os.path.join(ep_build_path, build_file.split(".")[0] + ".pyd")))
+            shutil.copy(build_file,
+                        os.path.join(ep_build_path, build_file.split(".")[0] + "." + lib_suffix))
+            os.remove(build_file)
+
+
 
     if os.path.exists("src_copy"):
         shutil.rmtree("src_copy")
@@ -378,7 +386,7 @@ def copy_dir(source_dir, save_path):
 def packAPP(args):
     writePy(args)
     writeSpec(args)
-    cmd_str = "{}/pyinstaller  {}.spec  --additional-hooks-dir hooks".format(args.python_path, args.app_name)
+    cmd_str = "pyinstaller  {}.spec  --additional-hooks-dir hooks".format(args.app_name)
     os.system(cmd_str)
     save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
@@ -425,40 +433,33 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     if getOperationSystem() == "Windows":
-        parser.add_argument("--python_path", type=str,
-                            default=r"C:\Users\Administrator\.virtualenvs\SuzhouPark5GAI-ioO_3PBQ\Scripts/")
         parser.add_argument('--extra_sys_list', type=list,
                             default=[])  ## 需要额外打包的路径
         parser.add_argument('--extra_path_list', type=list,
-                            default=["bin/{}/".format(getOperationSystem()), ])
-        # (r"D:/Libs/paddle/v2.1/",
-        #  ".")])  ## 需要额外打包的路径
-
+                            default=["qss",("data","xpinyin"),"resources"])
     else:
-        parser.add_argument("--python_path", type=str,
-                            default="/home/jade/.local/share/virtualenvs/container_ocr-OdTDZGFh/bin/")
-
         parser.add_argument('--extra_sys_list', type=list,
                             default=['sys.path.append("/usr/local/conta_detect-1.0/python_lib")'])  ## sys.path.append需要额外打包的路径
 
         parser.add_argument('--extra_path_list', type=list,
                             default=[])  ## 需要额外打包的路径
     parser.add_argument('--use_jade_log', type=bool,
-                        default=True)
-    parser.add_argument('--ID', type=str,
-                        default="0")
+                        default=False) ##是否使用JadeLog
     parser.add_argument('--full', type=bool,
-                        default=True)  ## 打包成一个完成的包
+                        default=False)  ## 打包成一个完成的包
     parser.add_argument('--console', type=str,
                         default="False")  ## 是否显示命令行窗口,只针对与Windows有效
     parser.add_argument('--app_name', type=str,
-                        default="conta_detectV2.4.2")  ##需要打包的文件名称
+                        default="container_ocr_programV2.4.3")  ##需要打包的文件名称
     parser.add_argument('--name', type=str,
-                        default="视频流箱门检测服务V2.4.2")  ##需要打包的文件名称
+                        default="箱号识别服务前端配置界面V2.4.3")  ##需要打包的文件名称
     parser.add_argument('--appimage', type=bool,
                         default=False)  ## 是否打包成AppImage
-    parser.add_argument('--lib_path', type=str, default="conta_detect_lib64")  ## 是否lib包分开打包
-
+    parser.add_argument('--lib_path', type=str, default="container_ocr_program_lib64")  ## 是否lib包分开打包
+    parser.add_argument('--is_qt', type=bool, default=True)  ## qt 会将controller view src 都进行编译
+    parser.add_argument('--specify_files',type=list,default=["customTextBrowser.py"]) ## 指定编译的文件
     args = parser.parse_args()
+    # ui_to_py()
     build(args)
     packAPP(args)
+
