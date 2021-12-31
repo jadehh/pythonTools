@@ -16,10 +16,12 @@ import subprocess
 def ui_to_py():
     view_path = "view"
     view_file_list = os.listdir(view_path)
+    progressBar = ProgressBar(len(view_file_list))
     for view_name in view_file_list:
         if "ui" in view_name:
             view_file = os.path.join(view_path,view_name)
             os.system("pyuic5 -o {}.py {}".format(view_file.split(".ui")[0],view_file))
+        progressBar.update()
 
 def getOperationSystem():
     return platform.system()
@@ -105,7 +107,9 @@ def copyPy(args):
                                                                                                             GetTimeStamp())
                                         f1.write((update_log + content).encode("utf-8"))
                                     else:
-                                        f1.write((content).encode("utf-8"))
+                                        update_log = "print('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,
+                                                                                                            GetTimeStamp())
+                                        f1.write((content+update_log).encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
 
