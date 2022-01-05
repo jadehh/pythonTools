@@ -105,11 +105,10 @@ def copyPy(args):
                                     if args.use_jade_log:
                                         update_log = "JadeLog.INFO('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,
                                                                                                             GetTimeStamp())
-                                        f1.write((update_log + content).encode("utf-8"))
                                     else:
                                         update_log = "print('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,
                                                                                                             GetTimeStamp())
-                                        f1.write((content+update_log).encode("utf-8"))
+                                    f1.write((update_log+content).encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
 
@@ -298,7 +297,7 @@ def build(args):
         if len(args.specify_files) > 0:
             if file_name in args.specify_files:
                 cmd_str = "easycython {}/{}".format( "new_src", file_name)
-                subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                result = subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 progressBar.update()
             else:
                 pass
