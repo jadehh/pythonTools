@@ -6,13 +6,11 @@
 # @Mailbox : jadehh@live.com
 # @Software: Samples
 # @Desc    :
-from jade.jade_tools import CreateSavePath, GetTimeStamp
+from jade.jade_tools import CreateSavePath
 import time
 import logging.config
-import os
 from queue import Queue
 from threading import Thread
-
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 logging.getLogger("spyne").setLevel(logging.ERROR)
@@ -68,10 +66,21 @@ class JadeLogging():
         sh.setFormatter(format_str)  # 设置屏幕上显示的格式
         logging.config.dictConfig(log_conf)
         self.logger = logging.getLogger(__name__)
+        self.max_format = 100
         self.logger.addHandler(sh)  # 把对象加到logger里
         self.logContent = Queue(maxsize=200)
         getlogContentThread = GetLogContentThread(self.write_log,self.logContent)
         getlogContentThread.start()
+
+    def format(self,content):
+        if len(content) < self.max_format:
+            if (self.max_format-len(content )) % 2 == 0:
+                content = "#"*int((self.max_format-len(content )) / 2) + content + "#"*int((self.max_format-len(content )) / 2)
+            else:
+                content = "#" * int(self.max_format - len(content) / 2) + content + "#" * int(
+                    (self.max_format - len(content)) / 2)+"#"
+        return content
+
 
     def write_log(self,content, Type="debug"):
         if Type == "debug":
@@ -84,13 +93,21 @@ class JadeLogging():
             self.logger.error(content)
         elif Type == 'critical':
             self.logger.critical(content)
-    def WARNING(self,content):
+    def WARNING(self,content,is_format=False):
+        if is_format:
+            content = self.format(content)
         self.logContent.put((content, "warning"))
-    def DEBUG(self,content):
+    def DEBUG(self,content,is_format=False):
+        if is_format:
+            content = self.format(content)
         self.logContent.put((content,"debug"))
-    def ERROR(self,content):
+    def ERROR(self,content,is_format=False):
+        if is_format:
+            content = self.format(content)
         self.logContent.put((content,"error"))
-    def INFO(self, content):
+    def INFO(self, content,is_format=False):
+        if is_format:
+            content = self.format(content)
         self.logContent.put((content,"info"))
 
     def release(self):
