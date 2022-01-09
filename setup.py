@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     include_package_data=True,
     platforms="any",
-    install_requires=["easycython==1.0.7","pyinstaller==4.6","numpy==1.19.5","pillow==8.4.0","opencv-python==4.2.0.34","imageio"]  # 这个项目需要的第三方库
+    install_requires=["opencv-python==4.2.0.34"]  # 这个项目需要的第三方库
 )
 

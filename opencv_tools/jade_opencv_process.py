@@ -18,13 +18,16 @@ import time
 import uuid
 from opencv_tools import DIRECTORY_IMAGES,DIRECTORY_ANNOTATIONS,DIRECTORY_PREANNOTATIONS
 import base64
-import imageio
+
 
 ## opencv读取中文路径图片
 def imread_chinese_path(image_path):
     image = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), -1)
     return image
 
+## 图像压缩
+def Image_Resize(image,width=768):
+    return cv2.resize(image,(width,int(width/image.shape[1]*image.shape[0])))
 ##旋转图片
 def Image_Roate(image, angle):
     # 获取图像的尺寸
@@ -1135,6 +1138,7 @@ def ImShow(images, key=0):
 
 
 def compose_gif(image_path_list, output_path, fps=1):
+    import imageio
     gif_images = []
     for path in image_path_list:
         gif_images.append(imageio.imread(path))
@@ -1154,4 +1158,6 @@ def overlay_image(image_path1,image_path2,boxes):
     return background_image
 
 if __name__ == '__main__':
+    image = ReadChinesePath(r"F:\现场数据\镇江大港\车牌图片\2021-12-15\20211215150146781771.jpg")
+    image = Image_Resize(image,768)
     overlay_image(r"F:\现场数据\镇江大港\车牌图片\2021-12-15\20211215150146781771.jpg",r"C:\Users\Administrator\Desktop\联图二维码.png",[880,1380,150,150])
