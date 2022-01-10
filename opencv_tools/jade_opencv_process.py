@@ -12,7 +12,6 @@ import numpy as np
 from jade import ProgressBar,getOperationSystem
 import threading
 import random
-from PIL import Image, ImageFont, ImageDraw
 import os
 import time
 import uuid

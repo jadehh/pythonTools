@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     include_package_data=True,
     platforms="any",
-    install_requires=["opencv-python==4.2.0.34"]  # 这个项目需要的第三方库
+    install_requires=[""]  # 这个项目需要的第三方库
 )
 
