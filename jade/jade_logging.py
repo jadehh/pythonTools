@@ -6,11 +6,13 @@
 # @Mailbox : jadehh@live.com
 # @Software: Samples
 # @Desc    :
-from jade.jade_tools import CreateSavePath
+from jade.jade_tools import CreateSavePath, GetTimeStamp
 import time
 import logging.config
+import os
 from queue import Queue
 from threading import Thread
+
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 logging.getLogger("spyne").setLevel(logging.ERROR)
@@ -27,7 +29,8 @@ class JadeLogging():
     """
     TimedRotatingFileHandler 测试
     """
-    def __init__(self,logging_path="log",max_count=180,Level="INFO"):
+
+    def __init__(self, logging_path="log", max_count=180, Level="INFO"):
         CreateSavePath(logging_path)
         import os
         log_conf = {
@@ -45,7 +48,7 @@ class JadeLogging():
                     'class': 'logging.handlers.TimedRotatingFileHandler',
                     'when': 'd',
                     'backupCount': max_count,
-                    'filename': os.path.join(logging_path,"info.log"),
+                    'filename': os.path.join(logging_path, "info.log"),
                     'encoding': 'utf-8',
                     'formatter': 'default',
                 }
@@ -55,7 +58,6 @@ class JadeLogging():
                 'level': Level,
             },
         }
-
 
         file_path = os.path.split(log_conf.get("handlers").get("file").get("filename"))[0]
         if not os.path.exists(file_path):
@@ -69,20 +71,26 @@ class JadeLogging():
         self.max_format = 100
         self.logger.addHandler(sh)  # 把对象加到logger里
         self.logContent = Queue(maxsize=200)
-        getlogContentThread = GetLogContentThread(self.write_log,self.logContent)
+        getlogContentThread = GetLogContentThread(self.write_log, self.logContent)
         getlogContentThread.start()
 
-    def format(self,content):
-        if len(content) < self.max_format:
-            if (self.max_format-len(content )) % 2 == 0:
-                content = "#"*int((self.max_format-len(content )) / 2) + content + "#"*int((self.max_format-len(content )) / 2)
+    def format(self, content, type="info"):
+        if type == "info":
+            max_format = self.max_format + 1
+        elif type == 'warning':
+            max_format = self.max_format - 2
+        else:
+            max_format = self.max_format
+        if len(content) < max_format:
+            if (max_format - len(content)) % 2 == 0:
+                content = "#" * int((max_format - len(content)) / 2) + content + "#" * int(
+                    (max_format - len(content)) / 2)
             else:
-                content = "#" * int(self.max_format - len(content) / 2) + content + "#" * int(
-                    (self.max_format - len(content)) / 2)+"#"
+                content = "#" * int((max_format - len(content)) / 2) + content + "#" * int(
+                    (max_format - len(content)) / 2) + "#"
         return content
 
-
-    def write_log(self,content, Type="debug"):
+    def write_log(self, content, Type="debug"):
         if Type == "debug":
             self.logger.debug(content)
         elif Type == "info":
@@ -93,38 +101,43 @@ class JadeLogging():
             self.logger.error(content)
         elif Type == 'critical':
             self.logger.critical(content)
-    def WARNING(self,content,is_format=False):
+
+    def WARNING(self, content, is_format=False):
         if is_format:
-            content = self.format(content)
+            content = self.format(content, type='warning')
         self.logContent.put((content, "warning"))
-    def DEBUG(self,content,is_format=False):
+
+    def DEBUG(self, content, is_format=False):
         if is_format:
-            content = self.format(content)
-        self.logContent.put((content,"debug"))
-    def ERROR(self,content,is_format=False):
+            content = self.format(content, type="debug")
+        self.logContent.put((content, "debug"))
+
+    def ERROR(self, content, is_format=False):
         if is_format:
-            content = self.format(content)
-        self.logContent.put((content,"error"))
-    def INFO(self, content,is_format=False):
+            content = self.format(content, type="error")
+        self.logContent.put((content, "error"))
+
+    def INFO(self, content, is_format=False):
         if is_format:
-            content = self.format(content)
-        self.logContent.put((content,"info"))
+            content = self.format(content, type="info")
+        self.logContent.put((content, "info"))
 
     def release(self):
-        self.logContent.put((False,"stop"))
+        self.logContent.put((False, "stop"))
 
 
 class GetLogContentThread(Thread):
-    def __init__(self,jadeLog,logcontentQueue):
+    def __init__(self, jadeLog, logcontentQueue):
         self.func = jadeLog
         self.logcontentQueue = logcontentQueue
         Thread.__init__(self)
+
     def run(self):
         while True:
-            content,log_type = self.logcontentQueue.get()
+            content, log_type = self.logcontentQueue.get()
             if content is False:
                 break
-            self.func(content,log_type)
+            self.func(content, log_type)
 
 
 if __name__ == "__main__":
@@ -144,7 +157,6 @@ if __name__ == "__main__":
     jadeLog.ERROR("ERROR")
     time.sleep(2)
     jadeLog.DEBUG("结束")
-
 
     use_time = time.time() - begin_time
     print("TimedRotatingFileHandler 耗时:%s秒" % use_time)
