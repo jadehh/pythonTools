@@ -309,8 +309,11 @@ def build(args):
     build_file_list = os.listdir()
     for build_file in build_file_list:
         if build_file.split(".")[-1] == lib_suffix:
-            shutil.copy(build_file,
+            try:
+                shutil.copy(build_file,
                         os.path.join(ep_build_path, build_file.split(".")[0] + "." + lib_suffix))
+            except:
+                pass
             os.remove(build_file)
 
 
@@ -347,7 +350,11 @@ def packAppImage(args):
                     lib_path = lib_path[0]
                 for lib_name in os.listdir(lib_path):
                     if "lib" in lib_name:
-                        shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
+                        try:
+                            shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
+                        except:
+                            pass
+
         os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
 
     with open(AppRunPath, "r") as f:
@@ -355,7 +362,11 @@ def packAppImage(args):
         for content in conetent_list:
             with open(os.path.join(save_path, "AppRun"), "a", encoding="utf-8") as f:
                 f.write(content + "\n")
-    shutil.copy("icons/app_logo.png", save_path)
+    try:
+        shutil.copy("icons/app_logo.png", save_path)
+    except:
+        pass
+
     with open(os.path.join(save_path, args.app_name + ".desktop"), "w", encoding="utf-8") as f:
         f.write("[Desktop Entry]\n"
                 "Version=1.0\n"
@@ -406,9 +417,15 @@ def packAPP(args):
     else:
         if args.appimage:
             app_name = packAppImage(args)
-            shutil.copy(app_name, "{}/".format(save_bin_path))
+            try:
+                shutil.copy(app_name, "{}/".format(save_bin_path))
+            except:
+                pass
         else:
-            shutil.copy("dist/{}".format(args.app_name), "{}/".format(save_bin_path))
+            try:
+                shutil.copy("dist/{}".format(args.app_name), "{}/".format(save_bin_path))
+            except:
+                pass
     if os.path.exists("{}.py".format(args.app_name)):
         os.remove("{}.py".format(args.app_name))
     if os.path.exists("{}.spec".format(args.app_name)):

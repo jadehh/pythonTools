@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     setup(
     name="jade",
-    version="1.0.1",
+    version="1.0.2",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="",
