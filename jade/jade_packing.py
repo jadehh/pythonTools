@@ -67,8 +67,12 @@ def copyPy(args):
                                         f1.write((content + '\n').encode("utf-8"))
                                         if content not in import_list and "#" not in content and content[0] != " ":
                                             import_list.append(content)
-
-
+                                elif "JadeLog = JadeLogging" in content:
+                                    if args.use_jade_log:
+                                        update_log = "    JadeLog.INFO('{}-更新时间为:{}',True)\r".format(args.name,GetTimeStamp(),True)
+                                        f1.write((content+update_log).encode("utf-8"))
+                                    else:
+                                        f1.write((content).encode("utf-8"))
                                 else:
                                     f1.write((content + "\n").encode("utf-8"))
                 else:
@@ -100,15 +104,13 @@ def copyPy(args):
                                         f1.write((content + '\n').encode("utf-8"))
                                         if content not in import_list and "#" not in content and content[0] != " ":
                                             import_list.append(content)
-
                                 elif "def main():" in content:
-                                    if args.use_jade_log:
-                                        update_log = "JadeLog.INFO('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,
-                                                                                                            GetTimeStamp())
-                                    else:
+                                    if args.use_jade_log is False:
                                         update_log = "print('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name,
-                                                                                                            GetTimeStamp())
-                                    f1.write((update_log+content).encode("utf-8"))
+                                                                                                     GetTimeStamp())
+                                        f1.write((update_log + content).encode("utf-8"))
+                                    else:
+                                        f1.write(content.encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
 
@@ -309,11 +311,9 @@ def build(args):
     build_file_list = os.listdir()
     for build_file in build_file_list:
         if build_file.split(".")[-1] == lib_suffix:
-            try:
-                shutil.copy(build_file,
+
+            shutil.copy(build_file,
                         os.path.join(ep_build_path, build_file.split(".")[0] + "." + lib_suffix))
-            except:
-                pass
             os.remove(build_file)
 
 
@@ -350,11 +350,7 @@ def packAppImage(args):
                     lib_path = lib_path[0]
                 for lib_name in os.listdir(lib_path):
                     if "lib" in lib_name:
-                        try:
-                            shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
-                        except:
-                            pass
-
+                        shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
         os.system("cp -r dist/{} {}".format(args.app_name, save_bin_path))
 
     with open(AppRunPath, "r") as f:
@@ -362,11 +358,7 @@ def packAppImage(args):
         for content in conetent_list:
             with open(os.path.join(save_path, "AppRun"), "a", encoding="utf-8") as f:
                 f.write(content + "\n")
-    try:
-        shutil.copy("icons/app_logo.png", save_path)
-    except:
-        pass
-
+    shutil.copy("icons/app_logo.png", save_path)
     with open(os.path.join(save_path, args.app_name + ".desktop"), "w", encoding="utf-8") as f:
         f.write("[Desktop Entry]\n"
                 "Version=1.0\n"
@@ -417,15 +409,9 @@ def packAPP(args):
     else:
         if args.appimage:
             app_name = packAppImage(args)
-            try:
-                shutil.copy(app_name, "{}/".format(save_bin_path))
-            except:
-                pass
+            shutil.copy(app_name, "{}/".format(save_bin_path))
         else:
-            try:
-                shutil.copy("dist/{}".format(args.app_name), "{}/".format(save_bin_path))
-            except:
-                pass
+            shutil.copy("dist/{}".format(args.app_name), "{}/".format(save_bin_path))
     if os.path.exists("{}.py".format(args.app_name)):
         os.remove("{}.py".format(args.app_name))
     if os.path.exists("{}.spec".format(args.app_name)):

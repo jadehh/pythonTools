@@ -74,7 +74,7 @@ class JadeLogging():
         getlogContentThread = GetLogContentThread(self.write_log, self.logContent)
         getlogContentThread.start()
 
-    def format(self, content, type="info"):
+    def format(self, content, type="info",is_newline=False):
         if type == "info":
             max_format = self.max_format + 1
         elif type == 'warning':
@@ -88,6 +88,8 @@ class JadeLogging():
             else:
                 content = "#" * int((max_format - len(content)) / 2) + content + "#" * int(
                     (max_format - len(content)) / 2) + "#"
+        if is_newline:
+            content = content + "\n"*4
         return content
 
     def write_log(self, content, Type="debug"):
@@ -102,25 +104,26 @@ class JadeLogging():
         elif Type == 'critical':
             self.logger.critical(content)
 
-    def WARNING(self, content, is_format=False):
+    def WARNING(self, content, is_format=False,is_newline=False):
         if is_format:
-            content = self.format(content, type='warning')
+            content = self.format(content, type='warning',is_newline=is_newline)
         self.logContent.put((content, "warning"))
 
-    def DEBUG(self, content, is_format=False):
+    def DEBUG(self, content, is_format=False,is_newline=False):
         if is_format:
-            content = self.format(content, type="debug")
+            content = self.format(content, type="debug",is_newline=is_newline)
         self.logContent.put((content, "debug"))
 
-    def ERROR(self, content, is_format=False):
+    def ERROR(self, content, is_format=False,is_newline=False):
         if is_format:
-            content = self.format(content, type="error")
+            content = self.format(content, type="error",is_newline=is_newline)
         self.logContent.put((content, "error"))
 
-    def INFO(self, content, is_format=False):
+    def INFO(self, content, is_format=False,is_newline=False):
         if is_format:
-            content = self.format(content, type="info")
+            content = self.format(content, type="info",is_newline=is_newline)
         self.logContent.put((content, "info"))
+
 
     def release(self):
         self.logContent.put((False, "stop"))
