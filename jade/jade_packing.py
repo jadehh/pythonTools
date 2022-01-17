@@ -450,10 +450,10 @@ def packSetup(args,exec_path):
                        '//  usPostUninstall:\n' \
                        '//    begin\n' \
                .format("{app}",
-                       "{group}",args.name,"{app}",args.app_name,
-                                       "{commondesktop}",args.name,"{app}",args.app_name,
+                       "{group}",args.name,"{app}",args.app_name+".exe",
+                                       "{commondesktop}",args.name,"{app}",args.app_name+".exe",
                                        "{cm:CreateDesktopIcon}","{cm:AdditionalIcons}",
-                                       "{app}",args.app_name,"{cm:LaunchProgram,ContainerOCR}",
+                                       "{app}",args.app_name+".exe","{cm:LaunchProgram,ContainerOCR}",
                                        "{sys}","{sys}",
                        args.app_name.split("V")[0]+"_setup",args.app_name.split("V")[0]+"_setup")
         content = content+content_back
