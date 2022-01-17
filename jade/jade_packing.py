@@ -334,6 +334,27 @@ def build(args):
             shutil.rmtree("build")
 
 
+def recursion_dir(file_list,path):
+    if os.path.isfile(path):
+        file_list.append(path)
+    else:
+        for file_name in os.listdir(path):
+            recursion_dir(file_list,os.path.join(path,file_name))
+
+def packSetup(exec_path):
+    file_list = []
+    recursion_dir(file_list,exec_path)
+    with open("inno_setup.txt",'wb') as f:
+        for file in file_list:
+            if len(file.split(exec_path)[-1].split("\\")) > 2:
+                path = (file.split(exec_path)[-1].split(file.split(exec_path)[-1].split("\\")[-1])[0])
+                cmd_str = 'Source: "{}"; DestDir: "{}\\{}"; Flags: ignoreversion\n'.format(file,'{app}',path)
+            else:
+                cmd_str = 'Source: "{}"; DestDir: "{}\\{}"; Flags: ignoreversion \n'.format(file,'{app}',"")
+
+
+            f.write(cmd_str.encode("utf-8"))
+
 def packAppImage(args):
     save_path = CreateSavePath(os.path.join("tmp"))
     save_bin_path = CreateSavePath(os.path.join(save_path, "usr/bin/"))
