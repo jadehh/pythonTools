@@ -11,7 +11,8 @@ import numpy as np
 import cv2
 import math
 from PIL import Image, ImageFont, ImageDraw
-
+from opencv_tools.jade_opencv_process import GetRandomColor
+from jade import getOperationSystem
 def get_color_map_list(num_classes):
     """
     Args:
@@ -410,3 +411,191 @@ def draw_text_list(img,font_path, label_list, pt_list=[], color_list=[], font_si
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
 
+
+def get_font_path(font_path):
+    if font_path is None:
+        if getOperationSystem() == "Windows":
+            font_path = r'C:\Windows\Fonts\simhei.ttf'
+        else:
+            font_path = r'/usr/fonts/simhei.ttf'
+        return font_path
+    else:
+        return font_path
+
+# 添加中文label
+def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=24,font_path=None):
+    cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
+    pilimg = Image.fromarray(cv2img)
+    # PIL图片上打印汉字
+    draw = ImageDraw.Draw(pilimg)  # 图片上打印
+    font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+    draw.text(pt1, label, (int(color[0]), int(color[1]), int(color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
+    return cv2charimg
+
+# 图片加标题，有黑边
+def Add_Title_Image(image, title,font_path=None):
+    image_shape = image.shape
+    image1 = Image.new("RGB", (image_shape[1], image_shape[0]))
+    image2 = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    image2 = image2.resize((image_shape[1] - 5 * 2, image_shape[0] - 50 * 2), )
+    # image.thumbnail(size)
+    draw = ImageDraw.Draw(image1)
+    # use a truetype font
+    font = ImageFont.truetype(get_font_path(font_path), 40)
+    draw.text((100, 0), title, font=font)
+    bw, bh = image1.size
+    lw, lh = image2.size
+    image1.paste(image2, (bw - lw, int((bh - lh) / 2)))
+    img = cv2.cvtColor(np.asarray(image1), cv2.COLOR_RGB2BGR)
+    return img
+
+def draw_text_det_res(img, dt_boxes, txts=None,font_path=None):
+    if isinstance(img, str):
+        src_im = cv2.imread(img)
+    else:
+        src_im = img.copy()
+    if txts is None:
+        txts = [None] * len(dt_boxes)
+    for idx, (box, txt) in enumerate(zip(dt_boxes, txts)):
+        box = np.array(box).astype(np.int32).reshape(-1, 2)
+        if txt:
+            src_im = draw_text_list(src_im,[txt[0]], [(box[0, 0], box[3, 1])], [(0, 0, 255)], font_size_list=[54],font_path=font_path)
+        cv2.polylines(src_im, [box], True, color=(0, 0, 255), thickness=2)
+    return src_im
+
+
+# PLT显示图片关键点和矩形框
+def PltShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
+    if type(img_path) == str:
+        im = plt.imread(img_path)
+    else:
+        im = img_path
+    plt.axis("off")
+    plt.imshow(im)
+    pts = np.array(keypoints)
+    scores = np.array(scores)
+    for i in range(len(pts)):
+        score = (scores[i]).mean()
+        pt = pts[i]
+        if score > 0.5:
+            currentAxis = plt.gca()
+            rect = patches.Rectangle((bboxes[i][0], bboxes[i][1]), bboxes[i][2] - bboxes[i][0],
+                                     bboxes[i][3] - bboxes[i][1],
+                                     linewidth=1,
+                                     edgecolor='r', facecolor='none')
+            currentAxis.add_patch(rect)
+            for p in range(pt.shape[0]):
+                score2 = scores[i][p, 0]
+                if score2 > 0.5 and p in [5, 6, 7, 8, 9, 10]:
+                    plt.plot(pt[p, 0], pt[p, 1], 'r.')
+                    plt.text(pt[p, 0], pt[p, 1], '{0}'.format(p))
+    edges = [[5, 7], [7, 9], [6, 8], [8, 10]]
+    for i in range(len(pts)):
+        for ie, e in enumerate(edges):
+            rgb = matplotlib.colors.hsv_to_rgb([ie / float(len(edges)), 1.0, 1.0])
+            plt.plot(pts[i][e, 0], pts[i][e, 1], color=rgb)
+    plt.ion()
+    plt.pause(waitkey)  # 显示的时间
+    plt.close()
+
+
+def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="result"):
+    base = int(np.ceil(pow(len(keyPoints), 1. / 3)))
+    colors = [_to_color(x) for x in range(len(keyPoints))]
+    h, w = image.shape[0], image.shape[1]
+    for i in range(len(keyPoints)):
+        for j in range(len(keyPoints[i])):
+            if keyPoints[i][j][0] < 0:
+                image = cv2.circle(image, (int(keyPoints[i][j][0] * w), int(keyPoints[i][j][1] * h)), 1, colors[i], 3,
+                                   3)
+                # image = Add_Chinese_Label(image, "{}".format(j), (int(keyPoints[i][j][0]*w),int(keyPoints[i][j][1]*h)), colors[i], 24)
+            else:
+                image = cv2.circle(image, (int(keyPoints[i][j][0]), int(keyPoints[i][j][1])), 1, colors[i], 3,
+                                   3)
+                # image = Add_Chinese_Label(image, "{}".format(j), (int(keyPoints[i][j][0]),int(keyPoints[i][j][1])), colors[i], 24)
+
+        point1 = (int(keyPoints[i][0][0]), int(keyPoints[i][0][1]))
+        point2 = (int(keyPoints[i][1][0]), int(keyPoints[i][1][1]))
+        point3 = (int(keyPoints[i][2][0]), int(keyPoints[i][2][1]))
+        point4 = (int(keyPoints[i][3][0]), int(keyPoints[i][3][1]))
+        image = cv2.line(image, point1, point2, colors[i], 2, 2)
+        image = cv2.line(image, point2, point3, colors[i], 2, 2)
+        image = cv2.line(image, point3, point4, colors[i], 2, 2)
+        image = cv2.line(image, point4, point1, colors[i], 2, 2)
+        if classes:
+            image = Add_Chinese_Label(image, classes[i], point1, colors[i], 40)
+
+    if waiktKey >= 0:
+        cv2.namedWindow(named_windows, 0)
+        cv2.imshow(named_windows, image)
+        cv2.waitKey(waiktKey)
+    else:
+        return image
+
+        return image
+
+
+# opencv显示关键点和矩形框
+def CVShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
+    if type(img_path) == str:
+        im = plt.imread(img_path)
+    else:
+        im = img_path
+
+    pts = np.array(keypoints)
+    scores = np.array(scores)
+    edges = [[5, 7], [7, 9], [6, 8], [8, 10]]
+    for i in range(len(pts)):
+        score = (scores[i]).mean()
+        pt = pts[i]
+        if score > 0.5:
+            im = cv2.rectangle(im, (int(bboxes[i][0]), int(bboxes[i][1])), (int(bboxes[i][2]), int(bboxes[i][3])),
+                               (255, 255, 255), 2, 2)
+            for p in range(pt.shape[0]):
+                score2 = scores[i][p, 0]
+                # if score2 > 0.5 and p in [5,6,7,8,9,10]:
+                im = cv2.circle(im, (int(pt[p, 0]), int(pt[p, 1])), 1, (255, 0, 0), 3, 3)
+                im = cv2.putText(im, str(p), (int(pt[p, 0]), int(pt[p, 1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                 (0, 0, 0), 1)
+
+            for ie, e in enumerate(edges):
+                rgb = matplotlib.colors.hsv_to_rgb([ie / float((len(edges))), 1, 1])
+
+                im = cv2.line(im, (int(pt[e[0]][0]), int(pt[e[0]][1])),
+                              (int(pt[e[1]][0]), int(pt[e[1]][1])), rgb * 255, 3, 3)
+
+    cv2.namedWindow("result", 0)
+    cv2.resizeWindow("result", 840, 680)
+    cv2.imshow("result", im)
+    cv2.waitKey(waitkey)
+
+# OCR识别结果
+def draw_ocr(image, boxes, txts, scores, draw_txt=True, drop_score=0.5):
+    """
+    Visualize the results of OCR detection and recognition
+    args:
+        image(Image|array): RGB image
+        boxes(list): boxes with shape(N, 4, 2)
+        txts(list): the texts
+        scores(list): txxs corresponding scores
+        draw_txt(bool): whether draw text or not
+        drop_score(float): only scores greater than drop_threshold will be visualized
+    return(array):
+        the visualized img
+    """
+    if scores is None:
+        scores = [1] * len(boxes)
+    for (box, score) in zip(boxes, scores):
+        if score < drop_score or math.isnan(score):
+            continue
+        box = np.reshape(np.array(box), [-1, 1, 2]).astype(np.int64)
+        image = cv2.polylines(np.array(image), [box], True, (255, 0, 0), 2)
+
+    if draw_txt:
+        img = np.array(resize_img(image, input_size=600))
+        txt_img = text_visual(
+            txts, scores, img_h=img.shape[0], img_w=600, threshold=drop_score)
+        img = np.concatenate([np.array(img), np.array(txt_img)], axis=1)
+        return img
+    return image
