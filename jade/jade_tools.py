@@ -225,6 +225,13 @@ def RenameImageWithDir(dir):
         shutil.copy(image_path,os.path.join(dir,GetSeqNumber()+".jpg"))
         os.remove(image_path)
         progressBar.update()
+
+class DetectResultModel():
+    def __init__(self,boxes,label_texts,labelIds,scores):
+        self.boxes = boxes
+        self.label_texts = label_texts
+        self.label_ids = labelIds
+        self.scores = scores
 if __name__ == '__main__':
     RenameImageWithDir(r"F:\现场数据\镇江大港\车牌图片\2021-12-15")
 
