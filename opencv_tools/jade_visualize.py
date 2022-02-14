@@ -14,6 +14,7 @@ from PIL import Image, ImageFont, ImageDraw
 from opencv_tools.jade_opencv_process import GetRandomColor
 from jade import getOperationSystem
 import random
+from jade import resource_path
 
 def get_color_map_list(num_classes):
     """
