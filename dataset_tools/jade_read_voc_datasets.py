@@ -200,8 +200,8 @@ def GenerateXml(filename,shape,bboxes,labels_text,save_path):
                         thirdname.appendChild(source_name)
 
     save_xml_path = os.path.join(save_path,filename+".xml")
-    f = open(save_xml_path, "w")
-    f.write(doc.toprettyxml(indent="  "))
+    f = open(save_xml_path, "wb")
+    f.write(doc.toprettyxml(indent="  ").encode("utf-8"))
     f.close()
 
 
