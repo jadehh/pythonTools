@@ -232,6 +232,29 @@ class DetectResultModel():
         self.label_texts = label_texts
         self.label_ids = labelIds
         self.scores = scores
+
+"""
+获取当前IP地址
+"""
+def get_ip_address():
+    ipaddress = os.popen("ifconfig",'r')
+    ifconfig_list = []
+    for line in ipaddress:
+        ifconfig_list.append(line)
+    wlan_list = []
+    config_tmp = ""
+    for config in ifconfig_list:
+        if config == "\n":
+            wlan_list.append(config_tmp)
+            config_tmp = ""
+        else:
+            config_tmp = config_tmp + config.split("\n")[0]
+
+    for wlan_config in wlan_list:
+        if "255.255." in wlan_config and "docker" not in wlan_config:
+            return wlan_config.split("inet")[1].split("netmask")[0].strip()
+
+
 if __name__ == '__main__':
     RenameImageWithDir(r"F:\现场数据\镇江大港\车牌图片\2021-12-15")
 

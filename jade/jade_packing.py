@@ -137,8 +137,10 @@ def writePy(args):
             f.write(extra_sys_path.encode("utf-8") + "\n".encode("utf-8"))
         for import_src in import_list:
             f.write(import_src.encode("utf-8") + "\n".encode("utf-8"))
-
-        f.write("from samplesMain import main\n"
+        if args.main:
+            f.write(args.main)
+        else:
+            f.write("from samplesMain import main\n"
                 "if __name__ == '__main__':\n"
                 "    main()\n".encode("utf-8"))
 
