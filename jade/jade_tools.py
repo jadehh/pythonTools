@@ -12,7 +12,7 @@ import datetime
 import time
 import shutil
 from jade.jade_progress_bar import ProgressBar
-
+import socket
 def zh_ch(string):
     """
     解决cv2.namedWindow中文乱码问题
@@ -236,26 +236,22 @@ class DetectResultModel():
 """
 获取当前IP地址
 """
-def get_ip_address():
-    ipaddress = os.popen("ifconfig",'r')
-    ifconfig_list = []
-    for line in ipaddress:
-        ifconfig_list.append(line)
-    wlan_list = []
-    config_tmp = ""
-    for config in ifconfig_list:
-        if config == "\n":
-            wlan_list.append(config_tmp)
-            config_tmp = ""
-        else:
-            config_tmp = config_tmp + config.split("\n")[0]
+def get_ip_address(ip_address="127.0.0.1"):
+    """
+            查询本机ip地址
+            :return: ip
+            """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((ip_address, 80))
+        ip = s.getsockname()[0]
+        s.close()
+    finally:
+        pass
+    return ip
 
-    for wlan_config in wlan_list:
-        if "255.255." in wlan_config and "docker" not in wlan_config:
-            return wlan_config.split("inet")[1].split("netmask")[0].strip()
 
 
 if __name__ == '__main__':
-    RenameImageWithDir(r"F:\现场数据\镇江大港\车牌图片\2021-12-15")
-
+    print(get_ip_address("192.168.35.120"))
 
