@@ -137,12 +137,17 @@ def writePy(args):
             f.write(extra_sys_path.encode("utf-8") + "\n".encode("utf-8"))
         for import_src in import_list:
             f.write(import_src.encode("utf-8") + "\n".encode("utf-8"))
-        if args.main:
-            f.write(args.main.encode("utf-8"))
-        else:
-            f.write("from samplesMain import main\n"
+        try:
+            if args.main:
+                f.write(args.main.encode("utf-8"))
+            else:
+                f.write("from samplesMain import main\n"
                 "if __name__ == '__main__':\n"
                 "    main()\n".encode("utf-8"))
+        except:
+            f.write("from samplesMain import main\n"
+                   "if __name__ == '__main__':\n"
+                   "    main()\n".encode("utf-8"))
 
 
 def writeSpec(args):
@@ -591,7 +596,6 @@ if __name__ == '__main__':
     parser.add_argument('--lib_path', type=str, default="container_ocr_program_lib64")  ## 是否lib包分开打包
     parser.add_argument('--is_qt', type=bool, default=True)  ## qt 会将controller view src 都进行编译
     parser.add_argument('--specify_files',type=list,default=["customTextBrowser.py"]) ## 指定编译的文件
-    parser.add_argument('--main',type=str,default="") ## 指定main函数
 
     args = parser.parse_args()
     # ui_to_py()

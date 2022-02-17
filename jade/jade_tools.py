@@ -188,7 +188,7 @@ def GetAllImagesNames(dir):
     imagename_list = os.listdir(dir)
     image_list = []
     for image_name in imagename_list:
-        if image_name[-4:].lower == ".jpg" or image_name[-4:].lower() == ".png":
+        if image_name[-4:].lower() == ".jpg" or image_name[-4:].lower() == ".png":
             image_list.append(image_name)
     return (image_list)
 
