@@ -36,7 +36,7 @@ def GetXmlClassesNames(xml_path):
 
 
 
-def ProcessXml(xml_path):
+def ProcessXml(xml_path,is_rate=True):
     # Read the XML annotation file.
     tree = ET.parse(xml_path)
     root = tree.getroot()
@@ -71,7 +71,14 @@ def ProcessXml(xml_path):
             truncated.append('0')
 
         bbox = obj.find('bndbox')
-        bboxes.append((float(bbox.find('xmin').text) / float(shape[1]) ,float(bbox.find('ymin').text) / float(shape[0]),float(bbox.find('xmax').text)/float(shape[1]),float(bbox.find('ymax').text)/float(shape[0])))
+        if is_rate is False:
+            bboxes.append([float(bbox.find('xmin').text) ,float(bbox.find('ymin').text),float(bbox.find('xmax').text),float(bbox.find('ymax').text)])
+        else:
+            bboxes.append((float(bbox.find('xmin').text) / float(shape[1]),
+                           float(bbox.find('ymin').text) / float(shape[0]),
+                           float(bbox.find('xmax').text) / float(shape[1]),
+                           float(bbox.find('ymax').text) / float(shape[0])))
+
     imagename = GetLastDir(xml_path)[:-4]+'.jpg'
     return imagename,shape, bboxes, labels_text,labels, difficult, truncated
 
@@ -118,9 +125,9 @@ def GenerateXml(filename,shape,bboxes,labels_text,save_path):
     sourcename = ['database','annotation','image']
     source_value = ['The Hand Database','VOC Hand','flickr']
     sizename = ['width','height','depth']
-    width = shape[1]
-    height = shape[0]
-    depth = shape[2]
+    width = int(shape[1])
+    height = int(shape[0])
+    depth = int(shape[2])
     size_value = [width,height,depth]
     objname = ['name','pose','difficult','truncated','bndbox']
     bndbox_key = ['xmin','ymin','xmax','ymax']
