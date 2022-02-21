@@ -28,6 +28,26 @@ def ui_to_py():
 def getOperationSystem():
     return platform.system()
 
+
+
+def get_import_content(f1,src_import,content,import_list):
+    prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
+    prefix = ""
+    edit = False
+    if len(prefix_list) > 0:
+        for text in prefix_list:
+            prefix = prefix + text + "."
+    if src_import == prefix.strip():
+        new_content = content.split(src_import)[0] + \
+                      content.split(src_import)[1]
+        f1.write((new_content + '\n').encode("utf-8"))
+        if new_content not in import_list and "#" not in new_content and \
+                new_content[
+                    0] != " ":
+            import_list.append(new_content)
+        edit = True
+    return edit
+
 def copyPy(args):
     new_src_path = CreateSavePath("new_src")
     if args.is_qt is False:
@@ -49,22 +69,7 @@ def copyPy(args):
                                     edit = False
                                     for src_import in src_import_list:
                                         if "from" in content:
-                                            prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
-                                            prefix = ""
-                                            if len(prefix_list) > 0:
-                                                for text in prefix_list:
-                                                    prefix =prefix + text + "."
-                                            if src_import == prefix.strip():
-                                                new_content = content.split(src_import)[0] + \
-                                                              content.split(src_import)[1]
-                                                f1.write((new_content + '\n').encode("utf-8"))
-                                                if new_content not in import_list and "#" not in new_content and \
-                                                        new_content[
-                                                            0] != " ":
-                                                    import_list.append(new_content)
-                                                edit = True
-                                                break
-
+                                            edit = get_import_content(f1, src_import, content, import_list)
                                     if edit is False:
                                         f1.write((content + '\n').encode("utf-8"))
                                         if content not in import_list and "#" not in content and content[0] != " ":
@@ -121,7 +126,18 @@ def copyPy(args):
 
 
 def writePy(args):
-    import_list = copyPy(args)
+    or_import_list = copyPy(args)
+    import_list = []
+    for import_content in or_import_list:
+        try:
+            content = import_content.split("import")[1].strip()
+            if content in args.remove_import_list:
+                pass
+            else:
+                import_list.append(import_content)
+        except:
+            import_list = or_import_list
+
 
     with open("{}.py".format(args.app_name), "wb") as f:
         f.write("import sys\n"
@@ -137,17 +153,10 @@ def writePy(args):
             f.write(extra_sys_path.encode("utf-8") + "\n".encode("utf-8"))
         for import_src in import_list:
             f.write(import_src.encode("utf-8") + "\n".encode("utf-8"))
-        try:
-            if args.main:
-                f.write(args.main.encode("utf-8"))
-            else:
-                f.write("from samplesMain import main\n"
+
+        f.write("from samplesMain import main\n"
                 "if __name__ == '__main__':\n"
                 "    main()\n".encode("utf-8"))
-        except:
-            f.write("from samplesMain import main\n"
-                   "if __name__ == '__main__':\n"
-                   "    main()\n".encode("utf-8"))
 
 
 def writeSpec(args):
@@ -596,7 +605,6 @@ if __name__ == '__main__':
     parser.add_argument('--lib_path', type=str, default="container_ocr_program_lib64")  ## 是否lib包分开打包
     parser.add_argument('--is_qt', type=bool, default=True)  ## qt 会将controller view src 都进行编译
     parser.add_argument('--specify_files',type=list,default=["customTextBrowser.py"]) ## 指定编译的文件
-
     args = parser.parse_args()
     # ui_to_py()
     build(args)
