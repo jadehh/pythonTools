@@ -503,8 +503,7 @@ def CombinedImages(images, img_per_row=3, columns=3):
 
 
 # 裁剪目标框
-def CutImageWithBox(image, bbox):
-    expand_size = 20
+def CutImageWithBox(image, bbox,expand_size=20):
     xmin = (int(bbox[0] - expand_size), 0)[int(bbox[0] - expand_size) < 0]
     ymin = (int(bbox[1] - expand_size), 0)[int(bbox[1] - expand_size) < 0]
     xmax = (int(bbox[2] + expand_size), 0)[int(bbox[2] + expand_size) < 0]
