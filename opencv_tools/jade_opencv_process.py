@@ -782,6 +782,14 @@ def overlay_image(image_path1,image_path2,boxes):
     cv2.waitKey(0)
     return background_image
 
+"""
+图片扩充
+"""
+def PadImage(image,width=10):
+    image_pad = cv2.copyMakeBorder(image, width, width, width, width,
+                           cv2.BORDER_CONSTANT, value=[255, 255, 255])
+    return image_pad
+
 if __name__ == '__main__':
     image = ReadChinesePath(r"F:\现场数据\镇江大港\车牌图片\2021-12-15\20211215150146781771.jpg")
     image = Image_Resize(image,768)
