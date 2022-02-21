@@ -69,7 +69,21 @@ def copyPy(args):
                                     edit = False
                                     for src_import in src_import_list:
                                         if "from" in content:
-                                            edit = get_import_content(f1, src_import, content, import_list)
+                                            prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
+                                            prefix = ""
+                                            if len(prefix_list) > 0:
+                                                for text in prefix_list:
+                                                    prefix = prefix + text + "."
+                                            if src_import == prefix.strip():
+                                                new_content = content.split(src_import)[0] + \
+                                                              content.split(src_import)[1]
+                                                f1.write((new_content + '\n').encode("utf-8"))
+                                                if new_content not in import_list and "#" not in new_content and \
+                                                        new_content[
+                                                            0] != " ":
+                                                    import_list.append(new_content)
+                                                edit = True
+                                                break
                                     if edit is False:
                                         f1.write((content + '\n').encode("utf-8"))
                                         if content not in import_list and "#" not in content and content[0] != " ":
