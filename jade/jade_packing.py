@@ -50,12 +50,16 @@ def get_import_content(f1,src_import,content,import_list):
 
 def copyPy(args):
     new_src_path = CreateSavePath("new_src")
-    if args.is_qt is False:
+    try:
+        if args.is_qt is False:
+            src_path_list = ["src"]
+            src_import_list = ["src."]
+        else:
+            src_path_list = ["src","view","view/customView","controller"]
+            src_import_list = ["src.","view.","view.customView.","controller."]
+    except :
         src_path_list = ["src"]
         src_import_list = ["src."]
-    else:
-        src_path_list = ["src","view","view/customView","controller"]
-        src_import_list = ["src.","view.","view.customView.","controller."]
     import_list = []
     for src_path in src_path_list:
         for file_name in os.listdir(src_path):
