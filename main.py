@@ -12,4 +12,4 @@ from dataset_tools.jade_create_object_dection_datasets import CreateYearsDataset
 if __name__ == '__main__':
     #create_text_detection_datasets(r"F:\数据集\关键点检测数据集\镇江大港厂内车牌关键点检测数据集",r"E:\Data\字符检测识别数据集\镇江大港厂内车牌关键点检测数据集",0.95)
     #CreatePaddleOCRDatasets(root_path="E:\Data\字符检测识别数据集\镇江大港厂内车牌关键点检测数据集", save_path="E:\Data\OCR\镇江大港厂内车牌识别数据集",dataset_type="镇江厂内车牌数据集")
-    CreateYearsDatasets(r"F:\数据集\VOC数据集\镇江大港车辆二维码检测",0.98)
+    CreateYearsDatasets(r"F:\数据集\VOC数据集\镇江大港车辆二维码检测")
