@@ -13,9 +13,6 @@ import math
 from PIL import Image, ImageFont, ImageDraw
 from opencv_tools.jade_opencv_process import GetRandomColor
 from jade import getOperationSystem
-import random
-from jade import resource_path
-
 def get_color_map_list(num_classes):
     """
     Args:
@@ -432,7 +429,11 @@ def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=
     # PIL图片上打印汉字
     draw = ImageDraw.Draw(pilimg)  # 图片上打印
     font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
-    draw.text(pt1, label, (int(color[0]), int(color[1]), int(color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    if type(label) == list:
+        for (txt,pt,txt_color) in zip(label,pt1,color):
+            draw.text(pt, txt, (int(txt_color[0]), int(txt_color[1]), int(txt_color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    else:
+        draw.text(pt1, label, (int(color[0]), int(color[1]), int(color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
 
@@ -503,80 +504,6 @@ def PltShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
     plt.close()
 
 
-
-def _to_color(indx):
-    """ return (b, r, g) tuple"""
-    b = random.randint(1, 10) / 10
-    g = random.randint(1, 10) / 10
-    r = random.randint(1, 10) / 10
-    return b * 255, r * 255, g * 255
-
-
-
-
-# opencv显示boxes
-def CVShowBoxes(image, detectresult, num_classes=90, waitkey=-1, named_windows="result"):
-    base = int(np.ceil(pow(num_classes, 1. / 3)))
-    colors = [_to_color(x) for x in range(num_classes)]
-    if type(image) == str:
-        image = cv2.imread(image)
-    image2 = image.copy()
-    boxes = detectresult.boxes
-    for i in range(len(boxes)):
-        if boxes[i][0] <= 1 and boxes[i][1] <= 1 and boxes[i][2] <= 1 and boxes[i][3] <= 1:
-            xmin = int(boxes[i][0] * image.shape[1])
-            ymin = int(boxes[i][1] * image.shape[0])
-            xmax = int(boxes[i][2] * image.shape[1])
-            ymax = int(boxes[i][3] * image.shape[0])
-        else:
-            xmin = int(boxes[i][0])
-            ymin = int(boxes[i][1])
-            xmax = int(boxes[i][2])
-            ymax = int(boxes[i][3])
-        if boxes is not None:
-            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
-            if detectresult.label_texts is not None:
-                if detectresult.scores is not None:
-                    image2 = Add_Chinese_Label(img=image2, label=detectresult.label_texts[i] + ":" + str(
-                        int(detectresult.scores[i] * 100)),
-                                               pt1=(xmin, ymin))
-                else:
-                    image2 = Add_Chinese_Label(img=image2, label=detectresult.label_texts[i],
-                                               pt1=(xmin, ymin))
-                if detectresult.label_ids is not None:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(detectresult.label_ids[i])],
-                                           3, 3)
-                else:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
-
-    if waitkey >= 0:
-        cv2.namedWindow(named_windows, 0)
-        # cv2.resizeWindow("result", 840, 680)
-        cv2.imshow(named_windows, image2)
-        cv2.waitKey(waitkey)
-    else:
-        return image2
-
-
-# opencv显示points
-def CVShowPoints(img_path, points, waitkey=1):
-    if type(img_path) != list:
-        image = cv2.imread(img_path)
-    else:
-        image = img_path
-    image2 = image.copy()
-
-    for i in range(len(points)):
-        psts = []
-        points2 = points[i]
-        for j in range(len(points2)):
-            for z in range(len(points2[j])):
-                if z % 2 == 0 and z != 0:
-                    cv2.circle(image2, (int(points2[j][z - 1]), int(points2[j][z])), 2, (255, 255, 255), 2, 1)
-
-    cv2.imshow("resukt", image2)
-    cv2.waitKey(waitkey * 1000)
-
 def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="result"):
     base = int(np.ceil(pow(len(keyPoints), 1. / 3)))
     colors = [_to_color(x) for x in range(len(keyPoints))]
@@ -610,6 +537,7 @@ def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="r
     else:
         return image
 
+        return image
 
 
 # opencv显示关键点和矩形框
