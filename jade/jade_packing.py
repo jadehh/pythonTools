@@ -172,9 +172,17 @@ def writePy(args):
         for import_src in import_list:
             f.write(import_src.encode("utf-8") + "\n".encode("utf-8"))
 
-        f.write("from samplesMain import main\n"
+        try:
+            if args.main:
+                f.write(args.main.encode("utf-8"))
+            else:
+                f.write("from samplesMain import main\n"
                 "if __name__ == '__main__':\n"
                 "    main()\n".encode("utf-8"))
+        except:
+            f.write("from samplesMain import main\n"
+                   "if __name__ == '__main__':\n"
+                   "    main()\n".encode("utf-8"))
 
 
 def writeSpec(args):
