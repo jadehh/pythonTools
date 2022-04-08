@@ -10,6 +10,8 @@ from dataset_tools.jade_create_paddle_text_detection_datasets import *
 from dataset_tools.jade_create_paddle_ocr_datasets import *
 from dataset_tools.jade_create_object_dection_datasets import CreateYearsDatasets
 if __name__ == '__main__':
-    #create_text_detection_datasets(r"F:\数据集\关键点检测数据集\镇江大港厂内车牌关键点检测数据集",r"E:\Data\字符检测识别数据集\镇江大港厂内车牌关键点检测数据集",0.95)
+
+    #removeNolabelDatasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集\2022-03-09")
+    create_text_detection_datasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集",r"E:\Data\字符检测识别数据集\定制版箱号关键点数据集",0.95)
     #CreatePaddleOCRDatasets(root_path="E:\Data\字符检测识别数据集\镇江大港厂内车牌关键点检测数据集", save_path="E:\Data\OCR\镇江大港厂内车牌识别数据集",dataset_type="镇江厂内车牌数据集")
-    CreateYearsDatasets(r"F:\数据集\VOC数据集\镇江大港车辆二维码检测")
+    # CreateYearsDatasets(r"F:\数据集\VOC数据集\定制版顶相机箱号检测数据集")

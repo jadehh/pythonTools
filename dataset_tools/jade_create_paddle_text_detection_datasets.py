@@ -192,16 +192,16 @@ def createDatasets(root_path):
 
 def removeNolabelDatasets(root_path):
     image_path_list = GetAllImagesPath(root_path)
+    progressBar = ProgressBar(len(image_path_list))
     for image_path in image_path_list:
         if os.path.exists(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json")):
             result = readjsonContent(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
             if result == '[]':
-                print("删除{}".format(image_path))
                 os.remove(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
                 os.remove(image_path)
         else:
-            print("删除{}".format(image_path))
             os.remove(image_path)
+        progressBar.update()
 
 
 def GetContaNumberPath(image_path_list):

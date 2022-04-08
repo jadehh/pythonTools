@@ -33,7 +33,6 @@ VOC_LABELS = {'__background__':(0, 'Background'),  # always index 0
               'tvmonitor':(20,'tvmonitor')}
 
 from dataset_tools.jade_create_object_dection_datasets import *
-from dataset_tools.jade_read_voc_datasets import *
 from dataset_tools.jade_voc_to_classify_datasets import *
 from dataset_tools.jade_create_classify_dataset import *
 from dataset_tools.coco_dataset_to_voc_dataset import *

@@ -1,10 +1,15 @@
-#coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File     : jade_voc_datasets.py
+# @Author   : jade
+# @Date     : 2022/3/9 13:33
+# @Email    : jadehh@1ive.com
+# @Software : Samples
+# @Desc     :
+from jade import *
+from opencv_tools import *
 from xml.dom import minidom
 from dataset_tools import *
-from jade import GetLastDir,CreateSavePath
-import os
-import numpy as np
-
 def GetXmlClassesNames(xml_path):
     classnames = []
     # Read the XML annotation file.
@@ -29,13 +34,6 @@ def GetXmlClassesNames(xml_path):
         if label not in classnames:
             classnames.append(label)
     return classnames
-
-
-
-
-
-
-
 def ProcessXml(xml_path,is_rate=True):
     # Read the XML annotation file.
     tree = ET.parse(xml_path)
@@ -81,10 +79,6 @@ def ProcessXml(xml_path,is_rate=True):
 
     imagename = GetLastDir(xml_path)[:-4]+'.jpg'
     return imagename,shape, bboxes, labels_text,labels, difficult, truncated
-
-
-
-
 def ProcessXml_Dataset(xml_path):
     # Read the XML annotation file.
     tree = ET.parse(xml_path)
@@ -113,7 +107,6 @@ def ProcessXml_Dataset(xml_path):
         else:
             new_groudth.append([0,0,0,0,0])
     return  np.array(new_groudth)
-
 # 生成XML文件方式
 def GenerateXml(filename,shape,bboxes,labels_text,save_path):
     CreateSavePath(save_path)
@@ -211,33 +204,65 @@ def GenerateXml(filename,shape,bboxes,labels_text,save_path):
     f.write(doc.toprettyxml(indent="  ").encode("utf-8"))
     f.close()
 
+class JadeVOCDatasets(object):
+    def __init__(self,root_path):
+        self.root_path = root_path
+        super(JadeVOCDatasets, self).__init__()
 
-def mkdir(path):
-    # 引入模块
-    import os
+    def remove_no_labels(self):
+        file_list = os.listdir(self.root_path)
+        processBar  = ProgressBar(len(file_list))
+        for file_name in file_list:
+            images_path = os.path.join(self.root_path,file_name,DIRECTORY_IMAGES)
+            annos_path = os.path.join(self.root_path,file_name,DIRECTORY_ANNOTATIONS)
+            image_list = GetAllImagesPath(images_path)
+            for image_path in image_list:
+                anno_path = os.path.join(annos_path,GetLastDir(image_path)[:-4]+".xml")
+                if os.path.exists(anno_path):
+                    imagename,shape, bboxes, labels_text,labels, difficult, truncated = ProcessXml(anno_path)
+                    if len(labels_text) == 0:
+                        os.remove(image_path)
+                else:
+                    os.remove(image_path)
+            processBar.update()
 
-    # 去除首位空格
-    path = path.strip()
-    # 去除尾部 \ 符号
-    path = path.rstrip("\\")
+    def change_labels(self,change_labesl,changed_label):
+        file_list = os.listdir(self.root_path)
+        processBar  = ProgressBar(len(file_list))
+        for file_name in file_list:
+            if os.path.isdir(os.path.join(self.root_path,file_name)):
+                images_path = os.path.join(self.root_path, file_name, DIRECTORY_IMAGES)
+                annos_path = os.path.join(self.root_path, file_name, DIRECTORY_ANNOTATIONS)
+                image_list = GetAllImagesPath(images_path)
+                for image_path in image_list:
+                    anno_path = os.path.join(annos_path, GetLastDir(image_path)[:-4] + ".xml")
+                    if os.path.exists(anno_path):
+                        imagename, shape, bboxes, labels_text, labels, difficult, truncated = ProcessXml(anno_path,is_rate=False)
+                        new_labels_text = []
+                        for label_text in labels_text:
+                            if label_text in change_labesl:
+                                new_labels_text.append(changed_label)
+                        GenerateXml(GetLastDir(image_path)[:-4],shape,bboxes,new_labels_text,os.path.join(self.root_path,file_name,DIRECTORY_ANNOTATIONS))
+                processBar.update()
 
-    # 判断路径是否存在
-    # 存在     True
-    # 不存在   False
-    isExists = os.path.exists(path)
-
-    # 判断结果
-    if not isExists:
-        # 如果不存在则创建目录 # 创建目录操作函数
-        os.makedirs(path)
-
-        print (path + ' 创建成功')
-        return True
-    else:
-        # 如果目录存在则不创建，并提示目录已存在
-        print (path + ' 目录已存在')
-        return False
-#smb://192.168.1.202/data/HAND_DATASET/VOC_HANDS_DATASET.tar.gz
+    def video_to_voc(self,save_path,detector=None,fps=5):
+        video_list = GetFilesWithLastNamePath(self.root_path, ".avi")
+        processBar = ProgressBar(len(video_list))
+        for video_path in video_list:
+            capture = cv2.VideoCapture(video_path)
+            index = 0
+            while capture.isOpened():
+                ret, frame = capture.read()
+                if ret is False:
+                    break
+                if detector is None:
+                    if index % fps == 0:
+                        WriteChienePath(os.path.join(save_path, GetSeqNumber() + ".jpg"), frame)
+                    index = index + 1
+            processBar.update()
 
 
-
+if __name__ == '__main__':
+    jadeVOCDatasets = JadeVOCDatasets(r'F:\数据集\VOC数据集\定制版顶相机箱号检测数据集')
+    # jadeVOCDatasets.remove_no_labels()
+    jadeVOCDatasets.change_labels(["PCTNNO","NCTNNO"],"CTNNO")
