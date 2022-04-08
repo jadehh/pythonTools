@@ -21,6 +21,13 @@ def zh_ch(string):
     """
     return string.encode("gbk").decode('UTF-8', errors='ignore')
 
+def Exit(exit_number):
+    """
+    强制结束
+    """
+    time.sleep(1)
+    os._exit(exit_number)
+
 def getNumberofString(string):
     """
     提取字符串中的数字
