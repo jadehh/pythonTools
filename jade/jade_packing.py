@@ -423,7 +423,7 @@ def packSetup(args,exec_path):
                    "[Files]\n" \
                   ";安装文件\n" \
                 .format(get_uuid(),args.name.split("V")[0],args.name.split("V")[-1],args.name,
-                                           "{pf64}",args.app_name.split("V")[0],args.app_name.split("V")[0],args.app_name.split("V")[0]+"_setup",
+                                           "{pf64}",args.app_name,args.app_name,args.app_name+"_setup",
                                            os.path.abspath("icons/app_logo.ico"))
 
         for file in file_list:
