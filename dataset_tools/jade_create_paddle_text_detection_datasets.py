@@ -13,6 +13,7 @@ from opencv_tools.jade_opencv_process import opencv_to_base64
 import shutil
 import cv2
 import random
+from dataset_tools import *
 
 
 def sortPoints(points, label):
@@ -200,8 +201,31 @@ def removeNolabelDatasets(root_path):
                 os.remove(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
                 os.remove(image_path)
         else:
+            print("清除图片")
             os.remove(image_path)
         progressBar.update()
+
+def removeNolabelVocDatasets(root_path):
+    for day in os.listdir(root_path):
+        if os.path.isdir(os.path.join(root_path,day)):
+            image_path_list = GetAllImagesPath(os.path.join(root_path, day, DIRECTORY_IMAGES))
+            progressBar = ProgressBar(len(image_path_list))
+            for image_path in image_path_list:
+                if os.path.exists(
+                        os.path.join(root_path, day, DIRECTORY_ANNOTATIONS, GetLastDir(image_path)[:-4] + ".xml")):
+                    imagename, shape, bboxes, labels_text, labels, difficult, truncated = ProcessXml(
+                        os.path.join(root_path, day, DIRECTORY_ANNOTATIONS, GetLastDir(image_path)[:-4] + ".xml"))
+                    if len(bboxes) == 0:
+                        print("清除{},清除{}".format(image_path, os.path.join(root_path, day, DIRECTORY_ANNOTATIONS,
+                                                                          GetLastDir(image_path)[:-4] + ".xml")))
+                        os.remove(
+                            os.path.join(root_path, day, DIRECTORY_ANNOTATIONS, GetLastDir(image_path)[:-4] + ".xml"))
+                        os.remove(image_path)
+                else:
+                    print("清除{}".format(image_path))
+                    os.remove(image_path)
+                progressBar.update()
+
 
 
 def GetContaNumberPath(image_path_list):
