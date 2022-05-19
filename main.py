@@ -17,4 +17,4 @@ if __name__ == '__main__':
     # removeNolabelVocDatasets(r"F:\数据集\VOC数据集\验残集装箱检测数据集")
     # CreateYearsDatasets(r"F:\数据集\VOC数据集\验残集装箱检测数据集")
     create_text_detection_datasets(r"F:\数据集\关键点检测数据集\箱号关键点数据集",r'E:\Data\字符检测识别数据集\箱号关键点数据集')
-    CreatePaddleOCRDatasets(r'E:\Data\字符检测识别数据集\箱号关键点数据集', save_path="E:\Data\OCR\箱号识别数据集",dataset_type="箱号数据集")
+    #CreatePaddleOCRDatasets(r'E:\Data\字符检测识别数据集\箱号关键点数据集', save_path="E:\Data\OCR\箱号识别数据集",dataset_type="箱号数据集")
