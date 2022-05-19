@@ -30,15 +30,16 @@ class JadeLogging():
     TimedRotatingFileHandler 测试
     """
 
-    def __init__(self, logging_path="log", max_count=180, Level="INFO"):
+    def __init__(self, logging_path="log", max_count=180, Level="INFO",app_name=""):
         CreateSavePath(logging_path)
+        self.app_name = app_name
         import os
         log_conf = {
             'version': 1,
             'disable_existing_loggers': False,
             'formatters': {
                 'default': {
-                    'format': '%(asctime)s - %(levelname)s: %(message)s',
+                    'format': '%(asctime)s  - %(levelname)s: %(message)s',
                     'datefmt': "%Y-%m-%d %H:%M:%S"
                 },
             },
@@ -93,6 +94,8 @@ class JadeLogging():
         return content
 
     def write_log(self, content, Type="debug"):
+        if self.app_name:
+            content = self.app_name + ":" + content
         if Type == "debug":
             self.logger.debug(content)
         elif Type == "info":
