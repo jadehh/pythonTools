@@ -67,7 +67,10 @@ def copyPy(args):
                 if file_name != "samplesMain.py":
                     with open(os.path.join(new_src_path, file_name), "wb") as f1:
                         with open(os.path.join(src_path, file_name), "rb") as f:
-                            content_list = str(f.read(), encoding="utf-8").split("\n")
+                            try:
+                                content_list = str(f.read(), encoding="utf-8").split("\n")
+                            except:
+                                pass
                             for content in content_list:
                                 if "import" in content or ("from" in content and "import" in content):
                                     edit = False
@@ -192,7 +195,7 @@ def writeSpec(args):
     else:
         file_list = os.listdir("build/encryption")
         for i in range(len(file_list)):
-            file_path = os.path.join("build/encryption", file_list[i])
+            file_path = "build/encryption/{}".format(file_list[i])
             file_path_str = ("'{}'".format(file_path))
             file_path_list_str = "({},'.')".format(file_path_str)
             data_str = data_str + file_path_list_str + ","
@@ -342,7 +345,13 @@ def build(args):
     for file_name in file_list:
         if len(args.specify_files) > 0:
             if file_name in args.specify_files:
-                cmd_str = "easycython {}/{}".format( "new_src", file_name)
+                scripts_path = ""
+                try:
+                    if args.scripts_path:
+                        scripts_path = args.scripts_path + "/"
+                except:
+                    pass
+                cmd_str = "{}easycython {}/{}".format(scripts_path,"new_src", file_name)
                 result = subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 progressBar.update()
             else:
@@ -559,7 +568,14 @@ def copy_dir(source_dir, save_path):
 def packAPP(args):
     writePy(args)
     writeSpec(args)
-    cmd_str = "pyinstaller  {}.spec  --additional-hooks-dir hooks".format(args.app_name)
+    scripts_path = ""
+    try:
+        if args.scripts_path:
+            scripts_path = args.scripts_path + "/"
+    except:
+        pass
+    cmd_str = "{}pyinstaller  {}.spec  --additional-hooks-dir hooks".format(scripts_path,args.app_name)
+
     os.system(cmd_str)
     save_path = CreateSavePath(os.path.join("releases",args.name))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
