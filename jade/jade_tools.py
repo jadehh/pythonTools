@@ -59,7 +59,7 @@ def JudgeWhetherIPAddress(ip):
     else:
         return False
 
-def getConfig(config,section, configname,JadeLog=None,default_value=None):
+def getConfig(config,section, configname,default_value=None,config_dic=None,JadeLog=None):
     """
     读取ini参数
     """
@@ -67,12 +67,13 @@ def getConfig(config,section, configname,JadeLog=None,default_value=None):
         configparam = (config.get(section, configname)).split("#")[0].rstrip()
         return configparam
     except Exception as e:
+        if config_dic is not None:
+            config_dic.update({configname:default_value})
         if JadeLog:
             JadeLog.ERROR("读取{}参数异常,请检查参数是否正常".format(configname))
-            return default_value
         else:
-            print("读取{}参数异常,请检查参数是否正常".format(configname))
-            sys.exit(0)
+            pass
+        return default_value
 
 
 def getBoolConfig(config, section, configname):
