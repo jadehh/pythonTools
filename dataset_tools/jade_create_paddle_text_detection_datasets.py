@@ -205,12 +205,29 @@ def removeNolabelDatasets(root_path):
             os.remove(image_path)
         progressBar.update()
 
+
+def get_no_exists_index(arr1,arr2):
+    for (i,arr_1) in enumerate(arr1):
+        if arr_1 not in arr2:
+            return 0,i
+    for (i,arr_2) in enumerate(arr2):
+        if arr_2 not in arr1:
+            return 1,i
+    else:
+        return None,None
+
 def removeNolabelVocDatasets(root_path):
     for day in os.listdir(root_path):
         if os.path.isdir(os.path.join(root_path,day)):
             image_path_list = GetAllImagesPath(os.path.join(root_path, day, DIRECTORY_IMAGES))
             progressBar = ProgressBar(len(image_path_list))
+            xml_path_list = GetFilesWithLastNamePath(os.path.join(root_path,day,DIRECTORY_ANNOTATIONS),".xml")
+            xml_name_list = []
+            for xml_path in xml_path_list:
+                xml_name_list.append(GetLastDir(xml_path).split(".")[0])
+            image_name_list = []
             for image_path in image_path_list:
+                image_name_list.append(GetLastDir(image_path.split(".")[0]))
                 if os.path.exists(
                         os.path.join(root_path, day, DIRECTORY_ANNOTATIONS, GetLastDir(image_path)[:-4] + ".xml")):
                     imagename, shape, bboxes, labels_text, labels, difficult, truncated = ProcessXml(
@@ -226,8 +243,13 @@ def removeNolabelVocDatasets(root_path):
                     os.remove(image_path)
                 progressBar.update()
 
-
-
+            list_index,index = get_no_exists_index(image_name_list,xml_name_list)
+            if list_index == 0:
+                print("需要删除图片,{}".format(image_path_list[index]))
+                os.remove(image_path_list[index])
+            elif list_index == 1:
+                print("需要标注文件,{}".format(xml_path_list[index]))
+                os.remove(xml_path_list[index])
 def GetContaNumberPath(image_path_list):
     ContaNumber_list = []
     for file in image_path_list:
