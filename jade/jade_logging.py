@@ -35,15 +35,15 @@ class JadeLogging():
         self.app_name = app_name
         self.logger = logging.getLogger(self.app_name)
         if self.app_name:
-            self.format = '%(asctime)s - %(name)s - %(levelname)s: %(message)s'
+            self.log_format = '%(asctime)s - %(name)s - %(levelname)s: %(message)s'
         else:
-            self.format = '%(asctime)s - %(levelname)s: %(message)s'
+            self.log_format = '%(asctime)s - %(levelname)s: %(message)s'
         log_conf = {
             'version': 1,
             'disable_existing_loggers': False,
             'formatters': {
                 'default': {
-                    'format': self.format,
+                    'format': self.log_format,
                     'datefmt': "%Y-%m-%d %H:%M:%S"
                 },
             },
