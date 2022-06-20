@@ -12,7 +12,7 @@ import logging.config
 import os
 from queue import Queue
 from threading import Thread
-
+import os
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 logging.getLogger("spyne").setLevel(logging.ERROR)
@@ -33,13 +33,17 @@ class JadeLogging():
     def __init__(self, logging_path="log", max_count=180, Level="INFO",app_name=""):
         CreateSavePath(logging_path)
         self.app_name = app_name
-        import os
+        self.logger = logging.getLogger(self.app_name)
+        if self.app_name:
+            self.format = '%(asctime)s - %(name)s - %(levelname)s: %(message)s'
+        else:
+            self.format = '%(asctime)s - %(levelname)s: %(message)s'
         log_conf = {
             'version': 1,
             'disable_existing_loggers': False,
             'formatters': {
                 'default': {
-                    'format': '%(asctime)s  - %(levelname)s: %(message)s',
+                    'format': self.format,
                     'datefmt': "%Y-%m-%d %H:%M:%S"
                 },
             },
@@ -68,7 +72,6 @@ class JadeLogging():
         sh = logging.StreamHandler()  # 往屏幕上输出
         sh.setFormatter(format_str)  # 设置屏幕上显示的格式
         logging.config.dictConfig(log_conf)
-        self.logger = logging.getLogger(__name__)
         self.max_format = 100
         self.logger.addHandler(sh)  # 把对象加到logger里
         self.logContent = Queue(maxsize=200)
@@ -94,8 +97,6 @@ class JadeLogging():
         return content
 
     def write_log(self, content, Type="debug"):
-        if self.app_name:
-            content = self.app_name + ":" + content
         if Type == "debug":
             self.logger.debug(content)
         elif Type == "info":
@@ -156,7 +157,7 @@ if __name__ == "__main__":
     # print("ConcurrentTimedRotatingFileHandler 耗时:%s秒" % use_time)
     # begin_time = time.time()
     # 每个进程100个线程共需写入所有日志，由于GIL原因，并发只存在一个线程，但是会存在线程上下文切换，同样需要锁机制防止脏数据和日志丢失
-    jadeLog = JadeLogging()
+    jadeLog = JadeLogging(app_name="箱号识别服务")
 
     jadeLog.INFO("123")
     time.sleep(2)
