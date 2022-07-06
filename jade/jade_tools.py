@@ -96,6 +96,28 @@ def getBoolConfig(config, section, configname):
         sys.exit()
 
 
+def getSectionsConfig(config,section_list,configname):
+    config_list = []
+    for section in section_list:
+        try:
+            configparam = (config.get(section, configname)).split("#")[0].rstrip()
+            config_list.append(configparam)
+        except Exception as e:
+            print("读取{}参数异常,请检查参数是否正常,出错原因为 = {},发生异常文件{},发生异常所在的行数{}".format(configname.e,
+                                                                                        e.__traceback__.tb_frame.f_globals[
+                                                                                            "__file__"],
+                                                                                        e.__traceback__.tb_lineno))
+            sys.exit()
+    return config_list
+
+def getSectionList(config,section_name="Camera"):
+    section_list = []
+    for section in config.sections():
+        if section_name in section:
+            section_list.append(section)
+    return section_list
+
+
 def resource_path(relative_path):
     """
     生成资源文件目录访问路径,用于打包成可执行文件
