@@ -23,7 +23,8 @@ logging.getLogger("suds").setLevel(logging.ERROR)
 logging.getLogger("tornado.access").disabled = True
 logging.getLogger("tornado.application").disabled = True
 logging.getLogger("tornado.general").disabled = True
-
+logging.getLogger("PyQt5.uic.uiparser").setLevel(logging.ERROR)
+logging.getLogger("PyQt5.uic.properties").setLevel(logging.ERROR)
 
 class JadeLogging():
     """
