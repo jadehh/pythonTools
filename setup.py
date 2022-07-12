@@ -12,7 +12,7 @@ if __name__ == '__main__':
     find_packages("opencv_tools", pack_list)
     setup(
     name="opencv_tools",
-    version="1.0.0",
+    version="1.0.1",
     keywords=("pip", "opencv_tools", ""),
     description="opencv_tools",
     long_description="",

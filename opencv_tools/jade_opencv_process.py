@@ -799,13 +799,13 @@ class VideoCaptureBaseProcess(threading.Thread):
         self.use_gpu_decode = use_gpu_decode
         super(VideoCaptureBaseProcess, self).__init__()
 
-    def download_frame(self,frame):
-        frame = frame.download()
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+    def download_frame(self,frame,package_type=None):
+        if package_type == "gpu":
+            frame = frame.download()
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
         return frame
     def package_data(self,frame,package_type=None):
-        if package_type == "gpu":
-            frame = self.download_frame()
+        frame = self.download_frame(package_type)
         cv2.namedWindow("result",0)
         cv2.imshow("result",frame)
         cv2.waitKey(1)
