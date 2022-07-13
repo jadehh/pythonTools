@@ -792,20 +792,22 @@ def PadImage(image,width=10):
 
 
 class VideoCaptureBaseProcess(threading.Thread):
-    def __init__(self,video_path,camera_type,use_gpu_decode,JadeLog=None):
+    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None):
         self.video_path = video_path
         self.history_status = self.check_video_path()
         self.camera_type = camera_type
         self.use_gpu_decode = use_gpu_decode
+        self.camera_reopen_times = camera_reopen_times
+        self.JadeLog = JadeLog
         super(VideoCaptureBaseProcess, self).__init__()
 
-    def download_frame(self,frame,package_type=None):
-        if package_type == "gpu":
+    def download_frame(self,frame):
+        if self.use_gpu_decode:
             frame = frame.download()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
         return frame
-    def package_data(self,frame,package_type=None):
-        frame = self.download_frame(package_type)
+    def package_data(self,ret,frame):
+        frame = self.download_frame(frame)
         cv2.namedWindow("result",0)
         cv2.imshow("result",frame)
         cv2.waitKey(1)
@@ -822,40 +824,40 @@ class VideoCaptureBaseProcess(threading.Thread):
                 self.capture = cv2.cudacodec.createVideoReader(self.video_path)
                 if self.capture.nextFrame()[0]:
                     self.reopen_times = 0
-                    JadeLog.INFO(
+                    self.JadeLog.INFO(
                         "相机类型为:{},相机打开成功,使用GPU对视频解码,相机地址为{}".format(self.camera_type, self.video_path))
                 else:
-                    time.sleep(CAMERAREOPENTIME)
+                    time.sleep(self.camera_reopen_times)
                     self.reopen_times = self.reopen_times + 1
                     self.capture = None
-                    JadeLog.ERROR(
+                    self.JadeLog.ERROR(
                         "相机类型为:{},相机第{}次打开失败,相机地址为{}".format(self.camera_type, self.reopen_times, self.video_path))
             except Exception as e:
                 if "CUDA_ERROR_FILE_NOT_FOUND" in str(e):
-                    JadeLog.ERROR(
+                    self.JadeLog.ERROR(
                         "相机类型为:{},相机打开失败,检查用户名,密码和IP地址是否正确,相机地址为{},程序退出".format(self.camera_type, self.video_path))
                 elif "CUDA_ERROR_INVALID_DEVICE" in str(e):
-                    JadeLog.ERROR("相机类型为:{},不支持该显卡,请检查显卡驱动环境,或者使用CPU解码,程序退出".format(self.camera_type))
+                    self.JadeLog.ERROR("相机类型为:{},不支持该显卡,请检查显卡驱动环境,或者使用CPU解码,程序退出".format(self.camera_type))
                 elif "CUDA_ERROR_NO_DEVICE" in str(e):
-                    JadeLog.ERROR("相机类型为:{},请确认显卡驱动环境是否为440.82,尝试更换显卡驱动,或者使用CPU解码,程序退出".format(self.camera_type))
+                    self.JadeLog.ERROR("相机类型为:{},请确认显卡驱动环境是否为440.82,尝试更换显卡驱动,或者使用CPU解码,程序退出".format(self.camera_type))
                 else:
-                    JadeLog.ERROR("相机类型为:{},不支持GPU解码,请使用CPU视频流解码,程序退出,出错原因为:{},程序退出".format(self.camera_type, str(e)))
+                    self.JadeLog.ERROR("相机类型为:{},不支持GPU解码,请使用CPU视频流解码,程序退出,出错原因为:{},程序退出".format(self.camera_type, str(e)))
                 Exit(0)
         else:
-            JadeLog.ERROR("相机类型为:{},没有GPU解码功能,请重新编译,或者使用CPU解码,程序退出".format(self.camera_type))
+            self.JadeLog.ERROR("相机类型为:{},没有GPU解码功能,请重新编译,或者使用CPU解码,程序退出".format(self.camera_type))
             Exit(0)
 
     def opencv_cpu_capture(self):
         self.capture = cv2.VideoCapture(self.video_path)
         if self.capture.isOpened():
             self.reopen_times = 0
-            JadeLog.INFO(
+            self.JadeLog.INFO(
                 "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为{}".format(self.camera_type, self.video_path))
         else:
-            time.sleep(30)
+            time.sleep(self.camera_reopen_times)
             self.reopen_times = self.reopen_times + 1
             self.capture = None
-            JadeLog.ERROR("相机类型为:{},相机第{}次打开失败,相机地址为{}".format(self.camera_type, self.reopen_times, self.video_path))
+            self.JadeLog.ERROR("相机类型为:{},相机第{}次打开失败,相机地址为{}".format(self.camera_type, self.reopen_times, self.video_path))
 
 
 
@@ -867,14 +869,14 @@ class VideoCaptureBaseProcess(threading.Thread):
                 try:
                     ret, frame = self.capture.nextFrame()
                     if ret:
-                        self.package_data(frame,"gpu")
+                        self.package_data(ret,frame)
                     else:
-                        JadeLog.WARNING("相机类型为:{},相机中途断开,尝试重连".format(self.camera_type))
+                        self.JadeLog.WARNING("相机类型为:{},相机中途断开,尝试重连".format(self.camera_type))
                         self.open_gpu_capture()
                     if self.history_status:
                         time.sleep(0.04)
                 except:
-                    JadeLog.WARNING("相机类型为:{},相机解码失败,尝试重连".format(self.camera_type))
+                    self.JadeLog.WARNING("相机类型为:{},相机解码失败,尝试重连".format(self.camera_type))
                     self.open_gpu_capture()
 
 
@@ -886,14 +888,15 @@ class VideoCaptureBaseProcess(threading.Thread):
                 try:
                     ret, frame = self.capture.read()
                     if ret:
-                        self.package_data(frame,"cpu")
+                        self.package_data(ret,frame)
                     else:
-                        JadeLog.WARNING("相机类型为:{},相机中途断开,尝试重连".format(self.camera_type))
+                        self.JadeLog.WARNING("相机类型为:{},相机中途断开,尝试重连".format(self.camera_type))
                         self.opencv_cpu_capture()
                     if self.history_status:
                         time.sleep(0.04)
                 except Exception as e:
-                    JadeLog.WARNING("相机类型为:{},相机解码失败,尝试重连".format(self.camera_type))
+                    print(e)
+                    self.JadeLog.WARNING("相机类型为:{},相机解码失败,尝试重连".format(self.camera_type))
                     self.opencv_cpu_capture()
 
     def start_capture_thread(self):
@@ -904,6 +907,7 @@ class VideoCaptureBaseProcess(threading.Thread):
 
     def run(self):
         self.start_capture_thread()
+
 
 
 
