@@ -825,26 +825,29 @@ class VideoCaptureBaseProcess(threading.Thread):
     def open_gpu_capture(self):
         if (hasattr(cv2, "cudacodec")):
             try:
+                JadeLog.INFO("相机类型为:{},使用GPU解码,准备打开相机".format(self.camera_type))
                 self.capture = cv2.cudacodec.createVideoReader(self.video_path)
                 if self.capture.nextFrame()[0]:
                     self.reopen_times = 0
                     self.JadeLog.INFO(
-                        "相机类型为:{},相机打开成功,使用GPU对视频解码,相机地址为{}".format(self.camera_type, self.video_path))
+                        "相机类型为:{},相机打开成功,使用GPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
+                    return True
                 else:
                     self.reopen_times = self.reopen_times + 1
                     self.capture = None
                     self.JadeLog.ERROR(
-                        "相机类型为:{},相机第{}次打开失败,相机地址为{}".format(self.camera_type, self.reopen_times, self.video_path))
+                        "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
                     self.camera_abnormal(None)
-                    time.sleep(self.camera_reopen_times)
+                    return False
+
             except Exception as e:
                 self.camera_abnormal(str(e))
                 if "CUDA_ERROR_FILE_NOT_FOUND" in str(e):
                     self.reopen_times = self.reopen_times + 1
                     self.capture = None
                     self.JadeLog.ERROR(
-                        "相机类型为:{},相机第{}次打开失败,相机地址为{}".format(self.camera_type,self.reopen_times,self.video_path))
-                    time.sleep(self.camera_reopen_times)
+                        "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type,self.reopen_times,self.video_path))
+                    return False
                 elif "CUDA_ERROR_INVALID_DEVICE" in str(e):
                     self.JadeLog.ERROR("相机类型为:{},不支持该显卡,请检查显卡驱动环境,或者使用CPU解码,程序退出".format(self.camera_type))
                     Exit(0)
@@ -859,68 +862,52 @@ class VideoCaptureBaseProcess(threading.Thread):
             Exit(0)
 
     def opencv_cpu_capture(self):
+        JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
         self.capture = cv2.VideoCapture(self.video_path)
         if self.capture.isOpened():
             self.reopen_times = 0
             self.JadeLog.INFO(
-                "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为{}".format(self.camera_type, self.video_path))
+                "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
+            return True
         else:
             self.reopen_times = self.reopen_times + 1
             self.capture = None
-            self.JadeLog.ERROR("相机类型为:{},相机第{}次打开失败,相机地址为{}".format(self.camera_type, self.reopen_times, self.video_path))
-            time.sleep(self.camera_reopen_times)
+            self.JadeLog.ERROR("相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
             self.camera_abnormal(None)
+            return False
 
     def judge_capture_reader(self):
         if self.use_gpu_decode:
-            self.open_gpu_capture()
+            return self.open_gpu_capture()
         else:
-            self.opencv_cpu_capture()
+            return self.opencv_cpu_capture()
 
     def capture_reader(self):
-        self.judge_capture_reader()
-        index = 0
-        if self.capture:
-            while True:
-                try:
-                    if self.use_gpu_decode:
-                        ret, frame = self.capture.nextFrame()
-                    else:
-                        ret, frame = self.capture.read()
-                    if ret:
-                        self.package_data(ret,frame)
-                    else:
-                        self.JadeLog.WARNING("相机类型为:{},相机中途断开,尝试重连".format(self.camera_type))
+        while True:
+            if self.judge_capture_reader():
+                while True:
+                    try:
+                        if self.use_gpu_decode:
+                            ret, frame = self.capture.nextFrame()
+                        else:
+                            ret, frame = self.capture.read()
+                        self.package_data(ret, frame)
+                        if ret is False:
+                            self.JadeLog.WARNING(
+                                "相机类型为:{},相机中途断开,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
+                            time.sleep(self.camera_reopen_times)
+                            self.judge_capture_reader()
+                        if self.history_status:
+                            time.sleep(0.04)
+                    except Exception as e:
+                        self.JadeLog.WARNING(
+                            "相机类型为:{},相机解码失败,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
+                        time.sleep(self.camera_reopen_times)
                         self.judge_capture_reader()
-                    if self.history_status:
-                        time.sleep(0.04)
-                except Exception as e:
-                    self.JadeLog.WARNING("相机类型为:{},相机解码失败,尝试重连".format(self.camera_type))
-                    self.judge_capture_reader()
-        else:
-            self.JadeLog.ERROR("相机类型为:{},相机第1次打开失败,请确认相机是否在线,或参数是否正常,等待相机恢复正常时重启服务,此时不会再尝试重连".format(self.camera_type))
-
-
-    def cpu_reader(self):
-        self.opencv_cpu_capture()
-        index = 0
-        if self.capture:
-            while True:
-                try:
-                    ret, frame = self.capture.read()
-                    if ret:
-                        self.package_data(ret,frame)
-                    else:
-                        self.JadeLog.WARNING("相机类型为:{},相机中途断开,尝试重连".format(self.camera_type))
-                        self.opencv_cpu_capture()
-                    if self.history_status:
-                        time.sleep(0.04)
-                except Exception as e:
-                    self.JadeLog.WARNING("相机类型为:{},相机解码失败,尝试重连".format(self.camera_type))
-                    self.opencv_cpu_capture()
-        else:
-            JadeLog.ERROR("相机类型为:{},相机第1次打开失败,请确认相机是否在线,或参数是否正常,等待相机恢复正常时重启服务,此时不会再尝试重连".format(self.camera_type))
-
+            else:
+                self.JadeLog.WARNING(
+                    "相机类型为:{},相机打开失败,请确认相机是否在线,或参数是否正常,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
+                time.sleep(self.camera_reopen_times)
 
     def run(self):
         self.capture_reader()
@@ -928,6 +915,6 @@ class VideoCaptureBaseProcess(threading.Thread):
 
 if __name__ == '__main__':
     from jade import JadeLogging
-    JadeLog = JadeLogging("log")
+    JadeLog = JadeLogging("log",Level="DEBUG")
     videoCaptureThread = VideoCaptureBaseProcess("rtsp://admin:samples123@192.168.29.181:554/h264/ch1/main/av_stream","top",True,30,JadeLog)
     videoCaptureThread.start()
