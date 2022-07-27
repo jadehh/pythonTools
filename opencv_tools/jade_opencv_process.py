@@ -825,7 +825,7 @@ class VideoCaptureBaseProcess(threading.Thread):
     def open_gpu_capture(self):
         if (hasattr(cv2, "cudacodec")):
             try:
-                JadeLog.INFO("相机类型为:{},使用GPU解码,准备打开相机".format(self.camera_type))
+                self.JadeLog.INFO("相机类型为:{},使用GPU解码,准备打开相机".format(self.camera_type))
                 self.capture = cv2.cudacodec.createVideoReader(self.video_path)
                 if self.capture.nextFrame()[0]:
                     self.reopen_times = 0
@@ -862,7 +862,7 @@ class VideoCaptureBaseProcess(threading.Thread):
             Exit(0)
 
     def opencv_cpu_capture(self):
-        JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
+        self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
         self.capture = cv2.VideoCapture(self.video_path)
         if self.capture.isOpened():
             self.reopen_times = 0
