@@ -187,6 +187,10 @@ def GetTimeStamp():
     pathname = otherStyleTime
     return pathname
 
+def GetYear():
+    today  = datetime.datetime.now()
+    return today.year
+
 def GetTime():
     now = datetime.datetime.now()
     otherStyleTime = now.strftime("%Y-%m-%d-%H-%M-%S")

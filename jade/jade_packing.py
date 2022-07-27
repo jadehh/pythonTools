@@ -7,7 +7,7 @@
 # @Software : Samples
 # @Desc     :
 from jade import AppRunPath
-from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir
+from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear
 from jade.jade_progress_bar import ProgressBar
 import os
 import shutil
@@ -417,6 +417,8 @@ def packSetup(args,exec_path):
                   "; NOTE: The value of AppId uniquely identifies this application.\n" \
                   "; Do not use the same AppId value in installers for other applications.\n" \
                   "; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)\n" \
+                  "VersionInfoVersion = {}\n" \
+                  "AppCopyright = Copyright (C) 2019-{} Samples, Inc.\n"\
                   "AppId={}\n" \
                   ";应用名称\n" \
                   "AppName={}\n" \
@@ -441,7 +443,7 @@ def packSetup(args,exec_path):
                   ";LicenseFile=\n"\
                    "[Files]\n" \
                   ";安装文件\n" \
-                .format(get_uuid(),args.name.split("V")[0],args.name.split("V")[-1],args.name,
+                .format(args.name.split("V")[-1],GetYear(),get_uuid(),args.name.split("V")[0],args.name.split("V")[-1],args.name,
                                            "C:\\",args.app_name,args.app_name,args.app_name.split("V")[0]+"_setup-V"+args.app_name.split("V")[1],
                                            os.path.abspath("icons/app_logo.ico"))
 
