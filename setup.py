@@ -10,10 +10,9 @@ from setuptools import setup, find_packages
 if __name__ == '__main__':
     pack_list = ["jade"]
     find_packages("jade", pack_list)
-
     setup(
     name="jade",
-    version="1.0.5",
+    version="1.1.2",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="",
