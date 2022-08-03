@@ -606,7 +606,6 @@ def  packSetup(args,exec_path,uuid):
                        "begin\n" \
                        "//删除文件夹及其中所有文件\n" \
                        "DelTree('{}\\{}', True, True, True);\n" \
-                       "DelTree('C:\\tmp', True, True, True);\n" \
                        "Result := True;\n" \
                        "end\n" \
                        "else\n" \
