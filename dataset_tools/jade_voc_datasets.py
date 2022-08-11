@@ -10,6 +10,7 @@ from jade import *
 from opencv_tools import *
 from xml.dom import minidom
 from dataset_tools import *
+from opencv_tools import *
 def GetXmlClassesNames(xml_path):
     classnames = []
     # Read the XML annotation file.
@@ -261,6 +262,20 @@ class JadeVOCDatasets(object):
                     index = index + 1
             processBar.update()
 
+def paddle_pretrain_detection_dataset(root_path,detector,threshold=0.6):
+    image_path = os.path.join(root_path,DIRECTORY_IMAGES)
+    save_anno_path = CreateSavePath(os.path.join(root_path,DIRECTORY_ANNOTATIONS))
+    image_path_list = GetAllImagesPath(os.path.join(image_path))
+    processBar = ProgressBar(len(image_path_list))
+    for image_path in image_path_list:
+        file_name = GetLastDir(image_path).split(".")[0]
+        image = ReadChinesePath(image_path)
+        result = detector.predict(image,threshold)
+        if result["labels"][0] == -1:
+            GenerateXml(file_name,image.shape,[],[],save_anno_path)
+        else:
+            GenerateXml(file_name,image.shape,result["boxes"],result["labels"],save_anno_path)
+        processBar.update()
 
 if __name__ == '__main__':
     jadeVOCDatasets = JadeVOCDatasets(r'F:\数据集\VOC数据集\定制版顶相机箱号检测数据集')
