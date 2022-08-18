@@ -390,50 +390,6 @@ def _to_color(indx):
     return b * 255, r * 255, g * 255
 
 
-# opencv显示boxes
-def CVShowBoxes(image, detectresult, num_classes=90, waitkey=-1, named_windows="result"):
-    base = int(np.ceil(pow(num_classes, 1. / 3)))
-    colors = [_to_color(x) for x in range(num_classes)]
-    if type(image) == str:
-        image = cv2.imread(image)
-    image2 = image.copy()
-    boxes = detectresult.boxes
-    for i in range(len(boxes)):
-        if boxes[i][0] <= 1 and boxes[i][1] <= 1 and boxes[i][2] <= 1 and boxes[i][3] <= 1:
-            xmin = int(boxes[i][0] * image.shape[1])
-            ymin = int(boxes[i][1] * image.shape[0])
-            xmax = int(boxes[i][2] * image.shape[1])
-            ymax = int(boxes[i][3] * image.shape[0])
-        else:
-            xmin = int(boxes[i][0])
-            ymin = int(boxes[i][1])
-            xmax = int(boxes[i][2])
-            ymax = int(boxes[i][3])
-        if boxes is not None:
-            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
-            if detectresult.label_texts is not None:
-                if detectresult.scores is not None:
-                    image2 = Add_Chinese_Label(img=image2, label=detectresult.label_texts[i] + ":" + str(
-                        int(detectresult.scores[i] * 100)),
-                                               pt1=(xmin, ymin))
-                else:
-                    image2 = Add_Chinese_Label(img=image2, label=detectresult.label_texts[i],
-                                               pt1=(xmin, ymin))
-                if detectresult.label_ids is not None:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(detectresult.label_ids[i])],
-                                           3, 3)
-                else:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
-
-    if waitkey >= 0:
-        cv2.namedWindow(named_windows, 0)
-        # cv2.resizeWindow("result", 840, 680)
-        cv2.imshow(named_windows, image2)
-        cv2.waitKey(waitkey)
-    else:
-        return image2
-
-
 # opencv显示points
 def CVShowPoints(img_path, points, waitkey=1):
     if type(img_path) != list:
@@ -916,5 +872,5 @@ class VideoCaptureBaseProcess(threading.Thread):
 if __name__ == '__main__':
     from jade import JadeLogging
     JadeLog = JadeLogging("log",Level="DEBUG")
-    videoCaptureThread = VideoCaptureBaseProcess("rtsp://admin:samples123@192.168.29.181:554/h264/ch1/main/av_stream","top",True,30,JadeLog)
+    videoCaptureThread = VideoCaptureBaseProcess("rtsp://admin:samples123@192.168.29.181:554/h264/ch1/main/av_stream","top",False,30,JadeLog)
     videoCaptureThread.start()

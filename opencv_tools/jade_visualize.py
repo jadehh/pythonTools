@@ -33,7 +33,7 @@ def get_color_map_list(num_classes):
     color_map = [color_map[i:i + 3] for i in range(0, len(color_map), 3)]
     return color_map
 
-def draw_box(im, results,show_score=True):
+def draw_box(im, results,show_score=True,font_path=None,font_size=24):
     """
     Args:
         im (PIL.Image.Image): PIL image
@@ -69,10 +69,11 @@ def draw_box(im, results,show_score=True):
             text = "{} {:.4f}".format(labels_text[i,], scores[i,])
         else:
             text = "{} ".format(labels_text[i,])
-        tw, th = draw.textsize(text)
+        font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+        tw, th = draw.textsize(text,font)
         draw.rectangle(
             [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
-        draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
+        draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255),font=font)
     return im
 
 
@@ -207,7 +208,7 @@ def draw_mask(im, np_boxes, np_masks, labels, resolution=14, threshold=0.5):
     return Image.fromarray(im.astype('uint8'))
 
 
-def visualize_box_mask(im, results, mask_resolution=14,show_score=True):
+def visualize_box_mask(im, results, mask_resolution=14,show_score=True,font_path=None,font_size=12):
     """
     Args:
         im (str/np.ndarray): path of image/np.ndarray read by cv2
@@ -233,7 +234,7 @@ def visualize_box_mask(im, results, mask_resolution=14,show_score=True):
             results["labels"],
             resolution=mask_resolution)
     if 'boxes' in results:
-        im = draw_box(im, results,show_score)
+        im = draw_box(im, results,show_score,font_path,font_size)
     if 'segm' in results:
         im = draw_segm(
             im,
@@ -248,13 +249,15 @@ def visualize_box_mask(im, results, mask_resolution=14,show_score=True):
 def visualize(image_file,
               results,
               mask_resolution=14,
-              show_score=True):
+              show_score=True,font_path=None,font_size=12):
     # visualize the predict result
     im = visualize_box_mask(
         image_file,
         results,
         mask_resolution=mask_resolution,
-        show_score=show_score)
+        show_score=show_score,
+        font_path=font_path,
+        font_size=font_size)
     return  np.array(im)
 
 
