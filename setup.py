@@ -12,7 +12,7 @@ if __name__ == '__main__':
     find_packages("jade", pack_list)
     setup(
     name="jade",
-    version="1.1.3",
+    version="1.1.4",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="",
