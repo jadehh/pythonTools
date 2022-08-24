@@ -190,7 +190,10 @@ def get_app_name(args):
     if getOperationSystem() == "Windows":
         app_name = args.app_name
     else:
-        app_name = args.app_name + "V" + args.app_version[:-2]
+        if args.appimage:
+            app_name = args.app_name
+        else:
+            app_name = args.app_name + "V" + args.app_version[:-2]
     return app_name
 
 def write_version_info(args):
