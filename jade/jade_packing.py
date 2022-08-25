@@ -97,7 +97,7 @@ def copyPy(args):
                                             import_list.append(content)
                                 elif "JadeLog = JadeLogging" in content:
                                     if args.use_jade_log:
-                                        update_log = "    JadeLog.INFO('{}-更新时间为:{}',True)\r".format(args.name + "V" + args.app_version,GetTimeStamp(),True)
+                                        update_log = "\n    JadeLog.INFO('{}-更新时间为:{}',True)\r".format(args.name + "V" + args.app_version,GetTimeStamp(),True)
                                         f1.write((content+update_log).encode("utf-8"))
                                     else:
                                         f1.write((content).encode("utf-8"))
