@@ -138,7 +138,7 @@ def copyPy(args):
                                                                                                      GetTimeStamp())
                                         f1.write((update_log + content).encode("utf-8"))
                                     else:
-                                        f1.write(content.encode("utf-8"))
+                                        f1.write((content+"\n").encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
 
@@ -705,9 +705,12 @@ def packAPP(args):
         else:
             shutil.copy("dist\\{}.exe".format(get_app_name(args)), "{}/".format(save_bin_path))
     else:
-        if args.appimage:
-            app_name = packAppImage(args)
-            shutil.copy(app_name, "{}/".format(save_bin_path))
+        if "Linux" == getOperationSystem():
+            if args.appimage:
+                app_name = packAppImage(args)
+                shutil.copy(app_name, "{}/".format(save_bin_path))
+            else:
+                shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
         else:
             shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
     if os.path.exists("{}.py".format(get_app_name(args))):
