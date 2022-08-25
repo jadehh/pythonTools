@@ -338,7 +338,7 @@ def writeSpec(args):
                     "          upx=True,\n"
                     "          upx_exclude=[],\n"
                     "          name='{}')\n".format(get_app_name(args), binaries_str, data_str, get_app_name(args),args.console, icon_path,
-                                                    get_app_name(args).app_name).encode("utf-8"))
+                                                    get_app_name(args)).encode("utf-8"))
     else:
         with open("{}.spec".format(get_app_name(args)), "wb") as f:
             f.write("block_cipher = None\n"
