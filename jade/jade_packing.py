@@ -301,9 +301,53 @@ def writeSpec(args):
         else:
             binaries_str = binaries_str + "('icons/{}','{}'),".format(icon_list[i], "icons")
     icon_path = "icons/app_logo.ico"
-    if args.full is False:
-        with open("{}.spec".format(get_app_name(args)), "wb") as f:
-            f.write("block_cipher = None\n"
+    if getOperationSystem() == "Darwin":
+        with open("{}.spec".format(get_app_name(args)),"wb") as f:
+            f.write(("# -*- mode: python ; coding: utf-8 -*-\n\n\n"
+                    "block_cipher = None\n\n\n"
+                    "a = Analysis(['{}.py'],\n"
+                    "\t\t\tpathex=[],\n"
+                    "\t\t\t{},\n"
+                    "\t\t\t{},\n"
+                    "\t\t\thiddenimports=[],\n"
+                    "\t\t\thookspath=[],\n"
+                    "\t\t\thooksconfig=[],\n"
+                    "\t\t\truntime_hooks=[],\n"
+                    "\t\t\texcludes=[],\n"
+                    "\t\t\twin_no_prefer_redirects=False,\n"
+                    "\t\t\twin_private_assemblies=False,\n"
+                    "\t\t\tcipher=block_cipher,\n"
+                    "\t\t\tnoarchive=False)\n"
+                    "pyz = PYZ(a.pure, a.zipped_data,\n"
+                    "\t\t\tcipher=block_cipher)\n\n"
+                    "exe = EXE(pyz,\n"
+                    "\t\t\ta.scripts,\n"
+                    "\t\t\ta.binaries,\n"
+                    "\t\t\ta.zipfiles,\n"
+                    "\t\t\ta.datas,  \n"
+                    "\t\t\t[],\n"
+                    "\t\t\tname='{}',\n"
+                    "\t\t\tdebug=False,\n"
+                    "\t\t\tbootloader_ignore_signals=False,\n"
+                    "\t\t\tupx=True,\n"
+                    "\t\t\tupx_exclude=[],\n"
+                    "\t\t\truntime_tmpdir=None,\n"
+                    "\t\t\tconsole=False,\n"
+                    "\t\t\tdisable_windowed_traceback=False,\n"
+                    "\t\t\ttarget_arch=None,\n"
+                    "\t\t\tcodesign_identity=None,\n"
+                    "\t\t\tentitlements_file=None , icon='{}')\n"
+                    "app = BUNDLE(exe,\n"
+                    "\t\t\tname='{}.app',\n"
+                    "\t\t\ticon='{}',\n"
+                    "\t\t\tbundle_identifier=None,\n"
+                    "\t\t\tinfo_plist = ".format(get_app_name(args),binaries_str,data_str,
+                            get_app_name(args),icon_path,get_app_name(args),icon_path)+ "{\n\t\t\t\t\t\t\t'NSHighResolutionCapable':'True'\n\t\t\t\t\t\t\t})\n").encode('utf-8')
+                    )
+    else:
+        if args.full is False:
+            with open("{}.spec".format(get_app_name(args)), "wb") as f:
+                f.write("block_cipher = None\n"
                     "a = Analysis(['{}.py'],\n"
                     "             pathex=[''],\n"
                     "             {},\n"
@@ -339,9 +383,9 @@ def writeSpec(args):
                     "          upx_exclude=[],\n"
                     "          name='{}')\n".format(get_app_name(args), binaries_str, data_str, get_app_name(args),args.console, icon_path,
                                                     get_app_name(args)).encode("utf-8"))
-    else:
-        with open("{}.spec".format(get_app_name(args)), "wb") as f:
-            f.write("block_cipher = None\n"
+        else:
+            with open("{}.spec".format(get_app_name(args)), "wb") as f:
+                f.write("block_cipher = None\n"
                     "a = Analysis(['{}.py'],\n"
                     "             pathex=[''],\n"
                     "             {},\n"
@@ -712,7 +756,7 @@ def packAPP(args):
             else:
                 shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
         else:
-            shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
+            os.system("cp -r dist/{}.app {}".format(get_app_name(args),save_bin_path))
     if os.path.exists("{}.py".format(get_app_name(args))):
         os.remove("{}.py".format(get_app_name(args)))
     if os.path.exists("{}.spec".format(get_app_name(args))):
