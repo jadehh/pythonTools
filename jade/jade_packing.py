@@ -342,7 +342,9 @@ def writeSpec(args):
                     "\t\t\ticon='{}',\n"
                     "\t\t\tbundle_identifier=None,\n"
                     "\t\t\tinfo_plist = ".format(get_app_name(args),binaries_str,data_str,
-                            get_app_name(args),icon_path,get_app_name(args),icon_path)+ "{\n\t\t\t\t\t\t\t'NSHighResolutionCapable':'True'\n\t\t\t\t\t\t\t})\n").encode('utf-8')
+                            get_app_name(args),icon_path,get_app_name(args),icon_path)+
+                     "{\n\t\t\t\t\t\t\t'NSHighResolutionCapable':'True','CFBundleShortVersionString':"+"'{}'".format(args.app_version[:-2])
+                     +"\n\t\t\t\t\t\t\t})\n").encode('utf-8')
                     )
     else:
         if args.full is False:
