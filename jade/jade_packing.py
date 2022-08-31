@@ -15,6 +15,16 @@ import platform
 import subprocess
 import uuid
 
+def copy_build(args,save_path):
+    if getOperationSystem() == "Windows":
+        save_path = save_path
+    else:
+        save_path =  "/mnt/" + save_path[0].lower() +  save_path.replace("\\","//")[2:]
+
+    for file_name in os.listdir(args.lib_path):
+        shutil.copy(os.path.join(args.lib_path,file_name),os.path.join(save_path,getOperationSystem(),args.lib_path))
+
+
 def ui_to_py():
     view_path = "view"
     view_file_list = os.listdir(view_path)
