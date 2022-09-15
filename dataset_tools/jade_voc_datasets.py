@@ -262,6 +262,16 @@ class JadeVOCDatasets(object):
                     index = index + 1
             processBar.update()
 
+def remove_voc_imagesets(root_path):
+    processBar = ProgressBar(len(os.listdir(root_path)))
+    for year in os.listdir(root_path):
+        if os.path.isdir(os.path.join(root_path,year)):
+            year_path = os.path.join(root_path,year)
+            for file in os.listdir(year_path):
+                if  file == "ImageSets":
+                    shutil.rmtree(os.path.join(year_path,file))
+        processBar.update()
+
 def paddle_pretrain_detection_dataset(root_path,detector,threshold=0.6):
     image_path = os.path.join(root_path,DIRECTORY_IMAGES)
     save_anno_path = CreateSavePath(os.path.join(root_path,DIRECTORY_ANNOTATIONS))
