@@ -426,7 +426,9 @@ def writeSpec(args):
                     "          upx_exclude=[],\n"
                     "          runtime_tmpdir=None,\n"
                     "          console={},\n"
-                    "          icon='{}'\n)\n".format(get_app_name(args), binaries_str, data_str,get_app_name(args),args.console,icon_path).encode(
+                    "          icon='{}',\n"
+                    "          version='file_verison_info.txt')\n"
+                    .format(get_app_name(args), binaries_str, data_str,get_app_name(args),args.console,icon_path).encode(
                 "utf-8"))
 
 
