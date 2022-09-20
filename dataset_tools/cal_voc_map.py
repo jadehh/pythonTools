@@ -25,8 +25,7 @@ def cal_iou(bbgt,bb,gt_label,pd_label,class_name):
     ih = bi[3] - bi[1] + 1
     if iw > 0 and ih > 0:
         # compute overlap (IoU) = area of intersection / area of union
-        ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
-                                                          + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
+        ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0] + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
         ov = iw * ih / ua
         if ov > ovmax:
             if pd_label == gt_label == class_name:
