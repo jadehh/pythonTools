@@ -11,7 +11,7 @@ import numpy as np
 import cv2
 import math
 from PIL import Image, ImageFont, ImageDraw
-from opencv_tools.jade_opencv_process import GetRandomColor
+from opencv_tools.jade_opencv_process import GetRandomColor,ReadChinesePath
 from jade import getOperationSystem
 def get_color_map_list(num_classes):
     """
@@ -245,6 +245,30 @@ def visualize_box_mask(im, results, mask_resolution=14,show_score=True,font_path
     if 'landmark' in results:
         im = draw_lmk(im, results['landmark'])
     return im
+
+def cv_visualize(image,results,show_score=True,font_path=None,thickness=2,linetype=2,font_size=24):
+    if isinstance(image, str):
+        image = ReadChinesePath(image)
+    boxes = results["boxes"]
+    scores = results["scores"]
+    labels = results["labels"]
+    colors = [GetRandomColor()] * labels.shape[0]
+    for (box,score,label,color) in zip(boxes,scores,labels,colors):
+        if label != -1:
+            cv2.line(image, (int(box[0]), int(box[1])), (int(box[0]), int(box[1] + box[3])), color, thickness,
+                     thickness)
+            cv2.line(image, (int(box[0]), int(box[1] + box[3])), (int(box[2]), int(box[1] + box[3])), color, thickness,
+                     thickness)
+            cv2.line(image, (int(box[2]), int(box[1] + box[3])), (int(box[2]), int(box[1])), color, thickness,
+                     thickness)
+            cv2.line(image, (int(box[2]), int(box[1])), (int(box[0]), int(box[1])), color, thickness, thickness)
+            if show_score:
+                image = Add_Chinese_Label(image, label+" SCORE:{}".format("%.2f"%score), (int(box[0]), int(box[1])), color, font_size, font_path)
+            else:
+                image = Add_Chinese_Label(image, label, (int(box[0]), int(box[1])), color, font_size, font_path)
+
+    return image
+
 
 def visualize(image_file,
               results,
