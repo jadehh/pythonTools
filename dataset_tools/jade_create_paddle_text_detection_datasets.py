@@ -327,6 +327,11 @@ def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
     createDatasets(save_root_path)
 
 def create_text_detection_datasets(root_path,save_path,split_rate=0.95):
+    if os.path.exists(save_path):
+        try:
+            shutil.rmtree(save_path)
+        except:
+            print("文件夹删除失败,文件夹名称为:{}".format(save_path))
     file_list = os.listdir(root_path)
     for file_name in file_list:
         CreateTextDetDatasets(os.path.join(root_path, file_name),save_path,split_rate)
