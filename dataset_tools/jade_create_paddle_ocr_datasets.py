@@ -197,7 +197,11 @@ class CreatePaddleOCRDatasets(object):
         self.conta_check_model = ContaNumber()
         self.dataset_type = dataset_type  ## 数据集类型,如车牌数据集,箱号数据集
         label_list = self.get_label_text_path()
-
+        if os.path.exists(save_path):
+            try:
+                shutil.rmtree(save_path)
+            except:
+                print("删除文件夹失败,文件夹为:{}".format(save_path))
         for label_path in label_list:
             self.createOCRDatasets(label_path)
 
@@ -404,6 +408,7 @@ class CreatePaddleOCRDatasets(object):
         if os.path.exists(os.path.join(root_path, "rec_gt_test.txt")) is True:
             os.remove(os.path.join(root_path, "rec_gt_test.txt"))
         years = os.listdir(root_path)
+        train_list = []
         with open(os.path.join(root_path, "rec_gt_train.txt"), "wb") as f1:
             for year in years:
                 if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
