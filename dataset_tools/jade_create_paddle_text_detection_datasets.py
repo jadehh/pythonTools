@@ -267,21 +267,28 @@ def SplitDataSets(image_path_list, ContaNumber_list,split_rate):
     repeat_list = []
     repeat_image_path_list = []
     train_image_file_list = []
-    for i in range(len(image_path_list)):
-        if ContaNumber_list[i] not in repeat_list:
-            repeat_list.append(ContaNumber_list[i])
+    if split_rate == 1:
+        for i in range(len(image_path_list)):
             train_image_file_list.append(image_path_list[i])
-        else:
-            repeat_image_path_list.append(image_path_list[i])
-    if split_rate > len(train_image_file_list) / len(image_path_list): ##应该从repeat里面分出一部分给train_image_file_list
-        extra_count = ( int((split_rate - len(train_image_file_list) / len(image_path_list)) * len(image_path_list)))
-        extra_image_path_list = random.sample(repeat_image_path_list,extra_count)
-        train_image_file_list.extend(extra_image_path_list)
-        test_image_files = [file for file in repeat_image_path_list if file not in extra_image_path_list]
+        return train_image_file_list, train_image_file_list
     else:
-        test_image_files =  random.sample(image_path_list,int((1-split_rate)*len(image_path_list)))
+        for i in range(len(image_path_list)):
+            if ContaNumber_list[i] not in repeat_list:
+                repeat_list.append(ContaNumber_list[i])
+                train_image_file_list.append(image_path_list[i])
+            else:
+                repeat_image_path_list.append(image_path_list[i])
+        if split_rate > len(train_image_file_list) / len(image_path_list):  ##应该从repeat里面分出一部分给train_image_file_list
+            extra_count = (int((split_rate - len(train_image_file_list) / len(image_path_list)) * len(image_path_list)))
+            extra_image_path_list = random.sample(repeat_image_path_list, extra_count)
+            train_image_file_list.extend(extra_image_path_list)
+            test_image_files = [file for file in repeat_image_path_list if file not in extra_image_path_list]
+        else:
+            test_image_files = random.sample(image_path_list, int((1 - split_rate) * len(image_path_list)))
 
-    return train_image_file_list , test_image_files
+        return train_image_file_list, test_image_files
+
+
 
 def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
     ##　　
