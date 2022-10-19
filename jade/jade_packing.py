@@ -35,11 +35,6 @@ def ui_to_py():
             os.system("pyuic5 -o {}.py {}".format(view_file.split(".ui")[0],view_file))
         progressBar.update()
 
-def getOperationSystem():
-    return platform.system()
-
-
-
 def get_import_content(f1,src_import,content,import_list):
     prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
     prefix = ""

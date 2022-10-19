@@ -12,8 +12,9 @@ import datetime
 import time
 import shutil
 from jade.jade_progress_bar import ProgressBar
-from jade.jade_packing import getOperationSystem
 import socket
+import platform
+
 def zh_ch(string):
     """
     解决cv2.namedWindow中文乱码问题
@@ -289,6 +290,11 @@ def get_ip_address(ip_address="127.0.0.1"):
     finally:
         pass
     return ip
+"""
+获取操作系统
+"""
+def getOperationSystem():
+    return platform.system()
 
 """
 Windows与Linux直接路径转换
@@ -298,11 +304,20 @@ def ConvertPath(file_path):
         if getOperationSystem() == "Windows":
             pass
         elif getOperationSystem() == "Linux":
-            file_path = file_path.replace("\\","/")
-            file_path = "/mnt/" + file_path.split(":")[0].lower() + file_path.split(":")[1]
+            try:
+                file_path = file_path.replace("\\","/")
+            except:
+                pass
+            try:
+                file_path = "/mnt/" + file_path.split(":")[0].lower() + file_path.split(":")[1]
+            except:
+                pass
     else:
         if getOperationSystem() == "Windows":
-            file_path = file_path.split("/mnt/")[1][0].upper() + ":" + file_path.split("/mnt/")[1][1:]
+            try:
+                file_path = file_path.split("/mnt/")[1][0].upper() + ":" + file_path.split("/mnt/")[1][1:]
+            except:
+                pass
         elif getOperationSystem() == "Linux":
             pass
     if os.path.exists(file_path):
