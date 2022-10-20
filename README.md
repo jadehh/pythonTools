@@ -1,4 +1,4 @@
-##  python tools V1.0.1
+##  python tools V1.2.4
 * 不使用第三方wheel包
 
 
@@ -37,3 +37,8 @@ pip install wheel
 pip wheel --wheel-dir=./wheel_dir ./
 ```
 > wheel-dir 为wheel 输出文件夹，后面接项目文件夹（即包含setup.py的文件夹）
+
+
+## 更新日志
+update *支持不使用图片进行打包
+update *支持python3.7进行打包
