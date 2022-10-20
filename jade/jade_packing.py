@@ -299,13 +299,21 @@ def writeSpec(args):
 
 
     binaries_str = "binaries=["
-    icon_list = os.listdir("icons")
-    for i in range(len(icon_list)):
-        if i == len(icon_list) - 1:
-            binaries_str = binaries_str + "('icons/{}','{}')]".format(icon_list[i], "icons")
-        else:
-            binaries_str = binaries_str + "('icons/{}','{}'),".format(icon_list[i], "icons")
+    if os.path.exists("icons"):
+        icon_list = os.listdir("icons")
+        for i in range(len(icon_list)):
+            if i == len(icon_list) - 1:
+                binaries_str = binaries_str + "('icons/{}','{}')]".format(icon_list[i], "icons")
+            else:
+                binaries_str = binaries_str + "('icons/{}','{}'),".format(icon_list[i], "icons")
+    else:
+        binaries_str = binaries_str + "]"
+
     icon_path = "icons/app_logo.ico"
+    if os.path.exists(icon_path):
+        pass
+    else:
+        icon_path = ""
     if getOperationSystem() == "Darwin":
         with open("{}.spec".format(get_app_name(args)),"wb") as f:
             f.write(("# -*- mode: python ; coding: utf-8 -*-\n\n\n"
@@ -742,7 +750,11 @@ def packAPP(args):
             scripts_path = args.scripts_path + "/"
     except:
         pass
-    cmd_str = "{}pyinstaller  {}.spec  --additional-hooks-dir hooks".format(scripts_path,get_app_name(args))
+    python_version = (platform.python_version())
+    if int(python_version.split(".")[1]) > 6:
+        cmd_str = "{}pyinstaller  {}.spec ".format(scripts_path, get_app_name(args))
+    else:
+        cmd_str = "{}pyinstaller  {}.spec  --additional-hooks-dir hooks".format(scripts_path, get_app_name(args))
 
     os.system(cmd_str)
     save_path = CreateSavePath(os.path.join("releases",args.name + "V" + args.app_version))
