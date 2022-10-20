@@ -319,7 +319,10 @@ def ConvertPath(file_path):
             except:
                 pass
         elif getOperationSystem() == "Linux":
-            pass
+            try:
+                file_path = file_path.replace("\\", "/")
+            except:
+                pass
     if os.path.exists(file_path):
         return file_path
     else:
