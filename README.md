@@ -40,5 +40,6 @@ pip wheel --wheel-dir=./wheel_dir ./
 
 
 ## 更新日志
-update *支持不使用图片进行打包
-update *支持python3.7进行打包
+* update 支持不使用图片进行打包
+* update 支持python3.7进行打包
+* update 路径转换无需判断路径是否真实存在

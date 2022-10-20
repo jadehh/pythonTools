@@ -302,7 +302,7 @@ Windows与Linux直接路径转换
 def ConvertPath(file_path):
     if ":" in file_path:
         if getOperationSystem() == "Windows":
-            pass
+            file_path = file_path.replace("\\", "/")
         elif getOperationSystem() == "Linux":
             try:
                 file_path = file_path.replace("\\","/")
@@ -316,6 +316,7 @@ def ConvertPath(file_path):
         if getOperationSystem() == "Windows":
             try:
                 file_path = file_path.split("/mnt/")[1][0].upper() + ":" + file_path.split("/mnt/")[1][1:]
+                file_path = file_path.replace("\\", "/")
             except:
                 pass
         elif getOperationSystem() == "Linux":
@@ -323,11 +324,9 @@ def ConvertPath(file_path):
                 file_path = file_path.replace("\\", "/")
             except:
                 pass
-    if os.path.exists(file_path):
-        return file_path
-    else:
-        raise ValueError(
-            "file not exists,please check file {}".format(file_path))
+    return file_path
+
+
 
 if __name__ == '__main__':
     print(get_ip_address("192.168.35.120"))
