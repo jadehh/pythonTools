@@ -7,7 +7,7 @@
 # @Software : Samples
 # @Desc     :
 from jade import AppRunPath
-from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear
+from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear,getOperationSystem
 from jade.jade_progress_bar import ProgressBar
 import os
 import shutil
