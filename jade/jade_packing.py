@@ -6,7 +6,7 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
-from jade import AppRunPath
+from jade import AppRunPath,LogoPath
 from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear,getOperationSystem,GetPreviousDir
 from jade.jade_progress_bar import ProgressBar
 import os
@@ -334,6 +334,7 @@ def writeSpec(args):
         pass
     else:
         icon_path = ""
+
     if getOperationSystem() == "Darwin":
         with open("{}.spec".format(get_app_name(args)),"wb") as f:
             f.write(("# -*- mode: python ; coding: utf-8 -*-\n\n\n"
@@ -729,7 +730,10 @@ def packAppImage(args):
         for content in conetent_list:
             with open(os.path.join(save_path, "AppRun"), "a", encoding="utf-8") as f:
                 f.write(content + "\n")
-    shutil.copy("icons/app_logo.png", save_path)
+    if os.path.exists("icons/app_logo.png"):
+        shutil.copy("icons/app_logo.png", save_path)
+    else:
+        shutil.copy(LogoPath,save_path)
     with open(os.path.join(save_path, get_app_name(args) + ".desktop"), "w", encoding="utf-8") as f:
         f.write("[Desktop Entry]\n"
                 "Version={}\n"

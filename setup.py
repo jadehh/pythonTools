@@ -12,7 +12,7 @@ if __name__ == '__main__':
     find_packages("jade", pack_list)
     setup(
     name="jade",
-    version="1.2.6",
+    version="1.3.2",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="",
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     author_email="jadehh@live.com",
 
     packages=pack_list,
-    package_data={'': ['*Run']},
+    package_data={'': ['*Run','*png']},
     include_package_data=True,
     platforms="any",
     install_requires=["easycython","pyinstaller"]  # 这个项目需要的第三方库
