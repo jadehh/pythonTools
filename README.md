@@ -1,4 +1,4 @@
-##  python tools V1.2.4
+##  python tools V1.2.6
 * 不使用第三方wheel包
 
 
@@ -43,3 +43,4 @@ pip wheel --wheel-dir=./wheel_dir ./
 * update 支持不使用图片进行打包
 * update 支持python3.7进行打包
 * update 路径转换无需判断路径是否真实存在
+* update 打包的时候支持文件夹导入
