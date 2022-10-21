@@ -7,7 +7,7 @@
 # @Software : Samples
 # @Desc     :
 from jade import AppRunPath
-from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear,getOperationSystem
+from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear,getOperationSystem,GetPreviousDir
 from jade.jade_progress_bar import ProgressBar
 import os
 import shutil
@@ -256,6 +256,32 @@ def write_version_info(args):
                 "]\n"
                 ")\n".format(version_str,version_str,args.name,args.app_version[:-2],GetYear(),origanl_app_name,get_app_name(args),args.app_version[:-2]).encode("utf-8"))
 
+def recursion_dir_all_file(path):
+    '''
+    :param path: 文件夹目录
+    '''
+    file_list = []
+    for dir_path, dirs, files in os.walk(path):
+        for file in files:
+            file_path = os.path.join(dir_path, file)
+            if "\\" in file_path:
+                file_path = file_path.replace('\\', '/')
+            file_list.append(file_path)
+        for dir in dirs:
+            file_list.extend(recursion_dir_all_file(os.path.join(dir_path, dir)))
+    return file_list
+
+
+def get_file_data_str(file_path,save_path):
+    data_str = ""
+    file_list = recursion_dir_all_file(file_path)
+    for (i,file) in enumerate(file_list):
+        if i == len(file_list) - 1:
+            data_str = data_str + "('{}','{}')".format(file, GetPreviousDir(save_path + file.split(file_path)[-1]))
+        else:
+            data_str = data_str + "('{}','{}')".format(file, GetPreviousDir(save_path + file.split(file_path)[-1])) + ","
+
+    return data_str
 def writeSpec(args):
     data_str = "datas=["
     if args.lib_path:
@@ -279,15 +305,10 @@ def writeSpec(args):
                 bin_path = args.extra_path_list[i]
                 save_path = args.extra_path_list[i]
             if os.path.isdir(bin_path):
-                data_list = os.listdir(bin_path)
-                for j in range(len(data_list)):
-                    file_path = bin_path + "/" + data_list[j]
-                    file_path_str = ("'{}'".format(file_path))
-                    file_path_list_str = "({},'{}')".format(file_path_str, save_path)
-                    if j == len(data_list) - 1 and i == len(args.extra_path_list) - 1:
-                        data_str = data_str + file_path_list_str + "]"
-                    else:
-                        data_str = data_str + file_path_list_str + ","
+                if i == len(args.extra_path_list) - 1:
+                    data_str = data_str + get_file_data_str(bin_path, save_path) + "]"
+                else:
+                    data_str = data_str + get_file_data_str(bin_path, save_path) + ","
             else:
                 file_path = bin_path
                 file_path_str = ("'{}'".format(file_path))
@@ -296,7 +317,6 @@ def writeSpec(args):
                     data_str = data_str + file_path_list_str + "]"
                 else:
                     data_str = data_str + file_path_list_str + ","
-
 
     binaries_str = "binaries=["
     if os.path.exists("icons"):
