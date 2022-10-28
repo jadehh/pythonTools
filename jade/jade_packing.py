@@ -165,6 +165,8 @@ def writePy(args):
             import_list = or_import_list
     app_name = get_app_name(args)
     with open("{}.py".format(app_name), "wb") as f:
+        if args.head_str:
+            f.write(args.head_str.encode("utf-8"))
         f.write("import sys\n"
                 "import os\n"
                 "if getattr(sys, 'frozen', False): #是否Bundle Resource\n"
@@ -198,7 +200,7 @@ def get_app_name(args):
         if args.appimage:
             app_name = args.app_name
         else:
-            app_name = args.app_name + "V" + args.app_version[:-2]
+            app_name = args.app_name + "v" + args.app_version
     return app_name
 
 def write_version_info(args):
@@ -211,7 +213,7 @@ def write_version_info(args):
         if getOperationSystem() == "Windows":
             origanl_app_name = args.app_name + ".exe"
         else:
-            origanl_app_name = args.app_name + "V" +args.app_version[:-2]
+            origanl_app_name = args.app_name + "v" +args.app_version
         f.write("# UTF-8\n"
                 "#\n"
                 "# For more details about fixed file info 'ffi' see:\n"
@@ -305,10 +307,19 @@ def writeSpec(args):
                 bin_path = args.extra_path_list[i]
                 save_path = args.extra_path_list[i]
             if os.path.isdir(bin_path):
-                if i == len(args.extra_path_list) - 1:
-                    data_str = data_str + get_file_data_str(bin_path, save_path) + "]"
+                if type(args.extra_path_list[i]) == tuple:
+                    if i == len(args.extra_path_list) - 1:
+                        data_str = data_str + get_file_data_str(bin_path, save_path) + "]"
+                    else:
+                        data_str = data_str + get_file_data_str(bin_path, save_path) + ","
                 else:
-                    data_str = data_str + get_file_data_str(bin_path, save_path) + ","
+                    file_path = bin_path
+                    file_path_str = ("'{}'".format(file_path))
+                    file_path_list_str = "({},'{}')".format(file_path_str, save_path)
+                    if i == len(args.extra_path_list) - 1:
+                        data_str = data_str + file_path_list_str + "]"
+                    else:
+                        data_str = data_str + file_path_list_str + ","
             else:
                 file_path = bin_path
                 file_path_str = ("'{}'".format(file_path))
@@ -720,9 +731,10 @@ def packAppImage(args):
                 lib_path = args.extra_path_list[i]
                 if type(lib_path) == tuple:
                     lib_path = lib_path[0]
-                for lib_name in os.listdir(lib_path):
-                    if "lib" in lib_name:
-                        shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
+                if os.path.isdir(lib_path):
+                    for lib_name in os.listdir(lib_path):
+                        if "lib" in lib_name:
+                            shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
         os.system("cp -r dist/{} {}".format(get_app_name(args), save_bin_path))
 
     with open(AppRunPath, "r") as f:

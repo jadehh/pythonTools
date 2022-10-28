@@ -326,6 +326,22 @@ def ConvertPath(file_path):
                 pass
     return file_path
 
+"""
+更新
+"""
+def update_lib(lib_path):
+    if os.path.exists(lib_path):
+        if os.path.isdir(lib_path):
+            if getOperationSystem() == 'Windows':
+                file_list = GetFilesWithLastNamePath(lib_path, '.pyd')
+            elif getOperationSystem() == 'Linux':
+                file_list = GetFilesWithLastNamePath(lib_path, '.so')
+            for file in file_list:
+                try:
+                    shutil.copy(file, GetLastDir(lib_path))
+                except:
+                    pass
+            shutil.rmtree(lib_path)
 
 
 if __name__ == '__main__':

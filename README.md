@@ -46,3 +46,4 @@ pip wheel --wheel-dir=./wheel_dir ./
 * update 打包的时候支持文件夹导入
 * update 打包成AppImage时候无需icon图标
 * update 加入AppImage图标为默认图标
+* update Linux打包使用原始的版本号
