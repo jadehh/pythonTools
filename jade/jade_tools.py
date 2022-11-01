@@ -332,6 +332,7 @@ def ConvertPath(file_path):
 def update_lib(lib_path):
     if os.path.exists(lib_path):
         if os.path.isdir(lib_path):
+            CreateSavePath(GetLastDir(lib_path))
             if getOperationSystem() == 'Windows':
                 file_list = GetFilesWithLastNamePath(lib_path, '.pyd')
             elif getOperationSystem() == 'Linux':
@@ -339,7 +340,20 @@ def update_lib(lib_path):
             for file in file_list:
                 try:
                     shutil.copy(file, GetLastDir(lib_path))
+                    print("正在拷贝文件{},到{}成功".format(file,GetLastDir(lib_path)))
                 except:
+                    print("正在拷贝文件{},到{}失败".format(file,GetLastDir(lib_path)))
+                    pass
+            if getOperationSystem() == 'Windows':
+                exec_file_list = GetFilesWithLastNamePath(lib_path, '.exe')
+            elif getOperationSystem() == "Linux":
+                exec_file_list = GetFilesWithLastNamePath(lib_path, '.AppImage')
+            for exec_file in exec_file_list:
+                try:
+                    shutil.copy(exec_file, os.path.abspath(""))
+                    print("正在拷贝文件{},到{}成功".format(exec_file,os.path.abspath("")))
+                except:
+                    print("正在拷贝文件{},到{}失败".format(exec_file,os.path.abspath("")))
                     pass
             shutil.rmtree(lib_path)
 

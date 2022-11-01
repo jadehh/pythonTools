@@ -165,8 +165,11 @@ def writePy(args):
             import_list = or_import_list
     app_name = get_app_name(args)
     with open("{}.py".format(app_name), "wb") as f:
-        if args.head_str:
-            f.write(args.head_str.encode("utf-8"))
+        try:
+            if args.head_str:
+                f.write(args.head_str.encode("utf-8"))
+        except:
+            pass
         f.write("import sys\n"
                 "import os\n"
                 "if getattr(sys, 'frozen', False): #是否Bundle Resource\n"
@@ -194,14 +197,7 @@ def writePy(args):
                    "    main()\n".encode("utf-8"))
 
 def get_app_name(args):
-    if getOperationSystem() == "Windows":
-        app_name = args.app_name
-    else:
-        if args.appimage:
-            app_name = args.app_name
-        else:
-            app_name = args.app_name + "v" + args.app_version
-    return app_name
+    return args.app_name
 
 def write_version_info(args):
     with open("file_verison_info.txt","wb") as f:
