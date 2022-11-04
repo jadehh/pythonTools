@@ -753,7 +753,7 @@ def packAppImage(args):
                 "Exec={} %u\n"
                 "MimeType=x-scheme-handler/qv2ray;\n"
                 "X-AppImage-Version=912fe1b\n\n\n"
-                "Name[zh_CN]={}".format(args.app_version[:-4],get_app_name(args), get_app_name(args), get_app_name(args)))
+                "Name[zh_CN]={}".format("1.1",get_app_name(args), get_app_name(args), get_app_name(args)))
     print("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp",get_app_name(args)))
     os.system("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
     os.system("chmod +x  {}.AppImage".format(get_app_name(args)))
