@@ -282,7 +282,9 @@ def visualize(image_file,
         show_score=show_score,
         font_path=font_path,
         font_size=font_size)
-    return  np.array(im)
+    im = np.array(im)
+
+    return cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
 
 
 def resize_img(img, input_size=600):
