@@ -262,6 +262,38 @@ class JadeVOCDatasets(object):
                     index = index + 1
             processBar.update()
 
+    def VOCDatasetToYoloDatasets(self):
+        VOC_LABELS = []
+        with open(os.path.join(self.root_path,"label_list.txt"),"rb") as f:
+            content_list = f.readlines()
+            for content in content_list:
+                content = str(content, encoding="utf-8").strip()
+                VOC_LABELS.append(content)
+        progressBar = ProgressBar(len(os.listdir(self.root_path)))
+        for year in os.listdir(self.root_path):
+            if os.path.isdir(os.path.join(self.root_path,year)):
+                labels_dir = os.path.join(self.root_path,year,"Labels")
+                if os.path.exists(labels_dir):
+                    shutil.rmtree(labels_dir)
+                CreateSavePath(labels_dir)
+                xml_path_list = GetFilesWithLastNamePath(os.path.join(self.root_path,year,DIRECTORY_ANNOTATIONS),".xml")
+                for xml_path in xml_path_list:
+                    imagename,shape, bboxes, labels_text,labels, difficult, truncated = ProcessXml(xml_path)
+                    with open(os.path.join(labels_dir,"{}.txt".format(imagename.split(".")[0])),"wb") as f:
+                        for (label, box) in zip(labels_text, bboxes):
+                            f.write("{} {} {} {} {}".format(VOC_LABELS.index(label),box[0],box[1],box[2],box[3]).encode("utf-8"))
+            progressBar.update()
+        # with open(os.path.join(self.root_path, "train.txt"), "rb") as f:
+        #     content_list = f.readlines()
+        #     for content in content_list:
+        #         content = str(content, encoding="utf-8")
+        #         image_path, xml_path = os.path.join(self.root_path, content.split(" ")[0].strip()), os.path.join(self.root_path, content.split(" ")[1].strip())
+        #         imagename,shape, bboxes, labels_text,labels, difficult, truncated = ProcessXml(xml_path)
+        #         for (label,box) in zip(labels_text,bboxes):
+        #             print(VOC_LABELS.index(label),box)
+
+
+
 def remove_voc_imagesets(root_path):
     processBar = ProgressBar(len(os.listdir(root_path)))
     for year in os.listdir(root_path):
@@ -287,7 +319,9 @@ def paddle_pretrain_detection_dataset(root_path,detector,threshold=0.6):
             GenerateXml(file_name,image.shape,result["boxes"],result["labels"],save_anno_path)
         processBar.update()
 
+
+
 if __name__ == '__main__':
-    jadeVOCDatasets = JadeVOCDatasets(r'F:\数据集\VOC数据集\定制版顶相机箱号检测数据集')
+    jadeVOCDatasets = JadeVOCDatasets(r'E:\Data\VOC数据集\箱门检测数据集\ContainVOC')
     # jadeVOCDatasets.remove_no_labels()
-    jadeVOCDatasets.change_labels(["PCTNNO","NCTNNO"],"CTNNO")
+    jadeVOCDatasets.VOCDatasetToYoloDatasets()
