@@ -1,5 +1,21 @@
-##  python tools V1.4.0
+##  python tools V1.4.1
 * 不使用第三方wheel包
+
+## 更新日志
+
+* update 支持模型加密解密操作,支持解密直接返回字节流
+
+<details onclose>
+<summary>查看更多更新日志</summary>
+
+* update 支持不使用图片进行打包
+* update 支持python3.7进行打包
+* update 路径转换无需判断路径是否真实存在
+* update 打包的时候支持文件夹导入
+* update 打包成AppImage时候无需icon图标
+* update 加入AppImage图标为默认图标
+* update Linux打包使用原始的版本号
+</details>
 
 
 ## 1.编写python文件
@@ -7,7 +23,6 @@
 ## 2. 编写setup.py文件
 ```Python
 from setuptools import setup, find_packages
-
 setup(
     name="jade_tools",
     version="0.1",
@@ -37,13 +52,3 @@ pip install wheel
 pip wheel --wheel-dir=./wheel_dir ./
 ```
 > wheel-dir 为wheel 输出文件夹，后面接项目文件夹（即包含setup.py的文件夹）
-
-
-## 更新日志
-* update 支持不使用图片进行打包
-* update 支持python3.7进行打包
-* update 路径转换无需判断路径是否真实存在
-* update 打包的时候支持文件夹导入
-* update 打包成AppImage时候无需icon图标
-* update 加入AppImage图标为默认图标
-* update Linux打包使用原始的版本号
