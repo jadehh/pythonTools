@@ -14,6 +14,7 @@ import shutil
 from jade.jade_progress_bar import ProgressBar
 import socket
 import platform
+from cryptography.fernet import Fernet
 
 def zh_ch(string):
     """
@@ -358,6 +359,42 @@ def update_lib(lib_path):
             shutil.rmtree(lib_path)
 
 
-if __name__ == '__main__':
-    print(get_ip_address("192.168.35.120"))
+def encryption_model(model_path,key=None):
+    if key is None:
+        key = Fernet.generate_key()
+        # 保存license
+    f = Fernet(key)
+    with open(os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_en."+GetLastDir(model_path).split(".")[1]), 'wb') as ew:
+        # 二进制读取模型文件
+        content = open(model_path, 'rb').read()
+        # 根据密钥解密文件
+        encrypted_content = f.encrypt(content)
+        # print(encrypted_content)
+        # 保存到新文件
+        ew.write(encrypted_content)
 
+def decryption_model(model_path,key=None,is_byte=False):
+    if key is None:
+        raise  "没有密码无法解密"
+    f = Fernet(key)
+    en_model_file = open(model_path, 'rb').read()
+    en_model_file = f.decrypt(en_model_file)
+    if is_byte:
+        return en_model_file
+    save_model_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_dep."+GetLastDir(model_path).split(".")[1])
+    with open(save_model_path, "wb") as f:
+        f.write(en_model_file)
+    ## 注意返回正确的
+    return save_model_path
+
+def test_load_onnx(model):
+    import onnx
+    import onnxruntime
+    sess = onnxruntime.InferenceSession(model, providers=['CUDAExecutionProvider'])
+
+
+if __name__ == '__main__':
+    key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
+    #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
+    model = decryption_model("container_det_768-576_slim_en.onnx",key=key,is_byte=True)
+    test_load_onnx(model)
