@@ -1,13 +1,14 @@
-##  python tools V1.4.2
+##  python tools V1.4.3
 * 不使用第三方wheel包
 
 ## 更新日志
+* 版本号支持4位版本号和3位版本号
 
-* update 支持模型加密解密操作,支持解密直接返回字节流
-* 引入新的cffi包
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+* update 支持模型加密解密操作,支持解密直接返回字节流
+* 引入新的cffi包
 * update 支持不使用图片进行打包
 * update 支持python3.7进行打包
 * update 路径转换无需判断路径是否真实存在
