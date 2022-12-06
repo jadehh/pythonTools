@@ -1,5 +1,6 @@
 ##  OpencvToolsV1.1.2
-* Opencv相关操作
+Opencv相关操作
+
 ### 打包为wheel文件
 
 安装wheel
@@ -14,3 +15,4 @@ pip wheel --wheel-dir=./wheel_dir ./
 
 ### 更新日志
 * 支持华为Ascned解码
+* 日志输出Ascned芯片解码
