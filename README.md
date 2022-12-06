@@ -1,4 +1,4 @@
-##  OpencvToolsV1.1.2
+##  OpencvToolsV1.1.4
 Opencv相关操作
 
 ### 打包为wheel文件
@@ -14,5 +14,6 @@ pip wheel --wheel-dir=./wheel_dir ./
 > wheel-dir 为wheel 输出文件夹，后面接项目文件夹（即包含setup.py的文件夹）
 
 ### 更新日志
-* 支持华为Ascned解码
-* 日志输出Ascned芯片解码
+* 支持华为Ascend解码
+* 日志输出Ascend芯片解码
+* 初始化Ascend环境
