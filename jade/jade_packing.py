@@ -206,6 +206,13 @@ def write_version_info(args):
             version_str = version_str + version_word + ","
         version_str = version_str[:-1]
         origanl_app_name = ""
+        app_version = ""
+        if len(args.app_version.split(".")) < 3:
+            raise  "请确认App Version参数是否按照规范,1.0.0或1.0.0.0"
+        if len(args.app_version.split(".")) == 3:
+            app_version = args.app_version
+        if len(args.app_version.split(".")) == 4:
+            app_version = args.app_version[:-2]
         if getOperationSystem() == "Windows":
             origanl_app_name = args.app_name + ".exe"
         else:
@@ -252,7 +259,7 @@ def write_version_info(args):
                 "]),\n"
                 "VarFileInfo([VarStruct(u'Translation', [2052, 1200])]) # 语言\n"
                 "]\n"
-                ")\n".format(version_str,version_str,args.name,args.app_version[:-2],GetYear(),origanl_app_name,get_app_name(args),args.app_version[:-2]).encode("utf-8"))
+                ")\n".format(version_str,version_str,args.name,app_version,GetYear(),origanl_app_name,get_app_name(args),args.app_version[:-2]).encode("utf-8"))
 
 def recursion_dir_all_file(path):
     '''
