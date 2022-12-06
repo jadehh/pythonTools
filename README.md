@@ -1,4 +1,4 @@
-##  OpencvToolsV1.1.3
+##  OpencvToolsV1.1.4
 Opencv相关操作
 
 ### 打包为wheel文件
@@ -16,3 +16,4 @@ pip wheel --wheel-dir=./wheel_dir ./
 ### 更新日志
 * 支持华为Ascend解码
 * 日志输出Ascend芯片解码
+* 优化Ascend芯片解码
