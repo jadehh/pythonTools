@@ -1,10 +1,10 @@
-##  python tools V1.4.1
+##  python tools V1.4.2
 * 不使用第三方wheel包
 
 ## 更新日志
 
 * update 支持模型加密解密操作,支持解密直接返回字节流
-
+* 引入新的cffi包
 <details onclose>
 <summary>查看更多更新日志</summary>
 

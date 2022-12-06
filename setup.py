@@ -12,7 +12,7 @@ if __name__ == '__main__':
     find_packages("jade", pack_list)
     setup(
     name="jade",
-    version="1.4.1",
+    version="1.4.2",
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="",
@@ -25,6 +25,6 @@ if __name__ == '__main__':
     package_data={'': ['*Run','*png']},
     include_package_data=True,
     platforms="any",
-    install_requires=["easycython","pyinstaller","cryptography"]  # 这个项目需要的第三方库
+    install_requires=["easycython","pyinstaller","cryptography","cffi"]  # 这个项目需要的第三方库
 )
 
