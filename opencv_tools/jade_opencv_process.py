@@ -763,7 +763,7 @@ class VideoCaptureBaseProcess(threading.Thread):
         if self.use_gpu_decode:
             frame = frame.download()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
-        if self.device == "Ascend":
+        if self.device == "ascend":
             frame = self._dvpp.jpege(frame)
             frame = frame.jpeg_to_cv2()
         return frame
@@ -823,7 +823,7 @@ class VideoCaptureBaseProcess(threading.Thread):
             Exit(0)
 
     def opencv_cpu_capture(self):
-        if self.device == "Ascend":
+        if self.device == "ascend":
             from acllite import videocapture
             import acl
             ret = acl.rt.set_device(0)
@@ -833,7 +833,7 @@ class VideoCaptureBaseProcess(threading.Thread):
             self.capture = cv2.VideoCapture(self.video_path)
             self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
 
-        if self.device == "Ascend":
+        if self.device == "ascend":
             ret,frame = self.capture.read()
             if ret == 0 and frame is not None:
                 self.reopen_times = 0
@@ -877,7 +877,7 @@ class VideoCaptureBaseProcess(threading.Thread):
                             ret, frame = self.capture.nextFrame()
                         else:
                             ret, frame = self.capture.read()
-                        if self.device == "Ascend":
+                        if self.device == "ascend":
                             if ret == 0:
                                 ret = True
                             else:
@@ -902,7 +902,7 @@ class VideoCaptureBaseProcess(threading.Thread):
                 time.sleep(self.camera_reopen_times)
 
     def run(self):
-        if self.device == "Ascend":
+        if self.device == "ascend":
             import acl
             from acllite.acllite_imageproc import AclLiteImageProc
             ret = acl.rt.set_device(0)
