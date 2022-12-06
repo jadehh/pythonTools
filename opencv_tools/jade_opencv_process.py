@@ -748,13 +748,14 @@ def PadImage(image,width=10):
 
 
 class VideoCaptureBaseProcess(threading.Thread):
-    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None):
+    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None,device=None):
         self.video_path = video_path
         self.history_status = self.check_video_path()
         self.camera_type = camera_type
         self.use_gpu_decode = use_gpu_decode
         self.camera_reopen_times = camera_reopen_times
         self.reopen_times = 0
+        self.device = device
         self.JadeLog = JadeLog
         super(VideoCaptureBaseProcess, self).__init__()
 
@@ -819,18 +820,39 @@ class VideoCaptureBaseProcess(threading.Thread):
 
     def opencv_cpu_capture(self):
         self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
-        self.capture = cv2.VideoCapture(self.video_path)
-        if self.capture.isOpened():
-            self.reopen_times = 0
-            self.JadeLog.INFO(
-                "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
-            return True
+        if self.device == "Ascend":
+            from acllite import videocapture
+            self.capture = videocapture.VideoCapture(self.video_path)
         else:
-            self.reopen_times = self.reopen_times + 1
-            self.capture = None
-            self.JadeLog.ERROR("相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
-            self.camera_abnormal(None)
-            return False
+            self.capture = cv2.VideoCapture(self.video_path)
+        if self.device == "Ascned":
+            ret,frame = self.capture.read()
+            if ret:
+                self.reopen_times = 0
+                self.JadeLog.INFO(
+                    "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
+                return True
+            else:
+                self.reopen_times = self.reopen_times + 1
+                self.capture = None
+                self.JadeLog.ERROR(
+                    "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
+                self.camera_abnormal(None)
+                return False
+        else:
+            if self.capture.isOpened():
+                self.reopen_times = 0
+                self.JadeLog.INFO(
+                    "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
+                return True
+            else:
+                self.reopen_times = self.reopen_times + 1
+                self.capture = None
+                self.JadeLog.ERROR(
+                    "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
+                self.camera_abnormal(None)
+                return False
+
 
     def judge_capture_reader(self):
         if self.use_gpu_decode:
@@ -848,7 +870,7 @@ class VideoCaptureBaseProcess(threading.Thread):
                         else:
                             ret, frame = self.capture.read()
                         self.package_data(ret, frame)
-                        if ret is False:
+                        if ret is False or ret == 0 or frame is None:
                             self.JadeLog.WARNING(
                                 "相机类型为:{},相机中途断开,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
                             time.sleep(self.camera_reopen_times)
