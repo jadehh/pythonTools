@@ -748,7 +748,7 @@ def PadImage(image,width=10):
 
 
 class VideoCaptureBaseProcess(threading.Thread):
-    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None,device=None):
+    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None,device=None,acl_resource=None):
         self.video_path = video_path
         self.history_status = self.check_video_path()
         self.camera_type = camera_type
@@ -763,7 +763,11 @@ class VideoCaptureBaseProcess(threading.Thread):
         if self.use_gpu_decode:
             frame = frame.download()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+        if self.device == "Ascend":
+            frame = self._dvpp.jpege(frame)
+            frame = frame.jpeg_to_cv2()
         return frame
+
     def package_data(self,ret,frame):
         frame = self.download_frame(frame)
         cv2.namedWindow("result",0)
@@ -821,18 +825,20 @@ class VideoCaptureBaseProcess(threading.Thread):
     def opencv_cpu_capture(self):
         if self.device == "Ascend":
             from acllite import videocapture
+            import acl
+            ret = acl.rt.set_device(0)
             self.capture = videocapture.VideoCapture(self.video_path)
             self.JadeLog.INFO("相机类型为:{},使用Ascend芯片解码,准备打开相机".format(self.camera_type))
         else:
             self.capture = cv2.VideoCapture(self.video_path)
             self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
 
-        if self.device == "Ascned":
+        if self.device == "Ascend":
             ret,frame = self.capture.read()
-            if ret:
+            if ret == 0 and frame is not None:
                 self.reopen_times = 0
                 self.JadeLog.INFO(
-                    "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
+                    "相机类型为:{},相机打开成功,使用Ascend芯片解码,相机地址为:{}".format(self.camera_type, self.video_path))
                 return True
             else:
                 self.reopen_times = self.reopen_times + 1
@@ -871,12 +877,18 @@ class VideoCaptureBaseProcess(threading.Thread):
                             ret, frame = self.capture.nextFrame()
                         else:
                             ret, frame = self.capture.read()
-                        self.package_data(ret, frame)
-                        if ret is False or ret == 0 or frame is None:
+                        if self.device == "Ascend":
+                            if ret == 0:
+                                ret = True
+                            else:
+                                ret = False
+                        if ret is False or frame is None:
                             self.JadeLog.WARNING(
                                 "相机类型为:{},相机中途断开,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
                             time.sleep(self.camera_reopen_times)
                             self.judge_capture_reader()
+                        else:
+                            self.package_data(ret, frame)
                         if self.history_status:
                             time.sleep(0.04)
                     except Exception as e:
@@ -890,6 +902,11 @@ class VideoCaptureBaseProcess(threading.Thread):
                 time.sleep(self.camera_reopen_times)
 
     def run(self):
+        if self.device == "Ascend":
+            import acl
+            from acllite.acllite_imageproc import AclLiteImageProc
+            ret = acl.rt.set_device(0)
+            self._dvpp = AclLiteImageProc()
         self.capture_reader()
 
 
