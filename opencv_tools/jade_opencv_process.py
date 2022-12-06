@@ -819,12 +819,14 @@ class VideoCaptureBaseProcess(threading.Thread):
             Exit(0)
 
     def opencv_cpu_capture(self):
-        self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
         if self.device == "Ascend":
             from acllite import videocapture
             self.capture = videocapture.VideoCapture(self.video_path)
+            self.JadeLog.INFO("相机类型为:{},使用Ascend芯片解码,准备打开相机".format(self.camera_type))
         else:
             self.capture = cv2.VideoCapture(self.video_path)
+            self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
+
         if self.device == "Ascned":
             ret,frame = self.capture.read()
             if ret:
