@@ -211,6 +211,7 @@ def write_version_info(args):
             raise  "请确认App Version参数是否按照规范,1.0.0或1.0.0.0"
         if len(args.app_version.split(".")) == 3:
             app_version = args.app_version
+            version_str = version_str + ",1"
         if len(args.app_version.split(".")) == 4:
             app_version = args.app_version[:-2]
         if getOperationSystem() == "Windows":
