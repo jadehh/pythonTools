@@ -2,8 +2,8 @@
 * 不使用第三方wheel包
 
 ## 更新日志
-* 版本号支持4位版本号和3位版本号
 * update getSectionConfigs 方法
+* 版本号支持4位版本号和3位版本号
 <details onclose>
 <summary>查看更多更新日志</summary>
 
