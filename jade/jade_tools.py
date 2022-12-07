@@ -120,6 +120,17 @@ def getSectionList(config,section_name="Camera"):
             section_list.append(section)
     return section_list
 
+def getSectionConfigs(config,section):
+    try:
+        configsList = []
+        itemList = config.items(section)
+        for item in itemList:
+            configsList.append(item[1].split("#")[0].rstrip())
+    except Exception as e:
+        print("读取{}参数异常,请检查参数是否正常,异常原因为{}".format(section, e))
+        sys.exit()
+    return configsList
+
 
 def resource_path(relative_path):
     """
