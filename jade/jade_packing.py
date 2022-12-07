@@ -259,7 +259,7 @@ def write_version_info(args):
                 "]),\n"
                 "VarFileInfo([VarStruct(u'Translation', [2052, 1200])]) # 语言\n"
                 "]\n"
-                ")\n".format(version_str,version_str,args.name,app_version,GetYear(),origanl_app_name,get_app_name(args),args.app_version[:-2]).encode("utf-8"))
+                ")\n".format(version_str,version_str,args.name,app_version,GetYear(),origanl_app_name,get_app_name(args),app_version).encode("utf-8"))
 
 def recursion_dir_all_file(path):
     '''
