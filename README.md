@@ -1,7 +1,8 @@
-##  python tools V1.4.6
+##  python tools V1.4.7
 * 不使用第三方wheel包
 
 ## 更新日志
+* packing模块支持导入其他库传参
 * 优化jade packing 模块
 * 新增version文件
 * update jade packing 支持自定义main函数文件

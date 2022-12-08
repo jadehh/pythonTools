@@ -167,6 +167,8 @@ def writePy(args):
     with open("{}.py".format(app_name), "wb") as f:
         try:
             if args.head_str:
+                if "\\n" in args.head_str:
+                    args.head_str = (args.head_str.split("\\n")[0] + "\n")
                 f.write(args.head_str.encode("utf-8"))
         except:
             pass
