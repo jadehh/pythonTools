@@ -190,7 +190,13 @@ def writePy(args):
                     if args.main.endswith(".py"):
                         with open(args.main,"rb") as f2:
                             for content in f2.readlines():
-                                f.write(content)
+                                content_str = str(content,encoding="utf-8")
+                                if content_str[0] == "#":
+                                    pass
+                                elif "from src." in content_str:
+                                    f.write(content_str.replace("src.","").encode("utf-8"))
+                                else:
+                                    f.write(content)
                 else:
                     f.write(args.main.encode("utf-8"))
             else:

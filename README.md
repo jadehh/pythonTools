@@ -1,7 +1,8 @@
-##  python tools V1.4.5
+##  python tools V1.4.6
 * 不使用第三方wheel包
 
 ## 更新日志
+* 优化jade packing 模块
 * 新增version文件
 * update jade packing 支持自定义main函数文件
 * update getSectionConfigs 方法
