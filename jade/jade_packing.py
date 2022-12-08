@@ -186,15 +186,23 @@ def writePy(args):
 
         try:
             if args.main:
-                f.write(args.main.encode("utf-8"))
+                if os.path.exists(args.main):
+                    if args.main.endswith(".py"):
+                        with open(args.main,"rb") as f2:
+                            for content in f2.readlines():
+                                f.write(content)
+                else:
+                    f.write(args.main.encode("utf-8"))
             else:
                 f.write("from samplesMain import main\n"
                 "if __name__ == '__main__':\n"
                 "    main()\n".encode("utf-8"))
-        except:
+        except Exception as e:
+            print("Main函数写入失败,失败原因为:{}".format(e))
             f.write("from samplesMain import main\n"
                    "if __name__ == '__main__':\n"
                    "    main()\n".encode("utf-8"))
+
 
 def get_app_name(args):
     return args.app_name

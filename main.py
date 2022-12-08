@@ -6,4 +6,6 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
-from jade import *
+import jade
+if __name__ == '__main__':
+    print(jade.__version__)
