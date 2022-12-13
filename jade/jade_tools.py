@@ -384,7 +384,7 @@ def encryption_model(model_path,key=None):
         # 保存到新文件
         ew.write(encrypted_content)
 
-def decryption_model(model_path,key=None,is_byte=False):
+def decryption_model(model_path,key=None,is_byte=False,save_model_path=None):
     if key is None:
         raise  "没有密码无法解密"
     f = Fernet(key)
@@ -392,7 +392,8 @@ def decryption_model(model_path,key=None,is_byte=False):
     en_model_file = f.decrypt(en_model_file)
     if is_byte:
         return en_model_file
-    save_model_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_dep."+GetLastDir(model_path).split(".")[1])
+    if save_model_path is None:
+        save_model_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_dep."+GetLastDir(model_path).split(".")[1])
     with open(save_model_path, "wb") as f:
         f.write(en_model_file)
     ## 注意返回正确的

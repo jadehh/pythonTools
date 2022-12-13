@@ -1,7 +1,8 @@
-##  python tools V1.5.0
+##  python tools V1.5.1
 * 不使用第三方wheel包
 
 ## 更新日志
+* 支持模型解密自定义保存路径
 * packing模块支持导入其他库传参
 * 优化jade packing 模块
 * 新增version文件
