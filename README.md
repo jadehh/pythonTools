@@ -3,15 +3,16 @@
 
 ## 更新日志
 * 支持模型解密自定义保存路径
+
+<details onclose>
+<summary>查看更多更新日志</summary>
+
 * packing模块支持导入其他库传参
 * 优化jade packing 模块
 * 新增version文件
 * update jade packing 支持自定义main函数文件
 * update getSectionConfigs 方法
 * 版本号支持4位版本号和3位版本号
-<details onclose>
-<summary>查看更多更新日志</summary>
-
 * update 支持模型加密解密操作,支持解密直接返回字节流
 * 引入新的cffi包
 * update 支持不使用图片进行打包
