@@ -13,6 +13,15 @@ import math
 from PIL import Image, ImageFont, ImageDraw
 from opencv_tools.jade_opencv_process import GetRandomColor,ReadChinesePath
 from jade import getOperationSystem
+import random
+
+def _to_color(indx):
+    """ return (b, r, g) tuple"""
+    b = random.randint(1,10) / 10
+    g = random.randint(1,10) / 10
+    r = random.randint(1,10) / 10
+    return b * 255, r * 255, g * 255
+
 def get_color_map_list(num_classes):
     """
     Args:
@@ -43,6 +52,8 @@ def draw_box(im, results,show_score=True,font_path=None,font_size=24):
     Returns:
         im (PIL.Image.Image): visualized image
     """
+
+    im = Image.fromarray(im)
     np_boxes = results['boxes']
     labels_text = results["labels"]
     scores = results["scores"]
@@ -74,6 +85,7 @@ def draw_box(im, results,show_score=True,font_path=None,font_size=24):
         draw.rectangle(
             [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
         draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255),font=font)
+    im = np.array(im)
     return im
 
 
@@ -602,6 +614,48 @@ def CVShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
     cv2.resizeWindow("result", 840, 680)
     cv2.imshow("result", im)
     cv2.waitKey(waitkey)
+
+
+#opencv显示boxes
+def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,waitkey=-1,named_windows="result"):
+    base = int(np.ceil(pow(num_classes, 1. / 3)))
+    colors = [_to_color(x) for x in range(num_classes)]
+    if type(image) == str:
+        image = cv2.imread(image)
+    image2 = image.copy()
+    for i in range(len(boxes)):
+        if boxes[i][0] <= 1.1 and  boxes[i][1] <= 1.1 and boxes[i][2] <= 1.1 and boxes[i][3] <= 1.1:
+            xmin = int(boxes[i][0]*image.shape[1]) if int(boxes[i][0]*image.shape[1]) > 0  else 0
+            ymin = int(boxes[i][1]*image.shape[0]) if (int(boxes[i][1]*image.shape[0])) > 0 else 0
+            xmax = int(boxes[i][2]*image.shape[1]) if int(boxes[i][2]*image.shape[1]) > 0 else 0
+            ymax =  int(boxes[i][3]*image.shape[0]) if int(boxes[i][3]*image.shape[0]) > 0 else 0
+        else:
+            xmin = int(boxes[i][0])
+            ymin = int(boxes[i][1])
+            xmax = int(boxes[i][2])
+            ymax = int(boxes[i][3])
+        if boxes is not None:
+            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
+            if label_texts is not None:
+                if scores is not None:
+                    image2 = Add_Chinese_Label(img=image2, label=label_texts[i] + ":" + str(int(scores[i] * 100)),
+                                               pt1=(xmin, ymin))
+                else:
+                    image2 = Add_Chinese_Label(img=image2, label=label_texts[i],
+                                               pt1=(xmin, ymin))
+                if label_ids is not None:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(label_ids[i])], 3, 3)
+                else:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
+
+
+    if waitkey >= 0:
+        cv2.namedWindow(named_windows, 0)
+        # cv2.resizeWindow("result", 840, 680)
+        cv2.imshow(named_windows,image2)
+        cv2.waitKey(waitkey)
+    else:
+        return image2
 
 # OCR识别结果
 def draw_ocr(image, boxes, txts, scores, draw_txt=True, drop_score=0.5):
