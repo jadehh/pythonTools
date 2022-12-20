@@ -1,7 +1,8 @@
-##  python tools V1.5.1
+##  python tools V1.5.2
 * 不使用第三方wheel包
 
 ## 更新日志
+* 数据库支持清空操作
 * 支持模型解密自定义保存路径
 
 <details onclose>

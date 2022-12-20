@@ -111,7 +111,15 @@ class JadeSqliteDataBase(object):
                 self.JadeLog.ERROR("查询表失败,失败原因为{},sql语句为{}".format(e, sql_str))
             pass
 
-
+    def clear(self):
+        self.db = sqlite3.connect(self._db_name, check_same_thread=False)
+        self.cursor = self.db.cursor()
+        sql_str = "DELETE FROM {}".format(self.table_name)
+        try:
+            self.cursor.execute(sql_str)
+            self.db.commit()
+        except Exception as e:
+            self.JadeLog.ERROR("插入数据表失败,失败原因为{},sql语句为{}".format(e, sql_str))
 
 
 
