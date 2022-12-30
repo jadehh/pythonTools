@@ -209,7 +209,6 @@ def writePy(args):
                 "if __name__ == '__main__':\n"
                 "    main()\n".encode("utf-8"))
         except Exception as e:
-            print("Main函数写入失败,失败原因为:{}".format(e))
             f.write("from samplesMain import main\n"
                    "if __name__ == '__main__':\n"
                    "    main()\n".encode("utf-8"))
