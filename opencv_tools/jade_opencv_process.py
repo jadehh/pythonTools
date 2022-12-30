@@ -346,6 +346,18 @@ def cv2_base64(image):
     base64_str = base64.b64encode(base64_str)
     return str(base64_str, encoding="utf-8")
 
+# base64转opencv
+def base64_to_cv2(base_image):
+    image_bytes = base64.b64decode(base_image)
+    np_array = np.frombuffer(image_bytes, np.uint8)
+    image_cv2 = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+    return image_cv2
+
+# base64转文件
+
+def base64_to_file(base_image,image_path):
+    with open(image_path, 'wb') as f:
+        f.write(base64.b64decode(base_image))
 
 # opencv显示关键点和矩形框
 def CVShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):

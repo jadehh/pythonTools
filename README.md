@@ -1,4 +1,4 @@
-##  OpencvToolsV1.1.6
+##  OpencvToolsV1.1.7
 Opencv相关操作
 
 ### 打包为wheel文件
