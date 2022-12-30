@@ -19,3 +19,4 @@ pip wheel --wheel-dir=./wheel_dir ./
 * 优化Ascend芯片解码
 * device类型统一使用ascend
 * update CVShowBoxes 方法
+* update base64转图片和cv2的方法
