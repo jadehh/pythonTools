@@ -12,7 +12,7 @@ if __name__ == '__main__':
     find_packages("opencv_tools", pack_list)
     setup(
     name="opencv_tools",
-    version="1.1.7",
+    version="1.1.8",
     keywords=("pip", "opencv_tools", ""),
     description="opencv_tools",
     long_description="",
@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     include_package_data=True,
     platforms="any",
-    install_requires=[""]  # 这个项目需要的第三方库
+    install_requires=["https://gh.con.sh/https://github.com/jadehh/pythonTools/releases/download/JadeV1.5.3/jade-1.5.3-py3-none-any.whl"]  # 这个项目需要的第三方库
 )
 
