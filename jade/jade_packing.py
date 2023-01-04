@@ -25,7 +25,7 @@ def copy_build(args,save_path):
         shutil.copy(os.path.join(args.lib_path,file_name),os.path.join(save_path,getOperationSystem(),args.lib_path))
 
 
-def ui_to_py():
+def ui_to_py(trans=False):
     view_path = "view"
     view_file_list = os.listdir(view_path)
     progressBar = ProgressBar(len(view_file_list))
@@ -33,6 +33,9 @@ def ui_to_py():
         if "ui" in view_name:
             view_file = os.path.join(view_path,view_name)
             os.system("pyuic5 -o {}.py {}".format(view_file.split(".ui")[0],view_file))
+            if trans:
+                CreateSavePath("translator_ts_tmp")
+                os.system("pylupdate5 {}.py -ts translator_ts_tmp/{}.ts".format(view_file.split(".ui")[0], view_name.split(".ui")[0]))
         progressBar.update()
 
 def get_import_content(f1,src_import,content,import_list):
