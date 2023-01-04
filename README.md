@@ -9,7 +9,8 @@ pip install wheel
 ```
 打包wheel
 ```bash
-pip wheel --wheel-dir=./wheel_dir ./
+python setup.py sdist bdist_wheel
+
 ```
 > wheel-dir 为wheel 输出文件夹，后面接项目文件夹（即包含setup.py的文件夹）
 
