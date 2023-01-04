@@ -18,7 +18,7 @@ if __name__ == '__main__':
     long_description="",
     license="MIT Licence",
     url="https://jadehh@live.com",
-    author="opencv_tools",
+    author="jade",
     author_email="jadehh@live.com",
 
     packages=pack_list,
@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     include_package_data=True,
     platforms="any",
-    install_requires=["https://gh.con.sh/https://github.com/jadehh/pythonTools/releases/download/JadeV1.5.3/jade-1.5.3-py3-none-any.whl"]  # 这个项目需要的第三方库
+    install_requires=[]  # 这个项目需要的第三方库
 )
 
