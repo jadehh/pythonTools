@@ -345,7 +345,7 @@ def writeSpec(args):
             file_path_list_str = "({},'.')".format(file_path_str)
             data_str = data_str + file_path_list_str + ","
 
-    extra_path_list = str_to_list(args.extra_path_str)
+    extra_path_list = args.extra_path_list
     if len(extra_path_list) == 0:
         data_str = data_str + "]"
     else:
@@ -878,10 +878,11 @@ def packAPP(args):
                 app_name = packAppImage(args)
                 shutil.copy(app_name, "{}/".format(save_bin_path))
             else:
-                if str_to_bool(args.full) is False:
+                if str_to_bool(args.full) is True:
                     shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
                 else:
                     os.system("cp -r dist/{}/* {}/".format(get_app_name(args),(save_bin_path)))
+
 
         else:
             os.system("cp -r dist/{}.app {}".format(get_app_name(args), save_bin_path))
