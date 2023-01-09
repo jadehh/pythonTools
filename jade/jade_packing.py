@@ -919,12 +919,12 @@ if __name__ == '__main__':
     if getOperationSystem() == "Windows":
         parser.add_argument('--extra_sys_str', type=str,
                             default="")  ## 添加环境变量
-        parser.add_argument('--extra_path_str', type=str,
+        parser.add_argument('--extra_path_list', type=list,
                             default="")  ## 添加到exec打包路径
     else:
         parser.add_argument('--extra_sys_str', type=str,
                             default="")  ## 添加环境变量
-        parser.add_argument('--extra_path_str', type=str,
+        parser.add_argument('--extra_path_list', type=list,
                             default="")  ## 添加到exec打包路径
 
     parser.add_argument('--full', type=str,
