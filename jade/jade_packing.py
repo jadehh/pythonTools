@@ -878,7 +878,11 @@ def packAPP(args):
                 app_name = packAppImage(args)
                 shutil.copy(app_name, "{}/".format(save_bin_path))
             else:
-                shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
+                if str_to_bool(args.full) is False:
+                    shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
+                else:
+                    os.system("cp -r dist/{}/* {}/".format(get_app_name(args),(save_bin_path)))
+
         else:
             os.system("cp -r dist/{}.app {}".format(get_app_name(args), save_bin_path))
     if os.path.exists("{}.py".format(get_app_name(args))):
