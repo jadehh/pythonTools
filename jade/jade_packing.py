@@ -6,8 +6,8 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
-from jade import AppRunPath,LogoPath
-from jade.jade_tools import CreateSavePath, GetTimeStamp,GetLastDir,GetYear,getOperationSystem,GetPreviousDir
+from jade import AppRunPath, LogoPath
+from jade.jade_tools import CreateSavePath, GetTimeStamp, GetLastDir, GetYear, getOperationSystem, GetPreviousDir
 from jade.jade_progress_bar import ProgressBar
 import os
 import shutil
@@ -15,14 +15,25 @@ import platform
 import subprocess
 import uuid
 
-def copy_build(args,save_path):
+
+def str_to_bool(str):
+    if str == "False":
+        return False
+    elif str == "True":
+        return True
+    else:
+        return False
+
+
+def copy_build(args, save_path):
     if getOperationSystem() == "Windows":
         save_path = save_path
     else:
-        save_path =  "/mnt/" + save_path[0].lower() +  save_path.replace("\\","//")[2:]
+        save_path = "/mnt/" + save_path[0].lower() + save_path.replace("\\", "//")[2:]
 
     for file_name in os.listdir(args.lib_path):
-        shutil.copy(os.path.join(args.lib_path,file_name),os.path.join(save_path,getOperationSystem(),args.lib_path))
+        shutil.copy(os.path.join(args.lib_path, file_name),
+                    os.path.join(save_path, getOperationSystem(), args.lib_path))
 
 
 def ui_to_py(trans=False):
@@ -31,14 +42,16 @@ def ui_to_py(trans=False):
     progressBar = ProgressBar(len(view_file_list))
     for view_name in view_file_list:
         if "ui" in view_name:
-            view_file = os.path.join(view_path,view_name)
-            os.system("pyuic5 -o {}.py {}".format(view_file.split(".ui")[0],view_file))
+            view_file = os.path.join(view_path, view_name)
+            os.system("pyuic5 -o {}.py {}".format(view_file.split(".ui")[0], view_file))
             if trans:
                 CreateSavePath("translator_ts_tmp")
-                os.system("pylupdate5 {}.py -ts translator_ts_tmp/{}.ts".format(view_file.split(".ui")[0], view_name.split(".ui")[0]))
+                os.system("pylupdate5 {}.py -ts translator_ts_tmp/{}.ts".format(view_file.split(".ui")[0],
+                                                                                view_name.split(".ui")[0]))
         progressBar.update()
 
-def get_import_content(f1,src_import,content,import_list):
+
+def get_import_content(f1, src_import, content, import_list):
     prefix_list = content.split("from")[1].split("import")[0].split(".")[:-1]
     prefix = ""
     edit = False
@@ -56,16 +69,17 @@ def get_import_content(f1,src_import,content,import_list):
         edit = True
     return edit
 
+
 def copyPy(args):
     new_src_path = CreateSavePath("new_src")
     try:
-        if args.is_qt is False:
+        if str_to_bool(args.is_qt) is False:
             src_path_list = ["src"]
             src_import_list = ["src."]
         else:
-            src_path_list = ["src","view","view/customView","controller"]
-            src_import_list = ["src.","view.","view.customView.","controller."]
-    except :
+            src_path_list = ["src", "view", "view/customView", "controller"]
+            src_import_list = ["src.", "view.", "view.customView.", "controller."]
+    except:
         src_path_list = ["src"]
         src_import_list = ["src."]
     import_list = []
@@ -104,9 +118,10 @@ def copyPy(args):
                                         if content not in import_list and "#" not in content and content[0] != " ":
                                             import_list.append(content)
                                 elif "JadeLog = JadeLogging" in content:
-                                    if args.use_jade_log:
-                                        update_log = "\n    JadeLog.INFO('{}-更新时间为:{}',True)\r".format(args.name + "V" + args.app_version,GetTimeStamp(),True)
-                                        f1.write((content+update_log).encode("utf-8"))
+                                    if str_to_bool(args.use_jade_log):
+                                        update_log = "\n    JadeLog.INFO('{}-更新时间为:{}',True)\r".format(
+                                            args.name + "V" + args.app_version, GetTimeStamp(), True)
+                                        f1.write((content + update_log).encode("utf-8"))
                                     else:
                                         f1.write((content).encode("utf-8"))
                                 else:
@@ -124,7 +139,7 @@ def copyPy(args):
                                             prefix = ""
                                             if len(prefix_list) > 0:
                                                 for text in prefix_list:
-                                                    prefix =prefix + text + "."
+                                                    prefix = prefix + text + "."
                                             if src_import == prefix.strip():
                                                 new_content = content.split(src_import)[0] + \
                                                               content.split(src_import)[1]
@@ -141,15 +156,15 @@ def copyPy(args):
                                         if content not in import_list and "#" not in content and content[0] != " ":
                                             import_list.append(content)
                                 elif "def main():" in content:
-                                    if args.use_jade_log is False:
-                                        update_log = "print('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(args.name + "V" + args.app_version,
-                                                                                                     GetTimeStamp())
+                                    if str_to_bool(args.use_jade_log) is False:
+                                        update_log = "print('#'*20+ '{}-更新时间为:{}' +'#'*20)\r".format(
+                                            args.name + "V" + args.app_version,
+                                            GetTimeStamp())
                                         f1.write((update_log + content).encode("utf-8"))
                                     else:
-                                        f1.write((content+"\n").encode("utf-8"))
+                                        f1.write((content + "\n").encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
-
 
     return import_list
 
@@ -172,7 +187,7 @@ def writePy(args):
             if args.head_str:
                 if "\\n" in args.head_str:
                     new_head_str = ""
-                    for head_str in  args.head_str.split("\\n"):
+                    for head_str in args.head_str.split("\\n"):
                         new_head_str = new_head_str + head_str + "\n"
                     args.head_str = new_head_str
                 f.write(args.head_str.encode("utf-8"))
@@ -186,9 +201,12 @@ def writePy(args):
                 "    base_path = os.path.abspath('.')\n"
                 "sys.path.append('{}')\n"
                 "sys.path.append(os.path.join(base_path,'build/encryption'))\n".format(args.lib_path).encode("utf-8"))
+        try:
+            for extra_sys_path in str_to_list(args.extra_sys_str):
+                f.write(("sys.path.append" + "('" + extra_sys_path + "')" + "\n").encode("utf-8"))
+        except:
+            pass
 
-        for extra_sys_path in args.extra_sys_list:
-            f.write(extra_sys_path.encode("utf-8") + "\n".encode("utf-8"))
         for import_src in import_list:
             f.write(import_src.encode("utf-8") + "\n".encode("utf-8"))
 
@@ -196,32 +214,33 @@ def writePy(args):
             if args.main:
                 if os.path.exists(args.main):
                     if args.main.endswith(".py"):
-                        with open(args.main,"rb") as f2:
+                        with open(args.main, "rb") as f2:
                             for content in f2.readlines():
-                                content_str = str(content,encoding="utf-8")
+                                content_str = str(content, encoding="utf-8")
                                 if content_str[0] == "#":
                                     pass
                                 elif "from src." in content_str:
-                                    f.write(content_str.replace("src.","").encode("utf-8"))
+                                    f.write(content_str.replace("src.", "").encode("utf-8"))
                                 else:
                                     f.write(content)
                 else:
                     f.write(args.main.encode("utf-8"))
             else:
                 f.write("from samplesMain import main\n"
-                "if __name__ == '__main__':\n"
-                "    main()\n".encode("utf-8"))
+                        "if __name__ == '__main__':\n"
+                        "    main()\n".encode("utf-8"))
         except Exception as e:
             f.write("from samplesMain import main\n"
-                   "if __name__ == '__main__':\n"
-                   "    main()\n".encode("utf-8"))
+                    "if __name__ == '__main__':\n"
+                    "    main()\n".encode("utf-8"))
 
 
 def get_app_name(args):
     return args.app_name
 
+
 def write_version_info(args):
-    with open("file_verison_info.txt","wb") as f:
+    with open("file_verison_info.txt", "wb") as f:
         version_str = ""
         for version_word in args.app_version.split("."):
             version_str = version_str + version_word + ","
@@ -229,7 +248,7 @@ def write_version_info(args):
         origanl_app_name = ""
         app_version = ""
         if len(args.app_version.split(".")) < 3:
-            raise  "请确认App Version参数是否按照规范,1.0.0或1.0.0.0"
+            raise "请确认App Version参数是否按照规范,1.0.0或1.0.0.0"
         if len(args.app_version.split(".")) == 3:
             app_version = args.app_version
             version_str = version_str + ",1"
@@ -238,7 +257,7 @@ def write_version_info(args):
         if getOperationSystem() == "Windows":
             origanl_app_name = args.app_name + ".exe"
         else:
-            origanl_app_name = args.app_name + "v" +args.app_version
+            origanl_app_name = args.app_name + "v" + args.app_version
         f.write("# UTF-8\n"
                 "#\n"
                 "# For more details about fixed file info 'ffi' see:\n"
@@ -281,7 +300,9 @@ def write_version_info(args):
                 "]),\n"
                 "VarFileInfo([VarStruct(u'Translation', [2052, 1200])]) # 语言\n"
                 "]\n"
-                ")\n".format(version_str,version_str,args.name,app_version,GetYear(),origanl_app_name,get_app_name(args),app_version).encode("utf-8"))
+                ")\n".format(version_str, version_str, args.name, app_version, GetYear(), origanl_app_name,
+                             get_app_name(args), app_version).encode("utf-8"))
+
 
 def recursion_dir_all_file(path):
     '''
@@ -299,16 +320,19 @@ def recursion_dir_all_file(path):
     return file_list
 
 
-def get_file_data_str(file_path,save_path):
+def get_file_data_str(file_path, save_path):
     data_str = ""
     file_list = recursion_dir_all_file(file_path)
-    for (i,file) in enumerate(file_list):
+    for (i, file) in enumerate(file_list):
         if i == len(file_list) - 1:
             data_str = data_str + "('{}','{}')".format(file, GetPreviousDir(save_path + file.split(file_path)[-1]))
         else:
-            data_str = data_str + "('{}','{}')".format(file, GetPreviousDir(save_path + file.split(file_path)[-1])) + ","
+            data_str = data_str + "('{}','{}')".format(file,
+                                                       GetPreviousDir(save_path + file.split(file_path)[-1])) + ","
 
     return data_str
+
+
 def writeSpec(args):
     data_str = "datas=["
     if args.lib_path:
@@ -321,19 +345,20 @@ def writeSpec(args):
             file_path_list_str = "({},'.')".format(file_path_str)
             data_str = data_str + file_path_list_str + ","
 
-    if len(args.extra_path_list) == 0:
+    extra_path_list = str_to_list(args.extra_path_str)
+    if len(extra_path_list) == 0:
         data_str = data_str + "]"
     else:
-        for i in range(len(args.extra_path_list)):
-            if type(args.extra_path_list[i]) == tuple:
-                bin_path = args.extra_path_list[i][0]
-                save_path = args.extra_path_list[i][1]
+        for i in range(len(extra_path_list)):
+            if type(extra_path_list[i]) == tuple:
+                bin_path = extra_path_list[i][0]
+                save_path = extra_path_list[i][1]
             else:
-                bin_path = args.extra_path_list[i]
-                save_path = args.extra_path_list[i]
+                bin_path = extra_path_list[i]
+                save_path = extra_path_list[i]
             if os.path.isdir(bin_path):
-                if type(args.extra_path_list[i]) == tuple:
-                    if i == len(args.extra_path_list) - 1:
+                if type(extra_path_list[i]) == tuple:
+                    if i == len(extra_path_list) - 1:
                         data_str = data_str + get_file_data_str(bin_path, save_path) + "]"
                     else:
                         data_str = data_str + get_file_data_str(bin_path, save_path) + ","
@@ -341,7 +366,7 @@ def writeSpec(args):
                     file_path = bin_path
                     file_path_str = ("'{}'".format(file_path))
                     file_path_list_str = "({},'{}')".format(file_path_str, save_path)
-                    if i == len(args.extra_path_list) - 1:
+                    if i == len(extra_path_list) - 1:
                         data_str = data_str + file_path_list_str + "]"
                     else:
                         data_str = data_str + file_path_list_str + ","
@@ -349,7 +374,7 @@ def writeSpec(args):
                 file_path = bin_path
                 file_path_str = ("'{}'".format(file_path))
                 file_path_list_str = "({},'{}')".format(file_path_str, save_path)
-                if  i == len(args.extra_path_list) - 1:
+                if i == len(extra_path_list) - 1:
                     data_str = data_str + file_path_list_str + "]"
                 else:
                     data_str = data_str + file_path_list_str + ","
@@ -372,126 +397,135 @@ def writeSpec(args):
         icon_path = ""
 
     if getOperationSystem() == "Darwin":
-        with open("{}.spec".format(get_app_name(args)),"wb") as f:
+        with open("{}.spec".format(get_app_name(args)), "wb") as f:
             f.write(("# -*- mode: python ; coding: utf-8 -*-\n\n\n"
-                    "block_cipher = None\n\n\n"
-                    "a = Analysis(['{}.py'],\n"
-                    "\t\t\tpathex=[],\n"
-                    "\t\t\t{},\n"
-                    "\t\t\t{},\n"
-                    "\t\t\thiddenimports=[],\n"
-                    "\t\t\thookspath=[],\n"
-                    "\t\t\thooksconfig=[],\n"
-                    "\t\t\truntime_hooks=[],\n"
-                    "\t\t\texcludes=[],\n"
-                    "\t\t\twin_no_prefer_redirects=False,\n"
-                    "\t\t\twin_private_assemblies=False,\n"
-                    "\t\t\tcipher=block_cipher,\n"
-                    "\t\t\tnoarchive=False)\n"
-                    "pyz = PYZ(a.pure, a.zipped_data,\n"
-                    "\t\t\tcipher=block_cipher)\n\n"
-                    "exe = EXE(pyz,\n"
-                    "\t\t\ta.scripts,\n"
-                    "\t\t\ta.binaries,\n"
-                    "\t\t\ta.zipfiles,\n"
-                    "\t\t\ta.datas,  \n"
-                    "\t\t\t[],\n"
-                    "\t\t\tname='{}',\n"
-                    "\t\t\tdebug=False,\n"
-                    "\t\t\tbootloader_ignore_signals=False,\n"
-                    "\t\t\tupx=True,\n"
-                    "\t\t\tupx_exclude=[],\n"
-                    "\t\t\truntime_tmpdir=None,\n"
-                    "\t\t\tconsole=False,\n"
-                    "\t\t\tdisable_windowed_traceback=False,\n"
-                    "\t\t\ttarget_arch=None,\n"
-                    "\t\t\tcodesign_identity=None,\n"
-                    "\t\t\tentitlements_file=None , icon='{}')\n"
-                    "app = BUNDLE(exe,\n"
-                    "\t\t\tname='{}.app',\n"
-                    "\t\t\ticon='{}',\n"
-                    "\t\t\tbundle_identifier=None,\n"
-                    "\t\t\tinfo_plist = ".format(get_app_name(args),binaries_str,data_str,
-                            get_app_name(args),icon_path,get_app_name(args),icon_path)+
-                     "{\n\t\t\t\t\t\t\t'NSHighResolutionCapable':'True','CFBundleShortVersionString':"+"'{}'".format(args.app_version[:-2])
-                     +"\n\t\t\t\t\t\t\t})\n").encode('utf-8')
+                     "block_cipher = None\n\n\n"
+                     "a = Analysis(['{}.py'],\n"
+                     "\t\t\tpathex=[],\n"
+                     "\t\t\t{},\n"
+                     "\t\t\t{},\n"
+                     "\t\t\thiddenimports=[],\n"
+                     "\t\t\thookspath=[],\n"
+                     "\t\t\thooksconfig=[],\n"
+                     "\t\t\truntime_hooks=[],\n"
+                     "\t\t\texcludes=[],\n"
+                     "\t\t\twin_no_prefer_redirects=False,\n"
+                     "\t\t\twin_private_assemblies=False,\n"
+                     "\t\t\tcipher=block_cipher,\n"
+                     "\t\t\tnoarchive=False)\n"
+                     "pyz = PYZ(a.pure, a.zipped_data,\n"
+                     "\t\t\tcipher=block_cipher)\n\n"
+                     "exe = EXE(pyz,\n"
+                     "\t\t\ta.scripts,\n"
+                     "\t\t\ta.binaries,\n"
+                     "\t\t\ta.zipfiles,\n"
+                     "\t\t\ta.datas,  \n"
+                     "\t\t\t[],\n"
+                     "\t\t\tname='{}',\n"
+                     "\t\t\tdebug=False,\n"
+                     "\t\t\tbootloader_ignore_signals=False,\n"
+                     "\t\t\tupx=True,\n"
+                     "\t\t\tupx_exclude=[],\n"
+                     "\t\t\truntime_tmpdir=None,\n"
+                     "\t\t\tconsole=False,\n"
+                     "\t\t\tdisable_windowed_traceback=False,\n"
+                     "\t\t\ttarget_arch=None,\n"
+                     "\t\t\tcodesign_identity=None,\n"
+                     "\t\t\tentitlements_file=None , icon='{}')\n"
+                     "app = BUNDLE(exe,\n"
+                     "\t\t\tname='{}.app',\n"
+                     "\t\t\ticon='{}',\n"
+                     "\t\t\tbundle_identifier=None,\n"
+                     "\t\t\tinfo_plist = ".format(get_app_name(args), binaries_str, data_str,
+                                                  get_app_name(args), icon_path, get_app_name(args), icon_path) +
+                     "{\n\t\t\t\t\t\t\t'NSHighResolutionCapable':'True','CFBundleShortVersionString':" + "'{}'".format(
+                        args.app_version[:-2])
+                     + "\n\t\t\t\t\t\t\t})\n").encode('utf-8')
                     )
     else:
-        if args.full is False:
+        if str_to_bool(args.full):
             with open("{}.spec".format(get_app_name(args)), "wb") as f:
                 f.write("block_cipher = None\n"
-                    "a = Analysis(['{}.py'],\n"
-                    "             pathex=[''],\n"
-                    "             {},\n"
-                    "             {},\n"
-                    "             hiddenimports=[],\n"
-                    "             hookspath=[],\n"
-                    "             runtime_hooks=[],\n"
-                    "             excludes=[],\n"
-                    "             win_no_prefer_redirects=False,\n"
-                    "             win_private_assemblies=False,\n"
-                    "             cipher=block_cipher,\n"
-                    "             noarchive=False)\n"
-                    "pyz = PYZ(a.pure, a.zipped_data,\n"
-                    "             cipher=block_cipher)\n"
-                    "exe2 = EXE(pyz,\n"
-                    "          a.scripts,\n"
-                    "          [],\n"
-                    "          exclude_binaries=True,\n"
-                    "          name='{}',\n"
-                    "          debug=False,\n"
-                    "          bootloader_ignore_signals=False,\n"
-                    "          strip=False,\n"
-                    "          upx=True,\n"
-                    "          console={},\n"
-                    "          icon='{}',\n"
-                    "          version='file_verison_info.txt')\n"
-                    "coll = COLLECT(exe2,\n"
-                    "          a.binaries,\n"
-                    "          a.zipfiles,\n"
-                    "          a.datas,\n"
-                    "          strip=False,\n"
-                    "          upx=True,\n"
-                    "          upx_exclude=[],\n"
-                    "          name='{}')\n".format(get_app_name(args), binaries_str, data_str, get_app_name(args),args.console, icon_path,
-                                                    get_app_name(args)).encode("utf-8"))
+                        "a = Analysis(['{}.py'],\n"
+                        "             pathex=[''],\n"
+                        "             {},\n"
+                        "             {},\n"
+                        "             hiddenimports=[],\n"
+                        "             hookspath=[],\n"
+                        "             runtime_hooks=[],\n"
+                        "             excludes=[],\n"
+                        "             win_no_prefer_redirects=False,\n"
+                        "             win_private_assemblies=False,\n"
+                        "             cipher=block_cipher,\n"
+                        "             noarchive=False)\n"
+                        "pyz = PYZ(a.pure, a.zipped_data,\n"
+                        "             cipher=block_cipher)\n"
+                        "exe2 = EXE(pyz,\n"
+                        "          a.scripts,\n"
+                        "          [],\n"
+                        "          exclude_binaries=True,\n"
+                        "          name='{}',\n"
+                        "          debug=False,\n"
+                        "          bootloader_ignore_signals=False,\n"
+                        "          strip=False,\n"
+                        "          upx=True,\n"
+                        "          console={},\n"
+                        "          icon='{}',\n"
+                        "          version='file_verison_info.txt')\n"
+                        "coll = COLLECT(exe2,\n"
+                        "          a.binaries,\n"
+                        "          a.zipfiles,\n"
+                        "          a.datas,\n"
+                        "          strip=False,\n"
+                        "          upx=True,\n"
+                        "          upx_exclude=[],\n"
+                        "          name='{}')\n".format(get_app_name(args), binaries_str, data_str, get_app_name(args),
+                                                        args.console, icon_path,
+                                                        get_app_name(args)).encode("utf-8"))
         else:
             with open("{}.spec".format(get_app_name(args)), "wb") as f:
                 f.write("block_cipher = None\n"
-                    "a = Analysis(['{}.py'],\n"
-                    "             pathex=[''],\n"
-                    "             {},\n"
-                    "             {},\n"
-                    "             hiddenimports=[],\n"
-                    "             hookspath=[],\n"
-                    "             runtime_hooks=[],\n"
-                    "             excludes=[],\n"
-                    "             win_no_prefer_redirects=False,\n"
-                    "             win_private_assemblies=False,\n"
-                    "             cipher=block_cipher,\n"
-                    "             noarchive=False)\n"
-                    "pyz = PYZ(a.pure, a.zipped_data,\n"
-                    "             cipher=block_cipher)\n"
-                    "exe1 = EXE(pyz,\n"
-                    "          a.scripts,\n"
-                    "          a.binaries,\n"
-                    "          a.zipfiles,\n"
-                    "          a.datas,\n"
-                    "          [],\n"
-                    "          name='{}',\n"
-                    "          debug=False,\n"
-                    "          bootloader_ignore_signals=False,\n"
-                    "          strip=False,\n"
-                    "          upx=True,\n"
-                    "          upx_exclude=[],\n"
-                    "          runtime_tmpdir=None,\n"
-                    "          console={},\n"
-                    "          icon='{}',\n"
-                    "          version='file_verison_info.txt')\n"
-                    .format(get_app_name(args), binaries_str, data_str,get_app_name(args),args.console,icon_path).encode(
-                "utf-8"))
+                        "a = Analysis(['{}.py'],\n"
+                        "             pathex=[''],\n"
+                        "             {},\n"
+                        "             {},\n"
+                        "             hiddenimports=[],\n"
+                        "             hookspath=[],\n"
+                        "             runtime_hooks=[],\n"
+                        "             excludes=[],\n"
+                        "             win_no_prefer_redirects=False,\n"
+                        "             win_private_assemblies=False,\n"
+                        "             cipher=block_cipher,\n"
+                        "             noarchive=False)\n"
+                        "pyz = PYZ(a.pure, a.zipped_data,\n"
+                        "             cipher=block_cipher)\n"
+                        "exe1 = EXE(pyz,\n"
+                        "          a.scripts,\n"
+                        "          a.binaries,\n"
+                        "          a.zipfiles,\n"
+                        "          a.datas,\n"
+                        "          [],\n"
+                        "          name='{}',\n"
+                        "          debug=False,\n"
+                        "          bootloader_ignore_signals=False,\n"
+                        "          strip=False,\n"
+                        "          upx=True,\n"
+                        "          upx_exclude=[],\n"
+                        "          runtime_tmpdir=None,\n"
+                        "          console={},\n"
+                        "          icon='{}',\n"
+                        "          version='file_verison_info.txt')\n"
+                    .format(get_app_name(args), binaries_str, data_str, get_app_name(args), args.console,
+                            icon_path).encode(
+                    "utf-8"))
 
 
+def str_to_list(str):
+    str_list = []
+    for z in str.split(","):
+        if z:
+            str_list.append(z)
+    return str_list
 
 
 def build(args):
@@ -519,8 +553,10 @@ def build(args):
     else:
         lib_suffix = "so"
 
-    if len(args.specify_files) > 0:
-        progressBar = ProgressBar(len(args.specify_files))
+    specify_files = str_to_list(args.specify_files)
+
+    if len(specify_files) > 0:
+        progressBar = ProgressBar(len(specify_files))
     else:
         progressBar = ProgressBar(len(file_list))
     scripts_path = ""
@@ -531,9 +567,9 @@ def build(args):
         pass
     need_to_build_file_list = []
     for file_name in file_list:
-        if len(args.specify_files) > 0:
-            if file_name in args.specify_files:
-                cmd_str = "{}easycython {}/{}".format(scripts_path,"new_src", file_name)
+        if len(specify_files) > 0:
+            if file_name in specify_files:
+                cmd_str = "{}easycython {}/{}".format(scripts_path, "new_src", file_name)
                 result = subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 progressBar.update()
                 need_to_build_file_list.append(file_name)
@@ -552,14 +588,14 @@ def build(args):
             shutil.copy(build_file,
                         os.path.join(ep_build_path, build_file.split(".")[0] + "." + lib_suffix))
             os.remove(build_file)
-            build_success_file_list.append(build_file.split(".")[0]+".py")
+            build_success_file_list.append(build_file.split(".")[0] + ".py")
 
     for build_file in build_success_file_list:
         if build_file in need_to_build_file_list:
             need_to_build_file_list.remove(build_file)
 
     for need_to_build_file in need_to_build_file_list:
-        print("\n{}文件编译失败,请使用easycython {}/{}重新编译".format(need_to_build_file,"src",need_to_build_file))
+        print("\n{}文件编译失败,请使用easycython {}/{}重新编译".format(need_to_build_file, "src", need_to_build_file))
         shutil.copy("{}/{}".format("new_src", need_to_build_file),
                     os.path.join(ep_build_path, need_to_build_file))
 
@@ -579,20 +615,23 @@ def build(args):
             shutil.rmtree("build")
 
 
-def recursion_dir(file_list,path):
+def recursion_dir(file_list, path):
     if os.path.isfile(path):
         file_list.append(path)
     else:
         for file_name in os.listdir(path):
-            recursion_dir(file_list,os.path.join(path,file_name))
+            recursion_dir(file_list, os.path.join(path, file_name))
+
 
 def get_uuid():
-    return "{"+"{"+str(uuid.uuid1())+"}"
+    return "{" + "{" + str(uuid.uuid1()) + "}"
 
-def  packSetup(args,exec_path,uuid):
+
+def packSetup(args, exec_path, uuid):
     file_list = []
-    recursion_dir(file_list,exec_path)
-    with open(os.path.join(os.path.expanduser("~"),"Desktop","{}.iss".format(get_app_name(args) + "V" + args.app_version)),'wb') as f:
+    recursion_dir(file_list, exec_path)
+    with open(os.path.join(os.path.expanduser("~"), "Desktop",
+                           "{}.iss".format(get_app_name(args) + "V" + args.app_version)), 'wb') as f:
         content = "; Script generated by the Inno Setup Script Wizard.\n" \
                   "; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!\n" \
                   "[Setup]\n" \
@@ -600,7 +639,7 @@ def  packSetup(args,exec_path,uuid):
                   "; Do not use the same AppId value in installers for other applications.\n" \
                   "; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)\n" \
                   "VersionInfoVersion = {}\n" \
-                  "AppCopyright = Copyright (C) 2019-{} Samples, Inc.\n"\
+                  "AppCopyright = Copyright (C) 2019-{} Samples, Inc.\n" \
                   "AppId={}\n" \
                   ";应用名称\n" \
                   "AppName={}\n" \
@@ -621,17 +660,18 @@ def  packSetup(args,exec_path,uuid):
                   "SolidCompression=yes\n" \
                   ";安装包图标文件\n" \
                   "SetupIconFile={}\n" \
-                  ";设置控制面板中程序图标\n"\
+                  ";设置控制面板中程序图标\n" \
                   "UninstallDisplayIcon={}\n" \
                   ";设置控制面板中程序的名称\n" \
-                  "UninstallDisplayName = {}\n"\
+                  "UninstallDisplayName = {}\n" \
                   ";许可文件\n" \
-                  ";LicenseFile=\n"\
-                   "[Files]\n" \
+                  ";LicenseFile=\n" \
+                  "[Files]\n" \
                   ";安装文件\n" \
-                .format(args.app_version,GetYear(),uuid,get_app_name(args),args.app_version,args.name,
-                                           "C:\\",get_app_name(args),get_app_name(args),get_app_name(args)+"_setup-V"+args.app_version[:-2] + "-" + args.app_version[-1],
-                                           os.path.abspath("icons/app_logo.ico"),os.path.abspath("icons/app_logo.ico"),args.name)
+            .format(args.app_version, GetYear(), uuid, get_app_name(args), args.app_version, args.name,
+                    "C:\\", get_app_name(args), get_app_name(args),
+                    get_app_name(args) + "_setup-V" + args.app_version[:-2] + "-" + args.app_version[-1],
+                    os.path.abspath("icons/app_logo.ico"), os.path.abspath("icons/app_logo.ico"), args.name)
 
         for file in file_list:
             if len(file.split(exec_path)[-1].split("\\")) > 2:
@@ -639,9 +679,9 @@ def  packSetup(args,exec_path,uuid):
                 for p_file in file.split(exec_path)[-1].split("\\")[:-1]:
                     if p_file:
                         path = path + "\\" + p_file
-                cmd_str = 'Source: "{}"; DestDir: "{}\\{}"; Flags: ignoreversion\n'.format(file,'{app}',path)
+                cmd_str = 'Source: "{}"; DestDir: "{}\\{}"; Flags: ignoreversion\n'.format(file, '{app}', path)
             else:
-                cmd_str = 'Source: "{}"; DestDir: "{}\\{}"; Flags: ignoreversion \n'.format(file,'{app}',"")
+                cmd_str = 'Source: "{}"; DestDir: "{}\\{}"; Flags: ignoreversion \n'.format(file, '{app}', "")
 
             content = content + cmd_str
         content_back = ';[Registry]\n' \
@@ -662,7 +702,7 @@ def  packSetup(args,exec_path,uuid):
                        ';卸载时，停止服务并删除服务\n' \
                        ';Filename:{}\sc.exe; Parameters: "stop MESUploadDataService" ; Flags: runhidden; Components:Service\n' \
                        ';Filename: {}\sc.exe; Parameters: "delete MESUploadDataService" ; Flags: runhidden; Components:Service\n' \
-                        '[Messages]\n' \
+                       '[Messages]\n' \
                        ';安装时，windows任务栏提示标题\n' \
                        'SetupAppTitle={}\n' \
                        ';安装时，安装引导标题\n' \
@@ -698,13 +738,13 @@ def  packSetup(args,exec_path,uuid):
                        '//    end;\n' \
                        '//  usPostUninstall:\n' \
                        '//    begin\n' \
-               .format("{app}",
-                       "{group}",args.name,"{app}",get_app_name(args)+".exe",
-                                       "{commondesktop}",args.name,"{app}",get_app_name(args)+".exe",
-                                       "{cm:CreateDesktopIcon}","{cm:AdditionalIcons}",
-                                       "{app}",get_app_name(args)+".exe","{"+"cm:LaunchProgram,{}".format(args.name)+"}",
-                                       "{sys}","{sys}",
-                       args.name+"-安装", args.name+"-安装")
+            .format("{app}",
+                    "{group}", args.name, "{app}", get_app_name(args) + ".exe",
+                    "{commondesktop}", args.name, "{app}", get_app_name(args) + ".exe",
+                    "{cm:CreateDesktopIcon}", "{cm:AdditionalIcons}",
+                    "{app}", get_app_name(args) + ".exe", "{" + "cm:LaunchProgram,{}".format(args.name) + "}",
+                    "{sys}", "{sys}",
+                    args.name + "-安装", args.name + "-安装")
         content = content + content_back
         content_code = "[Code]\n" \
                        "//;通过名称终结进程\n" \
@@ -738,14 +778,16 @@ def  packSetup(args,exec_path,uuid):
                        "begin\n" \
                        "Result := True;\n" \
                        "end;\n" \
-                       "end;\n".format("{cmd}",get_app_name(args)+".exe","C:",get_app_name(args),"C:",get_app_name(args))
+                       "end;\n".format("{cmd}", get_app_name(args) + ".exe", "C:", get_app_name(args), "C:",
+                                       get_app_name(args))
         content = content + content_code
         f.write(content.encode("gbk"))
+
 
 def packAppImage(args):
     save_path = CreateSavePath(os.path.join("tmp"))
     save_bin_path = CreateSavePath(os.path.join(save_path, "usr/bin/"))
-    if args.full is False:
+    if str_to_bool(args.full) is False:
         os.system("cp -r dist/{}/* {}".format(get_app_name(args), save_bin_path))
         ## 需要在AppRun中添加环境变量
     else:
@@ -770,7 +812,7 @@ def packAppImage(args):
     if os.path.exists("icons/app_logo.png"):
         shutil.copy("icons/app_logo.png", save_path)
     else:
-        shutil.copy(LogoPath,save_path)
+        shutil.copy(LogoPath, save_path)
     with open(os.path.join(save_path, get_app_name(args) + ".desktop"), "w", encoding="utf-8") as f:
         f.write("[Desktop Entry]\n"
                 "Version={}\n"
@@ -782,23 +824,23 @@ def packAppImage(args):
                 "Exec={} %u\n"
                 "MimeType=x-scheme-handler/qv2ray;\n"
                 "X-AppImage-Version=912fe1b\n\n\n"
-                "Name[zh_CN]={}".format("1.1",get_app_name(args), get_app_name(args), get_app_name(args)))
-    print("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp",get_app_name(args)))
-    os.system("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
+                "Name[zh_CN]={}".format("1.1", get_app_name(args), get_app_name(args), get_app_name(args)))
+    print("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
+    os.system(
+        "{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
     os.system("chmod +x  {}.AppImage".format(get_app_name(args)))
     return "{}.AppImage".format(get_app_name(args))
 
 
 def copy_dir(source_dir, save_path):
     try:
-        shutil.rmtree("{}/{}".format(save_path,source_dir))
+        shutil.rmtree("{}/{}".format(save_path, source_dir))
     except:
         pass
     try:
-        shutil.copytree(source_dir, "{}/{}".format(save_path,source_dir))
-    except :
+        shutil.copytree(source_dir, "{}/{}".format(save_path, source_dir))
+    except:
         pass
-
 
 
 def packAPP(args):
@@ -818,7 +860,7 @@ def packAPP(args):
         cmd_str = "{}pyinstaller  {}.spec  --additional-hooks-dir hooks".format(scripts_path, get_app_name(args))
 
     os.system(cmd_str)
-    save_path = CreateSavePath(os.path.join("releases",args.name + "V" + args.app_version))
+    save_path = CreateSavePath(os.path.join("releases", args.name + "V" + args.app_version))
     if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
         shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
     save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
@@ -826,19 +868,19 @@ def packAPP(args):
     if args.lib_path:
         copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
-        if args.full is False:
-            os.system("xcopy dist\\{} {} /s/y".format(get_app_name(args),save_bin_path))
+        if str_to_bool(args.full) is False:
+            os.system("xcopy dist\\{} {} /s/y".format(get_app_name(args), save_bin_path))
         else:
             shutil.copy("dist\\{}.exe".format(get_app_name(args)), "{}/".format(save_bin_path))
     else:
         if "Linux" == getOperationSystem():
-            if args.appimage:
+            if str_to_bool(args.appimage):
                 app_name = packAppImage(args)
                 shutil.copy(app_name, "{}/".format(save_bin_path))
             else:
                 shutil.copy("dist/{}".format(get_app_name(args)), "{}/".format(save_bin_path))
         else:
-            os.system("cp -r dist/{}.app {}".format(get_app_name(args),save_bin_path))
+            os.system("cp -r dist/{}.app {}".format(get_app_name(args), save_bin_path))
     if os.path.exists("{}.py".format(get_app_name(args))):
         os.remove("{}.py".format(get_app_name(args)))
     if os.path.exists("{}.spec".format(get_app_name(args))):
@@ -863,38 +905,41 @@ def packAPP(args):
         shutil.rmtree("tmp")
     if os.path.exists("file_verison_info.txt"):
         os.remove("file_verison_info.txt")
+
+
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
     if getOperationSystem() == "Windows":
-        parser.add_argument('--extra_sys_list', type=list,
-                            default=[])  ## 需要额外打包的路径
-        parser.add_argument('--extra_path_list', type=list,
-                            default=["qss",("data","xpinyin"),"resources"])
+        parser.add_argument('--extra_sys_str', type=str,
+                            default="")  ## 添加环境变量
+        parser.add_argument('--extra_path_str', type=str,
+                            default="")  ## 添加到exec打包路径
     else:
-        parser.add_argument('--extra_sys_list', type=list,
-                            default=['sys.path.append("/usr/local/conta_detect-1.0/python_lib")'])  ## sys.path.append需要额外打包的路径
+        parser.add_argument('--extra_sys_str', type=str,
+                            default="")  ## 添加环境变量
+        parser.add_argument('--extra_path_str', type=str,
+                            default="")  ## 添加到exec打包路径
 
-        parser.add_argument('--extra_path_list', type=list,
-                            default=[])  ## 需要额外打包的路径
-    parser.add_argument('--use_jade_log', type=bool,
-                        default=False) ##是否使用JadeLog
-    parser.add_argument('--full', type=bool,
-                        default=False)  ## 打包成一个完成的包
+    parser.add_argument('--full', type=str,
+                        default="False")  ## 打包成一个完成的包
+    parser.add_argument("--use_jade_log", type=str, default="True")
     parser.add_argument('--console', type=str,
                         default="False")  ## 是否显示命令行窗口,只针对与Windows有效
+    parser.add_argument('--app_version', type=str,
+                        default="2.4.8.1")  ##需要打包的文件名称
     parser.add_argument('--app_name', type=str,
-                        default="container_ocr_programV2.4.3")  ##需要打包的文件名称
+                        default="conta_service")  ##需要打包的文件名称
     parser.add_argument('--name', type=str,
-                        default="箱号识别服务前端配置界面V2.4.3")  ##需要打包的文件名称
-    parser.add_argument('--appimage', type=bool,
-                        default=False)  ## 是否打包成AppImage
-    parser.add_argument('--lib_path', type=str, default="container_ocr_program_lib64")  ## 是否lib包分开打包
-    parser.add_argument('--is_qt', type=bool, default=True)  ## qt 会将controller view src 都进行编译
-    parser.add_argument('--specify_files',type=list,default=["customTextBrowser.py"]) ## 指定编译的文件
+                        default="箱号服务")  ##需要打包的文件名称
+    parser.add_argument('--appimage', type=str,
+                        default="False")  ## 是否打包成AppImage
+    parser.add_argument('--is_qt', type=str, default="False")  ## 是否为Qt
+    parser.add_argument("--specify_files", type=str, default="")
+    parser.add_argument('--lib_path', type=str, default="conta_service_lib64")  ## 是否lib包分开打包
+
     args = parser.parse_args()
-    # ui_to_py()
+    # writePy(args)
     build(args)
     packAPP(args)
-
