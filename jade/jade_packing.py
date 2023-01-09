@@ -443,7 +443,7 @@ def writeSpec(args):
                      + "\n\t\t\t\t\t\t\t})\n").encode('utf-8')
                     )
     else:
-        if str_to_bool(args.full):
+        if str_to_bool(args.full) is False:
             with open("{}.spec".format(get_app_name(args)), "wb") as f:
                 f.write("block_cipher = None\n"
                         "a = Analysis(['{}.py'],\n"
