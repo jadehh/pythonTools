@@ -375,14 +375,22 @@ def encryption_model(model_path,key=None):
         key = Fernet.generate_key()
         # 保存license
     f = Fernet(key)
-    with open(os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_en."+GetLastDir(model_path).split(".")[1]), 'wb') as ew:
-        # 二进制读取模型文件
-        content = open(model_path, 'rb').read()
-        # 根据密钥解密文件
-        encrypted_content = f.encrypt(content)
-        # print(encrypted_content)
-        # 保存到新文件
-        ew.write(encrypted_content)
+    try:
+        save_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_en."+GetLastDir(model_path).split(".")[1])
+    except:
+        save_path =  os.path.join(GetPreviousDir(model_path),GetLastDir(model_path)+"_en")
+    if os.path.exists(model_path) and os.path.isfile(model_path):
+        with open(save_path, 'wb') as ew:
+            # 二进制读取模型文件
+            content = open(model_path, 'rb').read()
+            # 根据密钥解密文件
+            encrypted_content = f.encrypt(content)
+            # print(encrypted_content)
+            # 保存到新文件
+            ew.write(encrypted_content)
+    else:
+        raise  FileExistsError("确认待加密的文件是否存在,文件路径为:{}".format(model_path))
+
 
 def decryption_model(model_path,key=None,is_byte=False,save_model_path=None):
     if key is None:
@@ -393,7 +401,10 @@ def decryption_model(model_path,key=None,is_byte=False,save_model_path=None):
     if is_byte:
         return en_model_file
     if save_model_path is None:
-        save_model_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_dep."+GetLastDir(model_path).split(".")[1])
+        try:
+            save_model_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_dep."+GetLastDir(model_path).split(".")[1])
+        except:
+            save_model_path = os.path.join(GetPreviousDir(model_path), GetLastDir(model_path) + "_en_dep")
     with open(save_model_path, "wb") as f:
         f.write(en_model_file)
     ## 注意返回正确的
