@@ -53,7 +53,6 @@ def draw_box(im, results,show_score=True,font_path=None,font_size=24):
         im (PIL.Image.Image): visualized image
     """
 
-    im = Image.fromarray(im)
     np_boxes = results['boxes']
     labels_text = results["labels"]
     scores = results["scores"]
