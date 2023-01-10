@@ -1,7 +1,8 @@
-##  python tools V1.5.7
+##  python tools V1.5.8
 * 不使用第三方wheel包
 
 ## 更新日志
+* 更新模型加密加密方法,支持没有后缀名称的模型加解密
 * 固定cryptography版本
 * 重新优化packing模块
 * ui文件转py文件时，新增是否翻译功能
