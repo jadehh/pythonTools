@@ -1,7 +1,8 @@
-##  python tools V1.5.6
+##  python tools V1.5.7
 * 不使用第三方wheel包
 
 ## 更新日志
+* 固定cryptography版本
 * 重新优化packing模块
 * ui文件转py文件时，新增是否翻译功能
 * 取消main文件没有的输出
