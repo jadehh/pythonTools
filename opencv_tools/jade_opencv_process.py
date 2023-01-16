@@ -760,7 +760,7 @@ def PadImage(image,width=10):
 
 
 class VideoCaptureBaseProcess(threading.Thread):
-    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None,device=None,acl_resource=None):
+    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None,device=None,acl_resource=None,show_window=False):
         self.video_path = video_path
         self.history_status = self.check_video_path()
         self.camera_type = camera_type
@@ -769,6 +769,7 @@ class VideoCaptureBaseProcess(threading.Thread):
         self.reopen_times = 0
         self.device = device
         self.JadeLog = JadeLog
+        self.show_window = show_window
         super(VideoCaptureBaseProcess, self).__init__()
 
     def download_frame(self,frame):
@@ -782,9 +783,10 @@ class VideoCaptureBaseProcess(threading.Thread):
 
     def package_data(self,ret,frame):
         frame = self.download_frame(frame)
-        # cv2.namedWindow("result",0)
-        # cv2.imshow("result",frame)
-        # cv2.waitKey(1)
+        if self.show_window:
+            cv2.namedWindow("result",0)
+            cv2.imshow("result",frame)
+            cv2.waitKey(1)
 
     def camera_abnormal(self,exception):
         pass
