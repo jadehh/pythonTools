@@ -782,9 +782,9 @@ class VideoCaptureBaseProcess(threading.Thread):
 
     def package_data(self,ret,frame):
         frame = self.download_frame(frame)
-        cv2.namedWindow("result",0)
-        cv2.imshow("result",frame)
-        cv2.waitKey(1)
+        # cv2.namedWindow("result",0)
+        # cv2.imshow("result",frame)
+        # cv2.waitKey(1)
 
     def camera_abnormal(self,exception):
         pass
