@@ -905,7 +905,7 @@ class VideoCaptureBaseProcess(threading.Thread):
                             time.sleep(0.04)
                     except Exception as e:
                         self.JadeLog.WARNING(
-                            "相机类型为:{},相机解码失败,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
+                            "相机类型为:{},相机解码失败,失败原因为:{},等待{}s,尝试重连".format(self.camera_type,e ,self.camera_reopen_times))
                         time.sleep(self.camera_reopen_times)
                         self.judge_capture_reader()
             else:
