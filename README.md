@@ -1,4 +1,4 @@
-##  python tools V1.0.1
+##  python tools V1.0.6
 * 不使用第三方wheel包
 
 
