@@ -6,6 +6,7 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+from dataset_tools.version import full_version as __version__
 DIRECTORY_ANNOTATIONS = 'Annotations/'
 DIRECTORY_IMAGES = 'JPEGImages/'
 DIRECTORY_PREANNOTATIONS = "PredictAnnotations/"

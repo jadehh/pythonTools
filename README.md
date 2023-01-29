@@ -1,37 +1,15 @@
-##  python tools V1.0.6
+## dataset_toolsV1.0.7
 * 不使用第三方wheel包
 
+## 更新日志
+* 支持创建文本检测数据集
 
-## 1.编写python文件
+<details onclose>
+<summary>查看更多更新日志</summary>
+* 支持制作VOC数据集
 
-## 2. 编写setup.py文件
-```Python
-from setuptools import setup, find_packages
+</details>
 
-setup(
-    name="jade_tools",
-    version="0.1",
-    keywords=("pip", "jade_tools", ""),
-    description="jade_tools",
-    long_description="xxx",
-    license="MIT Licence",
-
-    url="https://jadehh@live.com",
-    author="dataset_tools",
-    author_email="jadehh@live.com",
-
-    packages=find_packages(),
-    include_package_data=True,
-    platforms="any",
-    install_requires=["numpy","pillow","imageio"]  # 这个项目需要的第三方库
-)
-```
-## ３．打包为wheel文件
-
-安装wheel
-```bash
-pip install wheel
-```
 打包wheel
 ```bash
 python setup.py sdist bdist_wheel

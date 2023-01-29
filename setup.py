@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     setup(
     name="dataset_tools",
-    version="1.0.6",
+    version="1.0.7",
     keywords=("pip", "dataset_tools", ""),
     description="dataset_tools",
     long_description="",
