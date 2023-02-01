@@ -295,7 +295,7 @@ def visualize(image_file,
         font_size=font_size)
     im = np.array(im)
 
-    return cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
+    return im
 
 
 def resize_img(img, input_size=600):
@@ -444,6 +444,7 @@ def draw_text_list(img,font_path, label_list, pt_list=[], color_list=[], font_si
     cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
     pilimg = Image.fromarray(cv2img)
     # PIL图片上打印汉字
+    font_path = get_font_path(font_path)
     draw = ImageDraw.Draw(pilimg)  # 图片上打印
     for (label, pt, color, font_size) in zip(label_list, pt_list, color_list, font_size_list):
         font = ImageFont.truetype(font_path, font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
@@ -504,7 +505,7 @@ def draw_text_det_res(img, dt_boxes, txts=None,font_path=None):
     for idx, (box, txt) in enumerate(zip(dt_boxes, txts)):
         box = np.array(box).astype(np.int32).reshape(-1, 2)
         if txt:
-            src_im = draw_text_list(src_im,[txt[0]], [(box[0, 0], box[3, 1])], [(0, 0, 255)], font_size_list=[54],font_path=font_path)
+            src_im = draw_text_list(src_im, font_path, [txt], pt_list = [(box[0, 0], box[3, 1])], color_list = [(0, 0, 255)], font_size_list = [54])
         cv2.polylines(src_im, [box], True, color=(0, 0, 255), thickness=2)
     return src_im
 
@@ -657,7 +658,7 @@ def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,wai
         return image2
 
 # OCR识别结果
-def draw_ocr(image, boxes, txts, scores, draw_txt=True, drop_score=0.5):
+def draw_ocr(image, boxes, txts, scores=None, draw_txt=True, drop_score=0.5):
     """
     Visualize the results of OCR detection and recognition
     args:
