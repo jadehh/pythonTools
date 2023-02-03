@@ -1,7 +1,8 @@
-##  python tools V1.5.8
+##  python tools V1.5.9
 * 不使用第三方wheel包
 
 ## 更新日志
+* 打包时候支持自定义输出名
 * 更新模型加密加密方法,支持没有后缀名称的模型加解密
 * 固定cryptography版本
 * 重新优化packing模块
