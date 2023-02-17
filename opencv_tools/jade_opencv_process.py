@@ -777,8 +777,7 @@ class VideoCaptureBaseProcess(threading.Thread):
             frame = frame.download()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
         if self.device == "ascend":
-            frame = self._dvpp.jpege(frame)
-            frame = frame.jpeg_to_cv2()
+            pass
         return frame
 
     def package_data(self,ret,frame):
@@ -917,11 +916,6 @@ class VideoCaptureBaseProcess(threading.Thread):
                 time.sleep(self.camera_reopen_times)
 
     def run(self):
-        if self.device == "ascend":
-            import acl
-            from acllite.acllite_imageproc import AclLiteImageProc
-            ret = acl.rt.set_device(0)
-            self._dvpp = AclLiteImageProc()
         self.capture_reader()
 
 
