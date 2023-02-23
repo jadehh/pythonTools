@@ -18,7 +18,6 @@ import uuid
 from opencv_tools import DIRECTORY_IMAGES,DIRECTORY_ANNOTATIONS,DIRECTORY_PREANNOTATIONS
 import base64
 
-
 ## opencv读取中文路径图片
 def imread_chinese_path(image_path):
     image = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), -1)
@@ -770,6 +769,7 @@ class VideoCaptureBaseProcess(threading.Thread):
         self.device = device
         self.JadeLog = JadeLog
         self.show_window = show_window
+        self.capture = None
         super(VideoCaptureBaseProcess, self).__init__()
 
     def download_frame(self,frame):
@@ -838,14 +838,29 @@ class VideoCaptureBaseProcess(threading.Thread):
     def opencv_cpu_capture(self):
         if self.device == "ascend":
             from acllite import videocapture
-            import acl
-            ret = acl.rt.set_device(0)
-            self.capture = videocapture.VideoCapture(self.video_path)
-            self.JadeLog.INFO("相机类型为:{},使用Ascend芯片解码,准备打开相机".format(self.camera_type))
+            if self.capture is None:
+                import acl
+                from acllite import acllite_utils  as utils
+                self._context, ret = acl.rt.create_context(0)
+                utils.check_ret("acl.rt.create_context", ret)
+            else:
+                self.JadeLog.DEBUG("相机类型为:{},释放相机资源".format(self.camera_type))
+            try:
+                self.capture = videocapture.VideoCapture(self.video_path)
+                self.JadeLog.INFO("相机类型为:{},使用Ascend芯片解码,准备打开相机".format(self.camera_type))
+            except Exception as e:
+                self.JadeLog.ERROR("相机类型为:{},相机打开失败,失败原因为:{}".format(self.camera_type,e))
+                self.capture = None
+                self.capture = videocapture.VideoCapture(self.video_path)
         else:
+            if self.capture is None:
+                pass
+            else:
+                self.JadeLog.DEBUG("相机类型为:{},释放相机资源".format(self.camera_type))
+                self.capture.release()
             self.capture = cv2.VideoCapture(self.video_path)
+            self.capture.release()
             self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
-
         if self.device == "ascend":
             ret,frame = self.capture.read()
             if ret == 0 and frame is not None:
@@ -895,7 +910,8 @@ class VideoCaptureBaseProcess(threading.Thread):
                                 ret = True
                             else:
                                 ret = False
-                        if ret is False or frame is None:
+
+                        if ret is False:
                             self.JadeLog.WARNING(
                                 "相机类型为:{},相机中途断开,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
                             time.sleep(self.camera_reopen_times)
@@ -905,7 +921,7 @@ class VideoCaptureBaseProcess(threading.Thread):
                         if self.history_status:
                             time.sleep(0.04)
                     except Exception as e:
-                        self.JadeLog.WARNING(
+                        self.JadeLog.ERROR(
                             "相机类型为:{},相机解码失败,失败原因为:{},发生异常文件{},发生异常所在的行数{},等待{}s,尝试重连".format(self.camera_type,e ,
                                                                          e.__traceback__.tb_frame.f_globals["__file__"],e.__traceback__.tb_lineno,self.camera_reopen_times))
                         time.sleep(self.camera_reopen_times)
