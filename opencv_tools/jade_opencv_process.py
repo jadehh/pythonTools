@@ -859,7 +859,6 @@ class VideoCaptureBaseProcess(threading.Thread):
                 self.JadeLog.DEBUG("相机类型为:{},释放相机资源".format(self.camera_type))
                 self.capture.release()
             self.capture = cv2.VideoCapture(self.video_path)
-            self.capture.release()
             self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
         if self.device == "ascend":
             ret,frame = self.capture.read()
