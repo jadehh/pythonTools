@@ -1,4 +1,4 @@
-##  OpencvToolsV1.2.3
+##  OpencvToolsV1.2.4
 Opencv相关操作
 
 ### 打包为wheel文件
@@ -15,6 +15,7 @@ python setup.py sdist bdist_wheel
 > wheel-dir 为wheel 输出文件夹，后面接项目文件夹（即包含setup.py的文件夹）
 
 ### 更新日志
+* 优化VideoCaptureBaseProcess
 * 优化Ascend解码速度
 * 优化draw ocr 方法
 * 输出相机解码失败原因,输出解码失败详细原因
