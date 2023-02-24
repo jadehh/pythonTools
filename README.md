@@ -10,9 +10,8 @@ pip install wheel
 打包wheel
 ```bash
 python setup.py sdist bdist_wheel
-
 ```
-> wheel-dir 为wheel 输出文件夹，后面接项目文件夹（即包含setup.py的文件夹）
+> 需要删除其他包的缓存egg-info
 
 ### 更新日志
 * 优化VideoCaptureBaseProcess
