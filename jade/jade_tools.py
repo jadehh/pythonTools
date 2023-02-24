@@ -370,7 +370,7 @@ def update_lib(lib_path):
             shutil.rmtree(lib_path)
 
 
-def encryption_model(model_path,key=None):
+def encryption_model(model_path,save_root_path=None,key=None):
     if key is None:
         key = Fernet.generate_key()
         # 保存license
@@ -379,6 +379,11 @@ def encryption_model(model_path,key=None):
         save_path = os.path.join(GetPreviousDir(model_path),GetLastDir(model_path).split(".")[0]+"_en."+GetLastDir(model_path).split(".")[1])
     except:
         save_path =  os.path.join(GetPreviousDir(model_path),GetLastDir(model_path)+"_en")
+    if save_root_path:
+        print(save_path)
+        save_path = save_root_path + save_path[len(save_path.split("\\")[0]):]
+        print(save_path)
+        CreateSavePath(GetPreviousDir(save_path))
     if os.path.exists(model_path) and os.path.isfile(model_path):
         with open(save_path, 'wb') as ew:
             # 二进制读取模型文件
@@ -414,8 +419,16 @@ def test_load_onnx(model):
     import onnx
     import onnxruntime
     sess = onnxruntime.InferenceSession(model, providers=['CUDAExecutionProvider'])
-
-
+"""
+获取文件夹下所有文件
+    for model_path in findAllFile(model_root_path):
+            print(model_path)
+"""
+def findAllFile(base):
+    for root, ds, fs in os.walk(base):
+        for f in fs:
+            fullname = os.path.join(root, f)
+            yield fullname
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
