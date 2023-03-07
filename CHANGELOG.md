@@ -33,6 +33,6 @@
 
 - 解决ProgressBar模块在Windows上输出异常的bug
 
-## [1.6.3] - 2023-03-07
+## [JadeV1.6.3] - 2023-03-07
 
 - 解决ProgressBar模块在Windows上输出异常的bug
