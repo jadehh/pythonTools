@@ -1,4 +1,5 @@
 ## 提交记录
+* 打包的时候自动判断当前版本
 * 支持自动打包脚本,解决Windows下Progress的bug
 
 <details onclose>

@@ -1,4 +1,4 @@
-#  jade v1.6.3
+#  jade 
 * Python工具包
 
 ## 1．打包为wheel文件

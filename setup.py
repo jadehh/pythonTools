@@ -7,12 +7,13 @@
 # @Software : Samples
 # @Desc     :
 from setuptools import setup, find_packages
+from jade import __version__
 if __name__ == '__main__':
     pack_list = ["jade"]
     find_packages("jade", pack_list)
     setup(
     name="jade",
-    version="1.6.3",
+    version=__version__,
     keywords=("pip", "jade", ""),
     description="jade",
     long_description="",
