@@ -3,7 +3,7 @@ name: jade库打包
 on:
   push:
     tags:
-      - JadeV[0-9]+.*
+      - JadeV*
 jobs:
   build:
     name: Python制作Wheel
