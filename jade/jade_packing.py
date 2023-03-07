@@ -598,7 +598,10 @@ def build(args):
             need_to_build_file_list.remove(build_file)
 
     for need_to_build_file in need_to_build_file_list:
-        print("\n{}文件编译失败,请使用easycython {}/{}重新编译".format(need_to_build_file, "src", need_to_build_file))
+        try:
+            print("\n{}文件编译失败,请使用easycython {}/{}重新编译".format(need_to_build_file, "src", need_to_build_file))
+        except:
+            print("\n{} file compile failed,please use easycython {}/{} recompile".format(need_to_build_file, "src", need_to_build_file))
         shutil.copy("{}/{}".format("new_src", need_to_build_file),
                     os.path.join(ep_build_path, need_to_build_file))
 

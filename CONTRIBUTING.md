@@ -1,13 +1,17 @@
 ### 更新日志
 
-#### JadeV1.6.8 - 2023-03-07
-* wheel包需要配置version模块
-* 打包版本由更新日志统一管理,其他地方无需在配版本号
+#### JadeV1.6.9 - 2023-03-07
+* 解决编译失败,windows下输出的bug
 
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV1.6.8 - 2023-03-07
+* wheel包需要配置version模块
+* 打包版本由更新日志统一管理,其他地方无需在配版本号
+
 
 #### JadeV1.6.7 - 2023-03-07
 * 修改ChangeLog文件的名称改为CONTRIBUTING
