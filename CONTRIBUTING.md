@@ -4,7 +4,8 @@
 
 <details onclose>
 <summary>查看更多更新日志</summary>
-### JadeV1.6.6 - 2023-03-07
+
+#### JadeV1.6.6 - 2023-03-07
 * 固定ChangeLog的格式,使Release发布界面美观
 
 #### JadeV1.6.5 - 2023-03-07
