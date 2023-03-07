@@ -1,9 +1,11 @@
 # 更新日志
-### JadeV1.6.6 - 2023-03-07
-* 固定ChangeLog的格式,使Release发布界面美观
+### JadeV1.6.7 - 2023-03-07
+* 修改ChangeLog文件的名称改为CONTRIBUTING
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+### JadeV1.6.6 - 2023-03-07
+* 固定ChangeLog的格式,使Release发布界面美观
 
 ### JadeV1.6.5 - 2023-03-07
 * 创建Release的时候使用tag名称作为当前Release的名称
