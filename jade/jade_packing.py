@@ -165,7 +165,9 @@ def copyPy(args):
                                         f1.write((content + "\n").encode("utf-8"))
                                 else:
                                     f1.write((content + '\n').encode("utf-8"))
-
+    if args.app_version:
+        with open("new_src/samplesVersion.py","wb") as f:
+            f.write('app_version = "{}"'.format(args.app_version).encode("utf-8"))
     return import_list
 
 
@@ -199,6 +201,7 @@ def writePy(args):
                 "    base_path = sys._MEIPASS\n"
                 "else:\n"
                 "    base_path = os.path.abspath('.')\n"
+                "sys.path.append('new_src')\n"
                 "sys.path.append('{}')\n"
                 "sys.path.append(os.path.join(base_path,'build/encryption'))\n".format(args.lib_path).encode("utf-8"))
         try:
@@ -915,6 +918,22 @@ def packAPP(args):
         shutil.rmtree("tmp")
     if os.path.exists("file_verison_info.txt"):
         os.remove("file_verison_info.txt")
+
+def get_app_version():
+    try:
+        with open("CONTRIBUTING.md","rb") as f:
+            content = str(f.read(),encoding="utf-8").split("#### ")[1].split(" - ")[0]
+            version = ""
+            if "v" in content:
+                version = content.split("v")[-1]
+            elif "V" in content:
+                version = content.split("V")[-1]
+            if version:
+                return version
+            else:
+                raise "please check CONTRIBUTING contain version"
+    except:
+        raise "please check CONTRIBUTING contain version"
 
 
 if __name__ == '__main__':
