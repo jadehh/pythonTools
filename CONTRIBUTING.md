@@ -1,31 +1,32 @@
 ### 更新日志
 
-#### JadeV1.6.9 - 2023-03-07
-* 解决编译失败,windows下输出的bug
-
-
+#### JadeV1.7.0 - 2023-03-08
+* 修改Windows下ISS文件生成的路径为当前目录
 
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+#### JadeV1.6.9 - 2023-03-07
+* 解决编译失败,windows下输出的bug
+---
 #### JadeV1.6.8 - 2023-03-07
 * wheel包需要配置version模块
 * 打包版本由更新日志统一管理,其他地方无需在配版本号
-
+---
 
 #### JadeV1.6.7 - 2023-03-07
 * 修改ChangeLog文件的名称改为CONTRIBUTING
-
+---
 #### JadeV1.6.6 - 2023-03-07
 * 固定ChangeLog的格式,使Release发布界面美观
-
+---
 #### JadeV1.6.5 - 2023-03-07
 * 创建Release的时候使用tag名称作为当前Release的名称
-
+---
 #### JadeV1.6.4 - 2023-03-07
 * 打包的时候自动判断当前版本
 * 支持自动打包脚本,解决Windows下Progress的bug
-
+---
 #### JadeV1.6.3 - 2023-03-06
 * 支持遍历文件夹下所有文件
 * 加密文件支持传入输出文件夹名称参数
@@ -51,5 +52,6 @@
 * update 打包的时候支持文件夹导入
 * update 打包成AppImage时候无需icon图标
 * update 加入AppImage图标为默认图标
-* update Linux打包使用原始的版本号
+* update Linux打包使用原始的版本
+---
 </details>
