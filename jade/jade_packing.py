@@ -176,7 +176,7 @@ def copyPy(args):
                     '# @Software : Samples\n'
                     '# @Desc     :\n'
                     'app_version = "{}"\n'
-                    'log_level = DEBUG'.format(args.app_version).encode("utf-8"))
+                    'log_level = "DEBUG"'.format(args.app_version).encode("utf-8"))
     return import_list
 
 

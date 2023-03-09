@@ -1,15 +1,18 @@
 ### 更新日志
 
 
-#### JadeV1.7.5 - 2023-03-08
-* Release文件使用CONTRIBUTING.md
+#### JadeV1.7.6 - 2023-03-08
+* 解决log level的bug
 
----
 
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV1.7.5 - 2023-03-08
+* Release文件使用CONTRIBUTING.md
+---
 
 #### JadeV1.7.4 - 2023-03-08
 * 先创建Release,在上传文件到Release
