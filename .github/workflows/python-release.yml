@@ -5,6 +5,27 @@ on:
     tags:
       - JadeV*
 jobs:
+  release:
+    name: ${{ matrix.os }} 创建Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest" ] #, "macos-latest", "windows-latest"
+    steps:
+      - name: 克隆代码
+        uses: actions/checkout@v3
+      - name: 创建发行版本
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body_path: README.md
+          draft: false
+          prerelease: false
   build:
     name: Python制作Wheel
     runs-on: ubuntu-latest
@@ -25,17 +46,6 @@ jobs:
           rm -r build
           rm -r *.egg-info
           ls
-      - name: 创建发行版本
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body_path: CONTRIBUTING.md
-          draft: false
-          prerelease: false
 
 #      ## 上传文件
 #      - name: 上传文件

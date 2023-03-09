@@ -1,14 +1,20 @@
 ### 更新日志
 
 
-#### JadeV1.7.3 - 2023-03-08
-* 无需上传action附件,直接上传至release
+
+#### JadeV1.7.4 - 2023-03-08
+* 先创建Release,在上传文件到Release
 ---
 
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+
+#### JadeV1.7.3 - 2023-03-08
+* 无需上传action附件,直接上传至release
+---
 
 #### JadeV1.7.2 - 2023-03-08
 * 测试发布使用模糊路径
