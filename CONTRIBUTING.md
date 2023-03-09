@@ -1,10 +1,16 @@
 ### 更新日志
 
-#### JadeV1.7.0 - 2023-03-08
-* 修改Windows下ISS文件生成的路径为当前目录
+#### JadeV1.7.1 - 2023-03-08
+* 打包模块新增log_level参数
+* 支持使用Inno Setup打包Windows安装包
+---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV1.7.0 - 2023-03-08
+* 修改Windows下ISS文件生成的路径为当前目录
+---
 
 #### JadeV1.6.9 - 2023-03-07
 * 解决编译失败,windows下输出的bug

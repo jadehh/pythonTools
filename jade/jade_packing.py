@@ -167,7 +167,16 @@ def copyPy(args):
                                     f1.write((content + '\n').encode("utf-8"))
     if args.app_version:
         with open("new_src/samplesVersion.py","wb") as f:
-            f.write('app_version = "{}"'.format(args.app_version).encode("utf-8"))
+            f.write('#!/usr/bin/env python\n'
+                    '# -*- coding: utf-8 -*-\n'
+                    '# @File     : __version__.py\n'
+                    '# @Author   : jade\n'
+                    '# @Date     : 2023/3/7 16:19\n'
+                    '# @Email    : jadehh@1ive.com\n'
+                    '# @Software : Samples\n'
+                    '# @Desc     :\n'
+                    'app_version = "{}"\n'
+                    'log_level = DEBUG'.format(args.app_version).encode("utf-8"))
     return import_list
 
 
@@ -633,6 +642,7 @@ def get_uuid():
     return "{" + "{" + str(uuid.uuid1()) + "}"
 
 
+
 def packSetup(args, exec_path, uuid,output_name=None):
     file_list = []
     recursion_dir(file_list, exec_path)
@@ -792,6 +802,12 @@ def packSetup(args, exec_path, uuid,output_name=None):
                                        get_app_name(args))
         content = content + content_code
         f.write(content.encode("gbk"))
+    inno_setup_path = os.path.join(GetPreviousDir(os.getcwd()), "InnoSetup")
+    if os.path.exists(inno_setup_path):
+        print("Inno Setup Path exists,dir:{}".format(inno_setup_path))
+        cmd_str = "{} {}".format(os.path.join(inno_setup_path, "ISCC.exe"), os.path.join(os.getcwd(), issname))
+        print("cmd str:{}".format(cmd_str))
+        os.system(cmd_str)
 
 
 def packAppImage(args):
