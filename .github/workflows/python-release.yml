@@ -37,18 +37,18 @@ jobs:
           draft: false
           prerelease: false
 
-      ## 上传文件
-      - name: 上传文件
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          path: dist
+#      ## 上传文件
+#      - name: 上传文件
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: dist
+#          path: dist
       ## 发布
       - name: 发布
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "dist/**"
+          files: "dist/*.whl"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
