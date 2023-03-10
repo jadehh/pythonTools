@@ -828,8 +828,8 @@ def packAppImage(args):
                     for lib_name in os.listdir(lib_path):
                         if "lib" in lib_name:
                             shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
+        os.system("chmod +x  dist/{}".format(get_app_name(args)))
         os.system("cp -r dist/{} {}".format(get_app_name(args), save_bin_path))
-        os.system("chmod +x  {}".format(os.path.join(save_path,get_app_name(args))))
 
 
     with open(AppRunPath, "r") as f:
