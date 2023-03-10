@@ -807,7 +807,8 @@ def packSetup(args, exec_path, uuid,output_name=None):
         print("Inno Setup Path exists,dir:{}".format(inno_setup_path))
         cmd_str = "{} {}".format(os.path.join(inno_setup_path, "ISCC.exe"), os.path.join(os.getcwd(), issname))
         print("cmd str:{}".format(cmd_str))
-        os.system(cmd_str)
+        subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove(os.path.join(os.getcwd(), issname))
 
 
 def packAppImage(args):
@@ -899,7 +900,8 @@ def packAPP(args):
         copy_dir(args.lib_path, save_bin_path)
     if "Windows" == getOperationSystem():
         if str_to_bool(args.full) is False:
-            os.system("xcopy dist\\{} {} /s/y".format(get_app_name(args), save_bin_path))
+            cmd_str = "xcopy dist\\{} {} /s/y".format(get_app_name(args), save_bin_path)
+            subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             shutil.copy("dist\\{}.exe".format(get_app_name(args)), "{}/".format(save_bin_path))
     else:

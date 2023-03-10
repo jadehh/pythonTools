@@ -1,15 +1,19 @@
 ### 更新日志
 
-#### JadeV1.7.9 - 2023-03-10
-* ProgressBar Windows下还是继续使用中文
 
 
+#### JadeV1.8.0 - 2023-03-10
+* Inno Setup 不输出信息
+* Xcopy不输出信息
+---
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
 
-
+#### JadeV1.7.9 - 2023-03-10
+* ProgressBar Windows下还是继续使用中文
+---
 #### JadeV1.7.8 - 2023-03-09
 * 修改AppRun文件,解决在github action 自动打包execv error: Permission denied 的问题
 ---
