@@ -10,8 +10,6 @@ import time
 from shutil import get_terminal_size
 import sys
 import platform
-def getOperationSystem():
-    return platform.system()
 
 class TimerError(Exception):
 
@@ -88,17 +86,10 @@ class ProgressBar:
 
     def start(self):
         if self.task_num > 0:
-            if getOperationSystem() == "Windows":
-                self.file.write(f'[{" " * self.bar_width}] 0/{self.task_num}, '
-                                'Spend Time: 0s,Remaining Time:')
-            else:
-                self.file.write(f'[{" " * self.bar_width}] 0/{self.task_num}, '
+            self.file.write(f'[{" " * self.bar_width}] 0/{self.task_num}, '
                             '花费了: 0s, 预计还剩:')
         else:
-            if getOperationSystem() == "Windows":
-                self.file.write('Finish: 0, Use Time: 0s')
-            else:
-                self.file.write('完成: 0, 共花费: 0s')
+            self.file.write('完成: 0, 共花费: 0s')
         self.file.flush()
         self.timer = Timer()
 
@@ -113,12 +104,7 @@ class ProgressBar:
         if self.task_num > 0:
             percentage = self.completed / float(self.task_num)
             eta = int(elapsed * (1 - percentage) / percentage + 0.5)
-            if getOperationSystem() == "Windows":
-                msg = f'\r[{{}}] {self.completed}/{self.task_num}, ' \
-                      f'{fps:.1f} task/s,: Spend Time:{int(elapsed + 0.5)}s, ' \
-                      f'Remaining Time: {eta:5}s'
-            else:
-                msg = f'\r[{{}}] {self.completed}/{self.task_num}, ' \
+            msg = f'\r[{{}}] {self.completed}/{self.task_num}, ' \
                       f'{fps:.1f} task/s, 花费了: {int(elapsed + 0.5)}s, ' \
                       f'预计还剩: {eta:5}s'
 
@@ -130,12 +116,7 @@ class ProgressBar:
             bar_chars = '>' * mark_width + ' ' * (bar_width - mark_width)
             self.file.write(msg.format(bar_chars))
         else:
-            if getOperationSystem() == "Windows":
-                self.file.write(
-                    f'finish: {self.completed}, use: {int(elapsed + 0.5)}s,'
-                    f' {fps:.1f} tasks/s')
-            else:
-                self.file.write(
-                f'完成: {self.completed}, 共花费: {int(elapsed + 0.5)}s,'
-                f' {fps:.1f} tasks/s')
+            self.file.write(
+            f'完成: {self.completed}, 共花费: {int(elapsed + 0.5)}s,'
+            f' {fps:.1f} tasks/s')
         self.file.flush()

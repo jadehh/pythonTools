@@ -1,21 +1,25 @@
 ### 更新日志
 
+#### JadeV1.7.9 - 2023-03-10
+* ProgressBar Windows下还是继续使用中文
 
 
-
-#### JadeV1.7.8 - 2023-03-09
-* 修改AppRun文件,解决在github action 自动打包execv error: Permission denied 的问题
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+
+#### JadeV1.7.8 - 2023-03-09
+* 修改AppRun文件,解决在github action 自动打包execv error: Permission denied 的问题
+---
+
 #### JadeV1.7.7 - 2023-03-08
 * 制作AppImage先给可执行文件赋予权限
-
+---
 #### JadeV1.7.6 - 2023-03-08
 * 解决log level的bug
-
+---
 #### JadeV1.7.5 - 2023-03-08
 * Release文件使用CONTRIBUTING.md
 ---
