@@ -2,13 +2,16 @@
 
 
 
-#### JadeV1.7.7 - 2023-03-08
-* 制作AppImage先给可执行文件赋予权限
 
+#### JadeV1.7.8 - 2023-03-08
+* 修改AppRun文件,解决在github action 自动打包execv error: Permission denied 的问题
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV1.7.7 - 2023-03-08
+* 制作AppImage先给可执行文件赋予权限
 
 #### JadeV1.7.6 - 2023-03-08
 * 解决log level的bug
