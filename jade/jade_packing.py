@@ -828,7 +828,7 @@ def packAppImage(args):
                     for lib_name in os.listdir(lib_path):
                         if "lib" in lib_name:
                             shutil.copy(os.path.join(lib_path, lib_name), os.path.join(save_lib_path, lib_name))
-        os.system("chmod +x  dist/{}".format(get_app_name(args)))
+        os.system("chmod a+x  dist/{}".format(get_app_name(args)))
         os.system("cp -r dist/{} {}".format(get_app_name(args), save_bin_path))
 
 
@@ -837,6 +837,7 @@ def packAppImage(args):
         for content in conetent_list:
             with open(os.path.join(save_path, "AppRun"), "a", encoding="utf-8") as f:
                 f.write(content + "\n")
+    os.system("chmod a+x  {}".format(os.path.join(save_path, "AppRun")))
     if os.path.exists("icons/app_logo.png"):
         shutil.copy("icons/app_logo.png", save_path)
     else:
@@ -853,10 +854,11 @@ def packAppImage(args):
                 "MimeType=x-scheme-handler/qv2ray;\n"
                 "X-AppImage-Version=912fe1b\n\n\n"
                 "Name[zh_CN]={}".format("1.1", get_app_name(args), get_app_name(args), get_app_name(args)))
+    os.system("chmod a+x  {}".format(os.path.join(save_path, get_app_name(args) + ".desktop")))
     print("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
     os.system(
         "{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
-    os.system("chmod +x  {}.AppImage".format(get_app_name(args)))
+    os.system("chmod a+x  {}.AppImage".format(get_app_name(args)))
     return "{}.AppImage".format(get_app_name(args))
 
 
