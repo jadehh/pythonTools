@@ -3,7 +3,7 @@
 
 
 
-#### JadeV1.7.8 - 2023-03-08
+#### JadeV1.7.8 - 2023-03-09
 * 修改AppRun文件,解决在github action 自动打包execv error: Permission denied 的问题
 
 
