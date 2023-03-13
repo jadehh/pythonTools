@@ -7,13 +7,30 @@
 # @Software : Samples
 # @Desc     :
 from setuptools import setup, find_packages
+def get_app_version():
+    try:
+        with open("CONTRIBUTING.md","rb") as f:
+            content = str(f.read(),encoding="utf-8").split("#### ")[1].split(" - ")[0]
+            version = ""
+            if "v" in content and "V" in content:
+                version = content.split("V")[-1]
+            elif "v" in content:
+                version = content.split("v")[-1]
+            elif "V" in content:
+                version = content.split("V")[-1]
+            if version:
+                return version
+            else:
+                raise "please check CONTRIBUTING contain version"
+    except:
+        raise "please check CONTRIBUTING contain version"
 if __name__ == '__main__':
     pack_list = ["dataset_tools"]
     find_packages("dataset_tools", pack_list)
 
     setup(
     name="dataset_tools",
-    version="1.0.7",
+    version=get_app_version(),
     keywords=("pip", "dataset_tools", ""),
     description="dataset_tools",
     long_description="",
