@@ -948,7 +948,9 @@ def get_app_version():
         with open("CONTRIBUTING.md","rb") as f:
             content = str(f.read(),encoding="utf-8").split("#### ")[1].split(" - ")[0]
             version = ""
-            if "v" in content:
+            if "v" in content and "V" in content:
+                version = content.split("V")[-1]
+            elif "v" in content:
                 version = content.split("v")[-1]
             elif "V" in content:
                 version = content.split("V")[-1]
