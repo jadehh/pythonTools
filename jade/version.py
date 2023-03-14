@@ -1,1 +1,1 @@
-full_version  = '1.8.1'
+full_version  = '1.8.2'

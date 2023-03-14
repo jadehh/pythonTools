@@ -15,6 +15,7 @@ from jade.jade_progress_bar import ProgressBar
 import socket
 import platform
 from cryptography.fernet import Fernet
+import zipfile
 
 def zh_ch(string):
     """
@@ -429,6 +430,18 @@ def findAllFile(base):
         for f in fs:
             fullname = os.path.join(root, f)
             yield fullname
+def zip_file(dirpath,save_path):
+    output_name = save_path
+    parent_name = os.path.dirname(dirpath)
+    zip = zipfile.ZipFile(output_name, "w", zipfile.ZIP_DEFLATED)
+    # 多层级压缩
+    for root, dirs, files in os.walk(dirpath):
+        for file in files:
+            if str(file).startswith("~$"):
+                continue
+            filepath = os.path.join(root, file)
+            writepath = os.path.relpath(filepath, parent_name)
+            zip.write(filepath, writepath)
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
