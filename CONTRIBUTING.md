@@ -1,12 +1,17 @@
 ### 更新日志
 
 
-#### OpencvToolsV1.2.5 - 2023-03-13
-* 自动打包并发布
+#### OpencvToolsV1.2.6 - 2023-03-13
+* 新增图片文件转base64方法
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### OpencvToolsV1.2.5 - 2023-03-13
+* 自动打包并发布
+---
+
 
 #### OpencvToolsV1.2.4 - 2023-02-24
 * 优化VideoCaptureBaseProcess

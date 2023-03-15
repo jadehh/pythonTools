@@ -339,6 +339,17 @@ def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="r
         return image
 
 
+def file_to_base64(file_path):
+    if os.path.exists(file_path):
+        image = cv2.imdecode(np.fromfile(file_path, dtype=np.uint8), -1)
+        image_resize = image.copy()
+        image_resize = Image_Resize(image_resize, width=768)
+        image_resize_byte = cv2.imencode('.jpg', image_resize)[1].tobytes()
+        base64_str = str(base64.b64encode(image_resize_byte), encoding='utf-8')
+        return base64_str
+    else:
+        return ""
+
 # opencv 转 base64
 def cv2_base64(image):
     base64_str = cv2.imencode('.jpg', image)[1].tostring()
