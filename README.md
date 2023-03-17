@@ -8,8 +8,12 @@ pyldk = PyLdk(JadeLog=JadeLog)
 pyldk.get_ldk()
 ```
 ## 制作Wheel
-```bash
-python setup.py --name manylinux1_x86_64 --path  pyldk/lib/Linux/x86_64 sdist bdist_wheel 
+```bash    
+python setup.py --name manylinux1_x86_64 --path  pyldk/lib/Linux/x86_64
+python setup.py --name manylinux2014_aarch64 --path  pyldk/lib/Linux/aarch64
+python setup.py --name win32 --path  pyldk/lib/Windows/x86
+python setup.py --name win_amd64 --path  pyldk/lib/Windows/x64
+
 
 ```
 

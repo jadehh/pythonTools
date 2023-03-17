@@ -42,15 +42,16 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: 打包
         run: |
-          python setup.py sdist bdist_wheel
-          rm -r build
-          rm -r *.egg-info
+          python setup.py --name manylinux1_x86_64 --path  pyldk/lib/Linux/x86_64
+          python setup.py --name manylinux2014_aarch64 --path  pyldk/lib/Linux/aarch64
+          python setup.py --name win32 --path  pyldk/lib/Windows/x86
+          python setup.py --name win_amd64 --path  pyldk/lib/Windows/x64
           ls
       ## 发布
       - name: 发布
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "dist/*.whl"
+          files: "Ouput/*.whl"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
