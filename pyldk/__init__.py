@@ -6,3 +6,5 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+from pyldk.version import full_version as __version__
+

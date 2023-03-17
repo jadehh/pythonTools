@@ -6,5 +6,6 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+full_version  = '1.0.1'
 
 
