@@ -29,7 +29,12 @@ jobs:
           prerelease: false
   build:
     name: Python制作Wheel
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-18.04"] # "ubuntu-18.04", "windows-latest","macos-latest"
+        python-version: ["3.6"]
     steps:
       - uses: actions/checkout@v3
       - name: 安装Python环境
