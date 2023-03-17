@@ -961,6 +961,10 @@ def get_app_version():
     except:
         raise "please check CONTRIBUTING contain version"
 
+def write_version(package_name):
+    with open("{}/version.py".format(package_name),"wb") as f:
+        f.write("full_version  = '{}'\n".format(get_app_version()).encode("utf-8"))
+
 
 if __name__ == '__main__':
     import argparse

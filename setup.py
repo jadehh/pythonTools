@@ -7,15 +7,17 @@
 # @Software : Samples
 # @Desc     :
 from setuptools import setup, find_packages
-from jade import get_app_version
+from jade import get_app_version,write_version
 if __name__ == '__main__':
-    pack_list = ["jade"]
-    find_packages("jade", pack_list)
+    package_name = "jade"
+    write_version(package_name="jade")
+    pack_list = [package_name]
+    find_packages(package_name, pack_list)
     setup(
-    name="jade",
+    name=package_name,
     version=get_app_version(),
-    keywords=("pip", "jade", ""),
-    description="jade",
+    keywords=("pip", package_name, ""),
+    description=package_name,
     long_description="",
     license="MIT Licence",
     url="https://jadehh@live.com",
