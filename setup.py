@@ -36,6 +36,7 @@ if __name__ == '__main__':
     import os
     import shutil
     from jade import *
+    CreateSavePath("Ouput")
     parser = argparse.ArgumentParser()
     parser.add_argument('--package_name', type=str,
                         default="pyldk")  ## 打包名称
@@ -47,8 +48,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     write_setup(args=args)
     os.system("python setup_test.py sdist bdist_wheel")
-    # shutil.copy("dist/{}-{}-py3-none-any.whl".format(args.package_name, get_app_version()),
-    #             "Ouput/{}-{}-py3-none-{}.whl".format(args.package_name, get_app_version(),args.name))
-    # shutil.rmtree("dist")
-    # shutil.rmtree("build")
-    # shutil.rmtree("{}.egg-info".format(args.package_name))
+    shutil.copy("dist/{}-{}-py3-none-any.whl".format(args.package_name, get_app_version()),
+                "Ouput/{}-{}-py3-none-{}.whl".format(args.package_name, get_app_version(),args.name))
+    shutil.rmtree("dist")
+    shutil.rmtree("build")
+    shutil.rmtree("{}.egg-info".format(args.package_name))
