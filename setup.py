@@ -25,7 +25,7 @@ def get_app_version():
     except:
         raise "please check CONTRIBUTING contain version"
 if __name__ == '__main__':
-    pack_list = ["pyldk"]
+    pack_list = ["pyldk","pyldk/lib/Linux/aarch64","pyldk/lib/Linux/x86_64"]
     find_packages("pyldk", pack_list)
     setup(
     name="pyldk",
