@@ -6,11 +6,31 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+def write_version(package_name):
+    with open("{}/version.py".format(package_name),"wb") as f:
+        f.write("full_version  = '{}'\n".format(get_app_version()).encode("utf-8"))
+def get_app_version():
+    try:
+        with open("CONTRIBUTING.md","rb") as f:
+            content = str(f.read(),encoding="utf-8").split("#### ")[1].split(" - ")[0]
+            version = ""
+            if "v" in content and "V" in content:
+                version = content.split("V")[-1]
+            elif "v" in content:
+                version = content.split("v")[-1]
+            elif "V" in content:
+                version = content.split("V")[-1]
+            if version:
+                return version
+            else:
+                raise "please check CONTRIBUTING contain version"
+    except:
+        raise "please check CONTRIBUTING contain version"
+package_name = "jade"
+write_version(package_name=package_name)
 from setuptools import setup, find_packages
 from jade import get_app_version,write_version
 if __name__ == '__main__':
-    package_name = "jade"
-    write_version(package_name="jade")
     pack_list = [package_name]
     find_packages(package_name, pack_list)
     setup(
