@@ -53,7 +53,9 @@ jobs:
           python setup.py --name manylinux2014_aarch64 --path  pyldk/lib/Linux/aarch64
           python setup.py --name win32 --path  pyldk/lib/Windows/x86
           python setup.py --name win_amd64 --path  pyldk/lib/Windows/x64
-          ls
+          ls -l
+          cd dist
+          ls -l
       ## 发布
       - name: 发布
         uses: softprops/action-gh-release@v1
