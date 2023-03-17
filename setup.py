@@ -25,7 +25,7 @@ def write_setup(args):
                 '\t\tauthor="jade",\n'
                 '\t\tauthor_email="jadehh@live.com",\n'
                 '\t\tpackages=pack_list,\n'
-                '\t\tpackage_data={"": ["*.so"]},\n'
+                '\t\tpackage_data={"": ["*.so","*.dll"]},\n'
                 '\t\tinclude_package_data=True,\n'
                 '\t\tplatforms="any",\n'
                 '\t\tinstall_requires=[]  # 这个项目需要的第三方库\n'

@@ -2,7 +2,7 @@
 #### PyLdkV1.0.3 - 2023-03-17
 * 区分不同的操作系统版本
 * 修改python版本打包
-
+* 支持分别打包Linux x86_64 aarch64和Windows x86 x64架构的wheel包
 ---
 <details onclose>
 <summary>查看更多更新日志</summary>
