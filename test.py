@@ -21,6 +21,8 @@ def test_adapter():
             index = index + 1
             JadeLog.INFO("加密狗正常,index = {}".format(index))
         time.sleep(5*60)
-
+def test_version():
+    from pyldk import __version__
+    print(__version__)
 if __name__ == '__main__':
     test_adapter()

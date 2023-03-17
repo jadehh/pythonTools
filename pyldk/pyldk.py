@@ -11,7 +11,14 @@ import platform
 class PyLdk(object):
     def __init__(self,JadeLog=None):
         self.JadeLog = JadeLog
-        libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib/{}/{}'.format(getOperationSystem(),self.get_system_arch())))
+        if getOperationSystem() == "Windows":
+            if (platform.architecture()[0]) == "64bit":
+                libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib/{}/x64'.format(getOperationSystem())))
+            else:
+                libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib/{}/x86'.format(getOperationSystem())))
+
+        else:
+            libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib/{}/{}'.format(getOperationSystem(),self.get_system_arch())))
         self.adapter = BaseAdapter(os.path.join(libs_dir,os.listdir(libs_dir)[0]),JadeLog)
 
     def get_system_arch(self):
