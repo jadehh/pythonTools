@@ -14,10 +14,9 @@ JadeLog = JadeLogging()
 def test_adapter():
     index = 0
     pyldk = PyLdk(JadeLog=JadeLog)
-
     status,feature_id = pyldk.login()
-    while status == 0:
-        if pyldk.get_ldk() is False:
+    while status:
+        if pyldk.get_ldk(feature_id) is False:
             break
         else:
             index = index + 1

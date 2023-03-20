@@ -1,11 +1,17 @@
 ### 更新日志
 
+#### PyLdkV1.0.7 - 2023-03-20
+* 重新优化加密狗状态检测流程
+---
+
+
+<details onclose>
+<summary>查看更多更新日志</summary>
+
 #### PyLdkV1.0.6 - 2023-03-20
 * 解决加密狗拔出的异常情况
 ---
 
-<details onclose>
-<summary>查看更多更新日志</summary>
 
 #### PyLdkV1.0.5 - 2023-03-20
 * 支持上传pypi
