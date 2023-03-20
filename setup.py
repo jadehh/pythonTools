@@ -20,7 +20,7 @@ def write_setup(args):
                 '\t\tversion=get_app_version(),\n'
                 '\t\tkeywords=("pip", package_name, ""),\n'
                 '\t\tdescription=package_name,\n'
-                '\t\tlong_description="",\n'
+                '\t\tlong_description=GetReadMe(),\n'
                 '\t\tlicense="MIT Licence",\n'
                 '\t\turl="https://jadehh@live.com",\n'
                 '\t\tauthor="jade",\n'

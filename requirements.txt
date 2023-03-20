@@ -1,1 +1,1 @@
-https://gh.con.sh/https://github.com/jadehh/pythonTools/releases/download/JadeV1.8.3/jade-1.8.3-py3-none-any.whl
+https://gh.con.sh/https://github.com/jadehh/pythonTools/releases/download/JadeV1.8.4/jade-1.8.4-py3-none-any.whl
