@@ -1,17 +1,22 @@
 ### 更新日志
 
 
-
-
-#### JadeV1.8.4 - 2023-03-20
-* 新增读取README.md内容方法
+#### JadeV1.8.5 - 2023-03-20
+* 打包模块支持打包并压缩lib包到Output文件夹中
 ---
+
+
 
 
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+
+#### JadeV1.8.4 - 2023-03-20
+* 新增读取README.md内容方法
+---
 
 #### JadeV1.8.3 - 2023-03-17
 * 新增获取app version的方法
