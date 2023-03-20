@@ -43,6 +43,9 @@ jobs:
       - name: 打包
         run: |
           python setup.py sdist bdist_wheel
+          rm -r build
+          rm -r *.egg-info
+          ls
 
       ## 发布
       - name: 发布
@@ -53,9 +56,3 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      ## 发布至pypi
-      - name: 上传pypi
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          packages-dir: Ouput/

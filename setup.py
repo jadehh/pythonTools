@@ -52,10 +52,6 @@ if __name__ == '__main__':
     platforms="any",
     install_requires=["easycython","pyinstaller","cryptography==3.4.8","cffi"]  # 这个项目需要的第三方库
 )
-    shutil.copy("dist/{}-{}-py3-none-any.whl".format(package_name, get_app_version()),
-                "Ouput/{}-{}-py3-none-any.whl".format(package_name+"tools", get_app_version()))
-    shutil.rmtree("dist")
-    shutil.rmtree("build")
-    shutil.rmtree("{}.egg-info".format(package_name))
+
 
 
