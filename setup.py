@@ -6,6 +6,7 @@
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
+import shutil
 def write_version(package_name):
     with open("{}/version.py".format(package_name),"wb") as f:
         f.write("full_version  = '{}'\n".format(get_app_version()).encode("utf-8"))
@@ -29,9 +30,10 @@ def get_app_version():
 package_name = "jade"
 write_version(package_name=package_name)
 from setuptools import setup, find_packages
-from jade import get_app_version,write_version
+from jade import get_app_version,write_version,CreateSavePath
 if __name__ == '__main__':
     pack_list = [package_name]
+    CreateSavePath("Ouput")
     find_packages(package_name, pack_list)
     setup(
     name=package_name,
@@ -50,4 +52,10 @@ if __name__ == '__main__':
     platforms="any",
     install_requires=["easycython","pyinstaller","cryptography==3.4.8","cffi"]  # 这个项目需要的第三方库
 )
+    shutil.copy("dist/{}-{}-py3-none-any.whl".format(package_name, get_app_version()),
+                "Ouput/{}-{}-py3-none-any.whl".format(package_name, get_app_version()))
+    shutil.rmtree("dist")
+    shutil.rmtree("build")
+    shutil.rmtree("{}.egg-info".format(package_name))
+
 
