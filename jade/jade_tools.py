@@ -442,6 +442,10 @@ def zip_file(dirpath,save_path):
             filepath = os.path.join(root, file)
             writepath = os.path.relpath(filepath, parent_name)
             zip.write(filepath, writepath)
+def GetReadMe():
+	with open("README.md","rb") as f:
+		content = f.read()
+		return str(content,encoding="utf-8")
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")

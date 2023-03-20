@@ -2,10 +2,9 @@
 
 
 
-#### JadeV1.8.3 - 2023-03-17
-* 新增获取app version的方法
-* 自动写入version文件
-* 解决打包wheel的报错
+
+#### JadeV1.8.4 - 2023-03-20
+* 新增读取README.md内容方法
 ---
 
 
@@ -14,7 +13,11 @@
 <details onclose>
 <summary>查看更多更新日志</summary>
 
-
+#### JadeV1.8.3 - 2023-03-17
+* 新增获取app version的方法
+* 自动写入version文件
+* 解决打包wheel的报错
+---
 
 #### JadeV1.8.2 - 2023-03-14
 * 新增压缩文件夹到指定文件夹下方法
