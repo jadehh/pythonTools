@@ -11,7 +11,8 @@ def write_setup(args):
         f.write(('from setuptools import setup, find_packages\n'
                 'from jade import *\n'
                 'if __name__ == "__main__":\n'
-                '\tpackage_name = "{}" \n'.format(args.package_name) +
+                '\tpackage_name = "{}" \n'
+                 '\twrite_version(package_name)\n'.format(args.package_name) +
                 '\tpack_list = [package_name,"{}"]\n'.format(args.path) +
                 '\tfind_packages(package_name, pack_list)\n'
                 '\tsetup(\n'

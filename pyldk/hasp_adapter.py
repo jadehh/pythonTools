@@ -35,7 +35,7 @@ class BaseAdapter():
             print(msg)
 
     def get_info(self):
-        feature_id = ""
+        feature_id = -1
         try:
             self.lib.getInfo.restype = HaspStruct
             haspStruct = self.lib.getInfo()
