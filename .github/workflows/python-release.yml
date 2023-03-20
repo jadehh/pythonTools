@@ -58,7 +58,7 @@ jobs:
 
       ## 发布至pypi
       - name: 上传pypi
-          uses: pypa/gh-action-pypi-publish@release/v1
-          with:
-            password: ${{ secrets.PYPI_API_TOKEN }}
-            packages-dir: Ouput/
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: Ouput/
