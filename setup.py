@@ -21,6 +21,7 @@ def write_setup(args):
                 '\t\tkeywords=("pip", package_name, ""),\n'
                 '\t\tdescription=package_name,\n'
                 '\t\tlong_description=GetReadMe(),\n'
+                '\t\tlong_description_content_type="text/markdown",\n'
                 '\t\tlicense="MIT Licence",\n'
                 '\t\turl="https://jadehh@live.com",\n'
                 '\t\tauthor="jade",\n'

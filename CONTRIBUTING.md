@@ -1,13 +1,17 @@
 ### 更新日志
 
 
-#### PyLdkV1.1.0 - 2023-03-20
-* long_description使用README.md文档
+#### PyLdkV1.1.1 - 2023-03-20
+* long_description_content_type使用Markdown协议
 ---
+
 
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+#### PyLdkV1.1.0 - 2023-03-20
+* long_description使用README.md文档
+---
 
 #### PyLdkV1.0.9 - 2023-03-20
 * 当前加密狗驱动版本过低的判断
