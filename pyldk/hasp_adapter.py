@@ -76,15 +76,15 @@ class BaseAdapter():
             if haspStruct.status == 0:
                 self.logout(haspStruct.handle)
                 try:
-                    maxlogins = int(str(haspStruct.info,encoding="utf-8").split("<maxlogins>")[-1].split("</maxlogins>")[0])
+                    maxlogins = 1000000 if str(haspStruct.info,encoding="utf-8").split("<maxlogins>")[-1].split("</maxlogins>")[0] == "unlimited" else int(str(haspStruct.info,encoding="utf-8").split("<maxlogins>")[-1].split("</maxlogins>")[0])
                     currentlogins = int(str(haspStruct.info,encoding="utf-8").split("<currentlogins>")[-1].split("</currentlogins>")[0])
                     if currentlogins <= maxlogins:
                         return True
                     else:
                         self.log("获取加密狗登录最大用户失败,失败原因为:当前用户登录数超过最大用户授权数")
                         return False
-                except Exception:
-                    self.log("获取加密狗登录最大用户失败,失败原因为:{}".format(e))
+                except Exception as e:
+                    self.log("获取加密狗登录最大用户失败,失败原因为:{},info为:{}".format(e,str(haspStruct.info,encoding="utf-8")))
             else:
                 self.show_staus("获取加密狗登录最大用户失败",haspStruct.status)
         except Exception as e:
