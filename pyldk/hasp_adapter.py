@@ -11,8 +11,12 @@ import shutil
 from ctypes import *
 from jade import *
 import ctypes
+import platform
+
+
 class HaspStruct(Structure):
-	_fields_ = [('status',c_int),('info',c_char_p)]
+        _fields_ = [('status', c_int), ('handle', c_int32), ('info', c_char_p)]
+
 class BaseAdapter():
     # 动态sdk文件 .so .dll
     def __init__(self,so_path,JadeLog=None):
@@ -70,12 +74,14 @@ class BaseAdapter():
         try:
             haspStruct = self.lib.getSessionInfo(feature_id)
             if haspStruct.status == 0:
+                self.logout(haspStruct.handle)
                 try:
                     maxlogins = int(str(haspStruct.info,encoding="utf-8").split("<maxlogins>")[-1].split("</maxlogins>")[0])
                     currentlogins = int(str(haspStruct.info,encoding="utf-8").split("<currentlogins>")[-1].split("</currentlogins>")[0])
-                    if currentlogins < maxlogins:
+                    if currentlogins <= maxlogins:
                         return True
                     else:
+                        self.log("获取加密狗登录最大用户失败,失败原因为:当前用户登录数超过最大用户授权数")
                         return False
                 except Exception:
                     self.log("获取加密狗登录最大用户失败,失败原因为:{}".format(e))
@@ -85,7 +91,11 @@ class BaseAdapter():
             self.log("获取是否超出加密狗登录最大用户失败,失败原因为:{}".format(e))
 
 
-    def login(self):
-        status = self.lib.login()
-        return status
+    def login(self,feature_id):
+        self.lib.login.restype = HaspStruct
+        haspStruct = self.lib.login(feature_id)
+        return haspStruct
 
+
+    def logout(self,handle):
+        self.lib.logout(c_uint32(handle))

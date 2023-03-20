@@ -1,13 +1,17 @@
 ### 更新日志
+#### PyLdkV1.0.4 - 2023-03-20
+* 支持登出操作
+---
+
+<details onclose>
+<summary>查看更多更新日志</summary>
+
+
 #### PyLdkV1.0.3 - 2023-03-17
 * 区分不同的操作系统版本
 * 修改python版本打包
 * 支持分别打包Linux x86_64 aarch64和Windows x86 x64架构的wheel包
 ---
-<details onclose>
-<summary>查看更多更新日志</summary>
-
-
 
 #### PyLdkV1.0.2 - 2023-03-17
 * 解决打包时无法引入so包的问题

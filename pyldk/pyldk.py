@@ -33,17 +33,33 @@ class PyLdk(object):
         else:
             print(msg)
 
+    def get_feature_id(self):
+        feature_id = self.adapter.get_info()
+        return feature_id
+
+    def login(self):
+        ## 首先判断加密狗是否存在
+        haspStruct = self.adapter.login(0)
+        feature_id = 0
+        if haspStruct.status == 0:
+            self.adapter.logout(haspStruct.handle)
+            feature_id = self.get_feature_id()
+            haspStruct = self.adapter.login(feature_id)
+            if haspStruct.status == 0:
+                pass
+            else:
+                self.adapter.log("加密狗初始化失败",haspStruct.status)
+        else:
+            self.adapter.show_staus("加密狗初始化失败", haspStruct.status)
+        return haspStruct.status,feature_id
+
     def get_ldk(self):
         ldk_status = False
-        status = self.adapter.login()
-        if status == 0:
-            feature_id = self.adapter.get_info()
-            if feature_id > 0:
-                lower_users = self.adapter.bool_lower_users(feature_id)
-                if lower_users:
-                    ldk_status = True
-            elif feature_id == 0:
-                self.log("加密狗没有授权,请重新授权")
+        feature_id = self.adapter.get_info()
+        if feature_id > 0:
+            lower_users = self.adapter.bool_lower_users(feature_id)
+            if lower_users:
+                ldk_status = True
         else:
-            self.adapter.show_staus("登录失败",status)
+            self.log("加密狗没有授权,请重新授权")
         return ldk_status

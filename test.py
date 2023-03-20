@@ -13,14 +13,17 @@ from jade import JadeLogging
 JadeLog = JadeLogging()
 def test_adapter():
     index = 0
-    while True:
-        pyldk = PyLdk(JadeLog=JadeLog)
+    pyldk = PyLdk(JadeLog=JadeLog)
+
+    status,feature_id = pyldk.login()
+    while status == 0:
         if pyldk.get_ldk() is False:
             break
         else:
             index = index + 1
-            JadeLog.INFO("加密狗正常,index = {}".format(index))
-        time.sleep(5*60)
+            JadeLog.INFO("加密狗正常,登录id为:{},index = {}".format(feature_id,index))
+        time.sleep(1)
+    print("结束")
 def test_version():
     from pyldk import __version__
     print(__version__)
