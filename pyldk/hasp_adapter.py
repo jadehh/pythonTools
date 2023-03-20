@@ -59,6 +59,8 @@ class BaseAdapter():
             self.log("{},请检查加密狗是否正常插入".format(operation_str))
         elif status == 38:
             self.log("{},请检查登录用户是否超出授权的最大用户数".format(operation_str))
+        elif status == 42:
+            self.log("{},当前加密狗驱动版本过低,请点击工具中并升级加密狗驱动".format(operation_str))
         elif status == 50:
             self.log("{},加密狗中途断开".format(operation_str))
         elif status == 84:

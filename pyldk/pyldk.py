@@ -51,6 +51,7 @@ class PyLdk(object):
                     login_status = True
                 else:
                     self.adapter.log("加密狗初始化失败,请检查加密狗的授权,或者重新授权")
+                    self.adapter.logout(haspStruct.handle)
             else:
                 self.adapter.log("加密狗初始化失败",haspStruct.status)
         else:
