@@ -9,14 +9,15 @@
 from threading import Thread
 from jade.jade_tools import *
 class MonitorLDKThread(Thread):
-    def __init__(self,pyldk,JadeLog):
+    def __init__(self,pyldk,JadeLog,ldkqueue):
         self.pyldk = pyldk
         self.JadeLog = JadeLog
+        self.ldkqueue = ldkqueue
         super(MonitorLDKThread, self).__init__()
     def run(self):
         haspStruct,feature_id = self.pyldk.login()
         if haspStruct.status == 0:
-            ldkqueue.put((self.pyldk,haspStruct.handle))
+            self.ldkqueue.put((self.pyldk,haspStruct.handle))
         while haspStruct.status == 0:
             if self.pyldk.get_ldk(feature_id) is False:
                 break
