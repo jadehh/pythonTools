@@ -1,13 +1,17 @@
 ### 更新日志
 
 
-#### PyLdkV1.1.1 - 2023-03-20
-* long_description_content_type使用Markdown协议
----
 
+#### PyLdkV1.1.2 - 2023-03-24
+* login直接返回haspStruct
+---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### PyLdkV1.1.1 - 2023-03-20
+* long_description_content_type使用Markdown协议
+---
 
 #### PyLdkV1.1.0 - 2023-03-20
 * long_description使用README.md文档

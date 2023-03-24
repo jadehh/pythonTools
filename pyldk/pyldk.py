@@ -56,7 +56,7 @@ class PyLdk(object):
                 self.adapter.log("加密狗初始化失败",haspStruct.status)
         else:
             self.adapter.show_staus("加密狗初始化失败", haspStruct.status)
-        return login_status,feature_id
+        return haspStruct,feature_id
 
 
     def get_ldk(self,feature_id):
