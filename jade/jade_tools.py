@@ -471,6 +471,12 @@ def GetExitSignal(func,*args):
     while not killer.kill_now:
         time.sleep(1)
     Exit(-1)
+def ldk_release(ldkqueue,JadeLog=None):
+    if JadeLog:
+        JadeLog.DEBUG("准备释放加密狗登录", True)
+    if ldkqueue.qsize() > 0:
+        pyldk, handle = ldkqueue.get()
+        pyldk.adapter.logout(handle)
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
