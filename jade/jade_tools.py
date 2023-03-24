@@ -16,6 +16,7 @@ import socket
 import platform
 from cryptography.fernet import Fernet
 import zipfile
+import signal
 
 def zh_ch(string):
     """
@@ -446,6 +447,30 @@ def GetReadMe():
 	with open("README.md","rb") as f:
 		content = f.read()
 		return str(content,encoding="utf-8")
+
+class GracefulKiller:
+    kill_now = False
+    signals = {
+        signal.SIGINT: 'SIGINT',
+        signal.SIGTERM: 'SIGTERM'
+    }
+
+    def __init__(self,func,*args):
+        self.func = func
+        self.args = args
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    def exit_gracefully(self, signum, frame):
+        self.func(self.args[0][0],self.args[0][1])
+        time.sleep(1)
+        self.kill_now = True
+
+def GetExitSignal(func,*args):
+    killer = GracefulKiller(func,args)
+    while not killer.kill_now:
+        time.sleep(1)
+    Exit(-1)
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
