@@ -9,10 +9,11 @@
 from threading import Thread
 from jade.jade_tools import *
 class MonitorLDKThread(Thread):
-    def __init__(self,pyldk,JadeLog,ldkqueue):
+    def __init__(self,pyldk,JadeLog,ldkqueue,time=60*60):
         self.pyldk = pyldk
         self.JadeLog = JadeLog
         self.ldkqueue = ldkqueue
+        self.time = time
         super(MonitorLDKThread, self).__init__()
         self.start()
     def run(self):
@@ -24,6 +25,6 @@ class MonitorLDKThread(Thread):
                 break
             else:
                 self.JadeLog.DEBUG("加密狗监听正常")
-            time.sleep(60*60)
+            time.sleep(self.time)
         self.JadeLog.ERROR("加密狗异常,程序退出")
         Exit(-800)
