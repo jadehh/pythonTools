@@ -14,6 +14,7 @@ class MonitorLDKThread(Thread):
         self.JadeLog = JadeLog
         self.ldkqueue = ldkqueue
         super(MonitorLDKThread, self).__init__()
+        self.start()
     def run(self):
         haspStruct,feature_id = self.pyldk.login()
         if haspStruct.status == 0:
