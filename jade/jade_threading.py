@@ -29,12 +29,15 @@ class MonitorLDKThread(Thread):
             self.handlequeue.put(haspStruct.handle)
         while haspStruct.status == 0:
             haspStruct, feature_id = self.pyldk.login()
-            if self.handlequeue.qsize() == self.max_session_size:
-                self.logout()
-            self.handlequeue.put(haspStruct.handle)
-            if self.ldkqueue.qsize() > 0:
-                self.ldkqueue.get()
-            self.ldkqueue.put((self.pyldk,haspStruct.handle))
+            if haspStruct.status == 0:
+                if self.handlequeue.qsize() == self.max_session_size:
+                    self.logout()
+                self.handlequeue.put(haspStruct.handle)
+                if self.ldkqueue.qsize() > 0:
+                    self.ldkqueue.get()
+                self.ldkqueue.put((self.pyldk, haspStruct.handle))
+            else:
+                break
             if self.pyldk.get_ldk(feature_id) is False:
                 break
             else:
