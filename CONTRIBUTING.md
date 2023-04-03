@@ -2,9 +2,8 @@
 
 
 
-
-#### JadeV1.9.4 - 2023-04-03
-* 不在固定pyinstaller版本为4.6
+#### JadeV1.9.5 - 2023-04-03
+* 压缩lib包时,需要判断是否有可执行文件
 ---
 
 
@@ -12,6 +11,11 @@
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV1.9.4 - 2023-04-03
+* 不在固定pyinstaller版本为4.6
+---
+
 
 #### JadeV1.9.3 - 2023-03-24
 * 固定pyinstaller版本为4.6
