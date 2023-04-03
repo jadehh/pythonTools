@@ -630,6 +630,15 @@ def build(args):
             shutil.rmtree("build")
 
 
+    save_path = CreateSavePath(os.path.join("releases", args.name + "V" + args.app_version))
+    if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
+        shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
+    save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
+    # copy_dir("config", save_bin_path)
+    if args.lib_path:
+        copy_dir(args.lib_path, save_bin_path)
+
+
 def recursion_dir(file_list, path):
     if os.path.isfile(path):
         file_list.append(path)
@@ -942,14 +951,6 @@ def packAPP(args):
         shutil.rmtree("tmp")
     if os.path.exists("file_verison_info.txt"):
         os.remove("file_verison_info.txt")
-
-    save_path = CreateSavePath(os.path.join("releases", args.name + "V" + args.app_version))
-    if os.path.exists("{}/{}".format(getOperationSystem(), save_path)) is True:
-        shutil.rmtree("{}/{}".format(getOperationSystem(), save_path))
-    save_bin_path = CreateSavePath(os.path.join(save_path, getOperationSystem()))
-    # copy_dir("config", save_bin_path)
-    if args.lib_path:
-        copy_dir(args.lib_path, save_bin_path)
 
 def get_app_version():
     try:
