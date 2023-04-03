@@ -3,8 +3,8 @@
 
 
 
-#### JadeV1.9.3 - 2023-03-24
-* 固定pyinstaller版本为4.6
+#### JadeV1.9.4 - 2023-04-03
+* 不在固定pyinstaller版本为4.6
 ---
 
 
@@ -12,6 +12,11 @@
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV1.9.3 - 2023-03-24
+* 固定pyinstaller版本为4.6
+---
+
 
 #### JadeV1.9.2 - 2023-03-24
 * 优化加密狗判断流程,刷新的时候一直占用一个Session
