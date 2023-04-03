@@ -965,12 +965,13 @@ def write_version(package_name):
     with open("{}/version.py".format(package_name),"wb") as f:
         f.write("full_version  = '{}'\n".format(get_app_version()).encode("utf-8"))
 
-def zip_lib_package(args):
+def zip_lib_package(args,is_exec=True):
     CreateSavePath("Output")
     install_path = os.path.join(os.getcwd(),
                                 "releases/{}/{}".format(args.name + "V" + args.app_version, getOperationSystem()))
     zip_file(os.path.join(install_path, args.lib_path), os.path.join("Output/{}.zip".format(args.lib_path)))
-    shutil.copy(os.path.join(install_path,args.app_name),os.path.join("Output/{}".format(args.app_name)))
+    if is_exec:
+        shutil.copy(os.path.join(install_path,args.app_name),os.path.join("Output/{}".format(args.app_name)))
 if __name__ == '__main__':
     import argparse
 
