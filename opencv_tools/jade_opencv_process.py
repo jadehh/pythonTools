@@ -944,7 +944,10 @@ class VideoCaptureBaseProcess(threading.Thread):
     def run(self):
         self.capture_reader()
 
-
+def cv2_show(image,window_name="result",waitKey=0):
+    cv2.namedWindow(window_name,0)
+    cv2.imshow(window_name,image)
+    cv2.waitKey(waitKey)
 if __name__ == '__main__':
     from jade import JadeLogging
     JadeLog = JadeLogging("log",Level="DEBUG")
