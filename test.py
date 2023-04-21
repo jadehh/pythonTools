@@ -26,5 +26,15 @@ def test_adapter():
 def test_version():
     from pyldk import __version__
     print(__version__)
+
+def test_login_multi_ldk():
+    pyldk = PyLdk(JadeLog=JadeLog)
+    haspStruct = pyldk.adapter.login(101)
+    print(haspStruct.status)
+    pyldk = PyLdk(JadeLog=JadeLog)
+    haspStruct = pyldk.adapter.login(101)
+
+
+
 if __name__ == '__main__':
-    test_adapter()
+    test_login_multi_ldk()
