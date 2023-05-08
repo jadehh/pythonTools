@@ -1,11 +1,15 @@
 ### 更新日志
 
-#### JadeV2.0.1 - 2023-05-08
-* 加密狗如果没有feature id或者获取feature id失败时,需要退出会话
+#### JadeV2.0.2 - 2023-05-08
+* 初始化的时候就需要校验feature id 是否存在
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV2.0.1 - 2023-05-08
+* 加密狗如果没有feature id或者获取feature id失败时,需要退出会话
+---
 
 #### JadeV1.9.9 - 2023-05-08
 * 加密狗的监测支持自定义feature id

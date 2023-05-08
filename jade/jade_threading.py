@@ -15,8 +15,8 @@ class MonitorLDKThread(Thread):
         self.JadeLog = JadeLog
         self.ldkqueue = ldkqueue
         self.time = time
-        self.max_session_size = max_session_size
         self.feature_id = feature_id
+        self.max_session_size = max_session_size
         self.handlequeue = Queue(maxsize=max_session_size)
         super(MonitorLDKThread, self).__init__()
         self.start()
@@ -25,14 +25,12 @@ class MonitorLDKThread(Thread):
         handle = self.handlequeue.get()
         self.pyldk.adapter.logout(handle)
     def run(self):
-        haspStruct,feature_id = self.pyldk.login()
+        haspStruct,feature_id,login_status = self.pyldk.login(self.feature_id)
         if haspStruct.status == 0:
             self.handlequeue.put(haspStruct.handle)
-        while haspStruct.status == 0:
-            haspStruct, feature_id = self.pyldk.login()
-            if self.feature_id is None:
-                self.feature_id = feature_id
-            if haspStruct.status == 0:
+        while haspStruct.status == 0 and login_status:
+            haspStruct, feature_id,login_status = self.pyldk.login(self.feature_id)
+            if haspStruct.status == 0 and login_status:
                 if self.handlequeue.qsize() == self.max_session_size:
                     self.logout()
                 self.handlequeue.put(haspStruct.handle)
@@ -41,8 +39,7 @@ class MonitorLDKThread(Thread):
                 self.ldkqueue.put((self.pyldk, haspStruct.handle))
             else:
                 break
-            if self.pyldk.get_ldk(self.feature_id) is False:
-                self.logout()
+            if self.pyldk.get_ldk(feature_id) is False:
                 break
             else:
                 self.JadeLog.DEBUG("加密狗监听正常")
