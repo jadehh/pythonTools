@@ -2,6 +2,7 @@
 
 #### PyLdkV1.1.3 - 2023-05-08
 * 支持自定义授权ID登录
+* 自动打包使用最新的ubuntu
 ---
 
 <details onclose>
