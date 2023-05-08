@@ -42,6 +42,7 @@ class MonitorLDKThread(Thread):
             else:
                 break
             if self.pyldk.get_ldk(self.feature_id) is False:
+                self.logout()
                 break
             else:
                 self.JadeLog.DEBUG("加密狗监听正常")
