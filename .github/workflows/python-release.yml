@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu"] # "ubuntu-18.04", "windows-latest","macos-latest"
+        os: [ "ubuntu-latest"] # "ubuntu-18.04", "windows-latest","macos-latest"
         python-version: ["3.7"]
     steps:
       - name: 克隆代码
@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu"] # "ubuntu-18.04", "windows-latest","macos-latest"
+        os: [ "ubuntu-latest"] # "ubuntu-18.04", "windows-latest","macos-latest"
         python-version: ["3.7"]
     steps:
       - uses: actions/checkout@v3
