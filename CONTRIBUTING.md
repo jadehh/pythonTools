@@ -1,12 +1,17 @@
 ### 更新日志
 
+#### PyLdkV1.1.4 - 2023-05-08
+* 初始化的时候就需要校验feature id 是否存在
+---
+
+
+<details onclose>
+<summary>查看更多更新日志</summary>
+
 #### PyLdkV1.1.3 - 2023-05-08
 * 支持自定义授权ID登录
 * 自动打包使用最新的ubuntu
 ---
-
-<details onclose>
-<summary>查看更多更新日志</summary>
 
 #### PyLdkV1.1.2 - 2023-03-24
 * login直接返回haspStruct
