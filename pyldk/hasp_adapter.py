@@ -54,9 +54,11 @@ class BaseAdapter():
             self.log("获取加密狗ID列表失败,失败原因为:{}".format(e))
         return feature_id
 
-    def show_staus(self,operation_str,status):
+    def show_staus(self,operation_str,status,feature_id):
         if status == 7:
             self.log("{},请检查加密狗是否正常插入".format(operation_str))
+        elif status == 31:
+            self.log("{},没有找到该授权,请检查授权ID是否正确,授权ID为:{}".format(operation_str,feature_id))
         elif status == 38:
             self.log("{},请检查登录用户是否超出授权的最大用户数".format(operation_str))
         elif status == 42:
@@ -88,7 +90,7 @@ class BaseAdapter():
                 except Exception as e:
                     self.log("获取加密狗登录最大用户失败,失败原因为:{},info为:{}".format(e,str(haspStruct.info,encoding="utf-8")))
             else:
-                self.show_staus("获取加密狗登录最大用户失败",haspStruct.status)
+                self.show_staus("获取加密狗登录最大用户失败",haspStruct.status,feature_id)
         except Exception as e:
             self.log("获取是否超出加密狗登录最大用户失败,失败原因为:{}".format(e))
 

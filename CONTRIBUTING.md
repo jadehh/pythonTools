@@ -1,13 +1,15 @@
 ### 更新日志
 
-
-
-#### PyLdkV1.1.2 - 2023-03-24
-* login直接返回haspStruct
+#### PyLdkV1.1.3 - 2023-05-08
+* 支持自定义授权ID登录
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### PyLdkV1.1.2 - 2023-03-24
+* login直接返回haspStruct
+---
 
 #### PyLdkV1.1.1 - 2023-03-20
 * long_description_content_type使用Markdown协议
