@@ -978,7 +978,14 @@ def zip_lib_package(args):
     CreateSavePath("Output")
     install_path = os.path.join(os.getcwd(),
                                 "releases/{}/{}".format(args.name + "V" + args.app_version, getOperationSystem()))
-    zip_file(os.path.join(install_path, args.lib_path), os.path.join("Output/{}.zip".format(args.lib_path)))
+
+    is_zip_lib = True
+    try:
+        is_zip_lib = str_to_bool(args.zip_lib)
+    except:
+        pass
+    if is_zip_lib:
+        zip_file(os.path.join(install_path, args.lib_path), os.path.join("Output/{}.zip".format(args.lib_path)))
     if os.path.exists(os.path.join(install_path,args.app_name)):
         shutil.copy(os.path.join(install_path,args.app_name),os.path.join("Output/{}".format(args.app_name)))
 

@@ -1,11 +1,16 @@
 ### 更新日志
 
-#### JadeV2.0.2 - 2023-05-08
-* 初始化的时候就需要校验feature id 是否存在
+#### JadeV2.0.3 - 2023-05-11
+* 打包的时候新增是否压缩lib包参数
 ---
+
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV2.0.2 - 2023-05-08
+* 初始化的时候就需要校验feature id 是否存在
+---
 
 #### JadeV2.0.1 - 2023-05-08
 * 加密狗如果没有feature id或者获取feature id失败时,需要退出会话
