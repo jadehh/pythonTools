@@ -10,12 +10,12 @@ from threading import Thread
 from jade.jade_tools import *
 from queue import Queue
 class MonitorLDKThread(Thread):
-    def __init__(self,pyldk,JadeLog,ldkqueue,time=60*60,max_session_size=1,feature_id=None):
+    def __init__(self,pyldk,JadeLog,ldkqueue,time=60*60,max_session_size=1,feature_id_list=None):
         self.pyldk = pyldk
         self.JadeLog = JadeLog
         self.ldkqueue = ldkqueue
         self.time = time
-        self.feature_id = feature_id
+        self.feature_id_list = feature_id_list
         self.max_session_size = max_session_size
         self.handlequeue = Queue(maxsize=max_session_size)
         super(MonitorLDKThread, self).__init__()
@@ -25,11 +25,13 @@ class MonitorLDKThread(Thread):
         handle = self.handlequeue.get()
         self.pyldk.adapter.logout(handle)
     def run(self):
-        haspStruct,feature_id,login_status = self.pyldk.login(self.feature_id)
-        if haspStruct.status == 0:
-            self.handlequeue.put(haspStruct.handle)
+        for feature_id in self.feature_id_list:
+            haspStruct,feature_id,login_status = self.pyldk.login(feature_id)
+            if haspStruct.status == 0:
+                self.handlequeue.put(haspStruct.handle)
+                break
         while haspStruct.status == 0 and login_status:
-            haspStruct, feature_id,login_status = self.pyldk.login(self.feature_id)
+            haspStruct, feature_id,login_status = self.pyldk.login(feature_id)
             if haspStruct.status == 0 and login_status:
                 if self.handlequeue.qsize() == self.max_session_size:
                     self.logout()
