@@ -99,9 +99,9 @@ class ContaNumber(object):
 
     def check_well_model(self, conta_model):
         self.model_list = ["G", "V", "B", "S", "R", "H", "U", "P", "T", "A",
-                           "K"]  ##箱型校验规则,一共四位数,第三位为英文字母满足一定规则,第四位为0-9的数字
+                           "K"]  ##箱型校验规则,一共四位数,第三位为英文字母满足一定规则,第1位为0-9的数字
         try:
-            if conta_model[2] in self.model_list and conta_model[3].isdigit():
+            if conta_model[2] in self.model_list and conta_model[0].isdigit():
                 return True
             else:
                 return False
