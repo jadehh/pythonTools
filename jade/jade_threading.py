@@ -25,11 +25,14 @@ class MonitorLDKThread(Thread):
         handle = self.handlequeue.get()
         self.pyldk.adapter.logout(handle)
     def run(self):
-        for feature_id in self.feature_id_list:
-            haspStruct,feature_id,login_status = self.pyldk.login(feature_id)
-            if haspStruct.status == 0:
-                self.handlequeue.put(haspStruct.handle)
-                break
+        if self.feature_id_list:
+            for feature_id in self.feature_id_list:
+                haspStruct, feature_id, login_status = self.pyldk.login(feature_id)
+                if haspStruct.status == 0:
+                    self.handlequeue.put(haspStruct.handle)
+                    break
+        else:
+            haspStruct, feature_id, login_status = self.pyldk.login()
         while haspStruct.status == 0 and login_status:
             haspStruct, feature_id,login_status = self.pyldk.login(feature_id)
             if haspStruct.status == 0 and login_status:
