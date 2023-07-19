@@ -528,6 +528,7 @@ def writeSpec(args):
                         "             win_private_assemblies=False,\n"
                         "             cipher=block_cipher,\n"
                         "             noarchive=False)\n"
+                        "{}"
                         "pyz = PYZ(a.pure, a.zipped_data,\n"
                         "             cipher=block_cipher)\n"
                         "exe1 = EXE(pyz,\n"
@@ -546,7 +547,11 @@ def writeSpec(args):
                         "          console={},\n"
                         "          icon='{}',\n"
                         "          version='file_verison_info.txt')\n"
-                    .format(get_app_name(args), binaries_str, data_str, get_app_name(args), args.console,
+                    .format(get_app_name(args),
+                            binaries_str,
+                            data_str,
+                            exclude_files_str,
+                            get_app_name(args), args.console,
                             icon_path).encode(
                     "utf-8"))
 
