@@ -407,7 +407,16 @@ def writeSpec(args):
         pass
     else:
         icon_path = ""
-
+    exclude_files_str = ""
+    try:
+        exclude_files_list = str_to_list(args.exclude_files)
+        if len(exclude_files_list) > 0:
+            exclude_files_str = exclude_files_str + "a.binaries = a.binaries - TOC([\n"
+        for exclude_file in exclude_files_list:
+            exclude_files_str = exclude_files_str + "\t('{}',None, None),\n".format(exclude_file)
+        exclude_files_str = exclude_files_str + "])\n"
+    except:
+        pass
     if getOperationSystem() == "Darwin":
         with open("{}.spec".format(get_app_name(args)), "wb") as f:
             f.write(("# -*- mode: python ; coding: utf-8 -*-\n\n\n"
@@ -425,6 +434,7 @@ def writeSpec(args):
                      "\t\t\twin_private_assemblies=False,\n"
                      "\t\t\tcipher=block_cipher,\n"
                      "\t\t\tnoarchive=False)\n"
+                     "{}\n"
                      "pyz = PYZ(a.pure, a.zipped_data,\n"
                      "\t\t\tcipher=block_cipher)\n\n"
                      "exe = EXE(pyz,\n"
@@ -448,7 +458,10 @@ def writeSpec(args):
                      "\t\t\tname='{}.app',\n"
                      "\t\t\ticon='{}',\n"
                      "\t\t\tbundle_identifier=None,\n"
-                     "\t\t\tinfo_plist = ".format(get_app_name(args), binaries_str, data_str,
+                     "\t\t\tinfo_plist = ".format(get_app_name(args),
+                                                  binaries_str,
+                                                  data_str,
+                                                  exclude_files_str,
                                                   get_app_name(args), icon_path, get_app_name(args), icon_path) +
                      "{\n\t\t\t\t\t\t\t'NSHighResolutionCapable':'True','CFBundleShortVersionString':" + "'{}'".format(
                         args.app_version[:-2])
@@ -470,6 +483,7 @@ def writeSpec(args):
                         "             win_private_assemblies=False,\n"
                         "             cipher=block_cipher,\n"
                         "             noarchive=False)\n"
+                        "{}"
                         "pyz = PYZ(a.pure, a.zipped_data,\n"
                         "             cipher=block_cipher)\n"
                         "exe2 = EXE(pyz,\n"
@@ -491,7 +505,11 @@ def writeSpec(args):
                         "          strip=False,\n"
                         "          upx=True,\n"
                         "          upx_exclude=[],\n"
-                        "          name='{}')\n".format(get_app_name(args), binaries_str, data_str, get_app_name(args),
+                        "          name='{}')\n".format(get_app_name(args),
+                                                        binaries_str,
+                                                        data_str,
+                                                        exclude_files_str,
+                                                        get_app_name(args),
                                                         args.console, icon_path,
                                                         get_app_name(args)).encode("utf-8"))
         else:
