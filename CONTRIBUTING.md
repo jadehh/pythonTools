@@ -1,13 +1,16 @@
 ### 更新日志
 
-
-#### JadeV2.0.5 - 2023-06-14
-* 兼容加密狗feature id list为None的情况
+#### JadeV2.0.5 - 2023-07-19
+* 新增exclude_files参数,去除打包时不必要的动态库
 ---
+
 
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+#### JadeV2.0.5 - 2023-06-14
+* 兼容加密狗feature id list为None的情况
+---
 
 #### JadeV2.0.4 - 2023-05-22
 * 加密狗监测模块支持多个加密狗的id
