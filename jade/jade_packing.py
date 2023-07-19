@@ -414,7 +414,8 @@ def writeSpec(args):
             exclude_files_str = exclude_files_str + "a.binaries = a.binaries - TOC([\n"
         for exclude_file in exclude_files_list:
             exclude_files_str = exclude_files_str + "\t('{}',None, None),\n".format(exclude_file)
-        exclude_files_str = exclude_files_str + "])\n"
+        if len(exclude_files_list) > 0:
+            exclude_files_str = exclude_files_str + "])\n"
     except:
         pass
     if getOperationSystem() == "Darwin":
