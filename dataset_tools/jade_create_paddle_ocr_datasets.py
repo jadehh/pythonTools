@@ -359,7 +359,7 @@ class CreatePaddleOCRDatasets(object):
                                 all_image_height = all_image_height + txt_img.shape[0]
                                 all_image_count = all_image_count + 1
                                 with open(os.path.join(save_h_detail_path, "rec_gt_test.txt"), "ab") as f:
-                                    content = "test/" + image_name + "\t   " + txt
+                                    content = "test/" + image_name + "\t" + txt
                                     f.write((content + "\n").encode("utf-8"))
                             else:
                                 txt_img = (txt_img * 255).astype("uint8")
@@ -370,7 +370,7 @@ class CreatePaddleOCRDatasets(object):
                                 all_image_height = all_image_height + txt_img.shape[0]
                                 all_image_count = all_image_count + 1
                                 with open(os.path.join(save_v_detail_path, "rec_gt_test.txt"), "ab") as f:
-                                    content = "test/" + image_name + "\t   " + txt
+                                    content = "test/" + image_name + "\t" + txt
                                     f.write((content + "\n").encode("utf-8"))
                         else:
                             if h < w:
@@ -380,7 +380,7 @@ class CreatePaddleOCRDatasets(object):
                                 all_image_height = all_image_height + txt_img.shape[0]
                                 all_image_count = all_image_count + 1
                                 with open(os.path.join(save_h_detail_path, "rec_gt_train.txt"), "ab") as f:
-                                    content = "train/" + image_name + "\t   " + txt
+                                    content = "train/" + image_name + "\t" + txt
                                     f.write((content + "\n").encode("utf-8"))
                             else:
                                 txt_img = (txt_img * 255).astype("uint8")
@@ -391,7 +391,7 @@ class CreatePaddleOCRDatasets(object):
                                 cv2.imencode('.jpg', txt_img)[1].tofile(
                                     os.path.join(save_v_detail_train_path, image_name))
                                 with open(os.path.join(save_v_detail_path, "rec_gt_train.txt"), "ab") as f:
-                                    content = "train/" + image_name + "\t   " + txt
+                                    content = "train/" + image_name + "\t" + txt
                                     f.write((content + "\n").encode("utf-8"))
                     else:
                         if txt_orignal != "difficult":
