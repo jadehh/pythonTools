@@ -1,6 +1,6 @@
 ### 更新日志
 
-#### DatasetToolsV1.1.0 - 2023-03-13
+#### DatasetToolsV1.1.0 - 2023-08-15
 * 制作箱号识别模型时去除空白字符
 ---
 <details onclose>
