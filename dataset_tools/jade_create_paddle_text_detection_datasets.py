@@ -6,6 +6,8 @@
 # @Mailbox : jadehh@live.com
 # @Software: Samples
 # @Desc    :
+import os.path
+
 from jade import *
 import json
 import base64
@@ -175,20 +177,23 @@ def createDatasets(root_path):
     with open(os.path.join(root_path, "train_icdar2015_label.txt"), "wb") as f1:
         for year in years:
             if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
-                with open(os.path.join(root_path, year, "train_icdar2015_label.txt"), "rb") as f:
-                    content_list = f.readlines()
-                    for content in content_list:
-                        new_c = year + "/" + str(content,encoding="utf-8").strip()
-                        f1.write((new_c + "\n").encode("utf-8"))
+                if os.path.exists(os.path.join(root_path, year, "train_icdar2015_label.txt")):
+                    with open(os.path.join(root_path, year, "train_icdar2015_label.txt"), "rb") as f:
+                        content_list = f.readlines()
+                        for content in content_list:
+                            new_c = year + "/" + str(content, encoding="utf-8").strip()
+                            f1.write((new_c + "\n").encode("utf-8"))
 
     with open(os.path.join(root_path, "test_icdar2015_label.txt"), "wb") as f1:
         for year in years:
             if len(year.split("-")) > 1 and os.path.isdir(os.path.join(root_path, year)):
-                with open(os.path.join(root_path, year, "test_icdar2015_label.txt"), "rb") as f:
-                    content_list = f.readlines()
-                    for content in content_list:
-                        new_c = year + "/" + str(content,encoding="utf-8").strip()
-                        f1.write((new_c + "\n").encode("utf-8"))
+                if os.path.exists(os.path.join(root_path, year, "test_icdar2015_label.txt")):
+                    with open(os.path.join(root_path, year, "test_icdar2015_label.txt"), "rb") as f:
+                        content_list = f.readlines()
+                        for content in content_list:
+                            new_c = year + "/" + str(content, encoding="utf-8").strip()
+                            f1.write((new_c + "\n").encode("utf-8"))
+
 
 
 def removeNolabelDatasets(root_path):
