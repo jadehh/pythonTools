@@ -295,7 +295,7 @@ def SplitDataSets(image_path_list, ContaNumber_list,split_rate):
 
 
 
-def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
+def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9,max_candidates=0):
     ##　　
     removeNolabelDatasets(root_path)
     image_path_list = GetAllImagesPath(root_path)
@@ -308,14 +308,15 @@ def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
         os.remove(os.path.join(save_path, "test_icdar2015_label.txt"))
     index = 0
     ##分割数据集应该是从整体数据集中挑选出重复的数据
-
     train_image_files, test_image_files = SplitDataSets(image_path_list, ContaNumber_list,split_rate)
 
     progressBar = ProgressBar(len(train_image_files))
     for image_path in train_image_files:
         shutil.copyfile(image_path, os.path.join(save_image_path, GetLastDir(image_path)))
         result = readjsonContent(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
-
+        result_list = json.loads(result)
+        if len(result_list) > max_candidates:
+            max_candidates = len(result_list)
         with open(os.path.join(save_path, "train_icdar2015_label.txt"), "ab") as f:
             content = "image/" + GetLastDir(image_path) + "\t" + result
             f.write((content + "\n").encode("utf-8"))
@@ -325,11 +326,15 @@ def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9):
     for image_path in test_image_files:
         shutil.copyfile(image_path, os.path.join(save_image_path, GetLastDir(image_path)))
         result = readjsonContent(os.path.join(root_path, GetLastDir(image_path)[:-4] + ".json"))
+        result_list = json.loads(result)
+        if len(result_list) > max_candidates:
+            max_candidates = len(result_list)
         with open(os.path.join(save_path, "test_icdar2015_label.txt"), "ab") as f:
             content = "image/" + GetLastDir(image_path) + "\t" + result
             f.write((content + "\n").encode("utf-8"))
         progresstestBar.update()
     createDatasets(save_root_path)
+    return max_candidates
 
 def create_text_detection_datasets(root_path,save_path,split_rate=0.95):
     if os.path.exists(save_path):
@@ -338,5 +343,7 @@ def create_text_detection_datasets(root_path,save_path,split_rate=0.95):
         except:
             print("文件夹删除失败,文件夹名称为:{}".format(save_path))
     file_list = os.listdir(root_path)
+    max_candidates = 0
     for file_name in file_list:
-        CreateTextDetDatasets(os.path.join(root_path, file_name),save_path,split_rate)
+        max_candidates = CreateTextDetDatasets(os.path.join(root_path, file_name),save_path,split_rate,max_candidates)
+    print(max_candidates)
