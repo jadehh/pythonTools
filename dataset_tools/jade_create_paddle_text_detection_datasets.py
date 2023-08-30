@@ -346,4 +346,4 @@ def create_text_detection_datasets(root_path,save_path,split_rate=0.95):
     max_candidates = 0
     for file_name in file_list:
         max_candidates = CreateTextDetDatasets(os.path.join(root_path, file_name),save_path,split_rate,max_candidates)
-    print(max_candidates)
+    print("\nmax_candidates ={}".format(max_candidates))
