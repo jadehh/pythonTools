@@ -1,11 +1,15 @@
 ### 更新日志
 
-#### JadeV2.0.7 - 2023-07-19
-* 解决打包一个完成的包,exclude_files不生效的bug
+#### JadeV2.0.7 - 2023-09-21
+* 解决加密狗重复登录的bug
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV2.0.7 - 2023-07-19
+* 解决打包一个完成的包,exclude_files不生效的bug
+---
 
 #### JadeV2.0.6 - 2023-07-19
 * 新增exclude_files参数,去除打包时不必要的动态库

@@ -33,6 +33,7 @@ class MonitorLDKThread(Thread):
                     break
         else:
             haspStruct, feature_id, login_status = self.pyldk.login()
+            self.pyldk.adapter.logout(haspStruct.handle)
         while haspStruct.status == 0 and login_status:
             haspStruct, feature_id,login_status = self.pyldk.login(feature_id)
             if haspStruct.status == 0 and login_status:
