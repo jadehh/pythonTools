@@ -98,8 +98,7 @@ class ContaNumber(object):
         return False
 
     def check_well_model(self, conta_model):
-        self.model_list = ["G", "V", "B", "S", "R", "H", "U", "P", "T", "A","D"
-                           "K"]  ##箱型校验规则,一共四位数,第三位为英文字母满足一定规则,第1位为0-9的数字
+        self.model_list = ["G", "V", "B", "S", "R", "H", "U", "P", "T", "A","K","0","1"]  ##箱型校验规则,一共四位数,第三位为英文字母满足一定规则,第1位为0-9的数字
         try:
             if conta_model[2] in self.model_list:
                 return True
