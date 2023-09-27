@@ -20,5 +20,20 @@ def test_monitor_pydk():
     ldkqueue = Queue(10)
     LDKREFRESHTIME = 30
     MonitorLDKThread(PyLdk(JadeLog), JadeLog, ldkqueue, LDKREFRESHTIME)
+
+def test_print_a():
+    a = b'\xe7\x9b\xb8\xe6\x9c\xba\xe5\xbc\x82\xe5\xb8\xb8'
+    print(a.decode("utf-8"))
+
+
 if __name__ == '__main__':
-    test_monitor_pydk()
+    count = 0
+
+
+    def increase_count(count):
+        count += 1
+
+
+    print(count)  # 输出0
+    increase_count(count)
+    print(count)
