@@ -1,10 +1,17 @@
 ### 更新日志
+
+#### DatasetToolsV1.1.3 - 2023-09-27
+* 降低箱型校验标准
+---
+
+
+<details onclose>
+<summary>查看更多更新日志</summary>
+
 #### DatasetToolsV1.1.2 - 2023-08-30
 * 输出最大文本检框数量
 ---
 
-<details onclose>
-<summary>查看更多更新日志</summary>
 
 #### DatasetToolsV1.1.1 - 2023-08-23
 * 制作文本检测数据集时需要判断txt文件存不存在
