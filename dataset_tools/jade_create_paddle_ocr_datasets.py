@@ -189,18 +189,23 @@ class ContaNumber(object):
         return match_best_text, "", max_key_val
 
 
-class CreatePaddleOCRDatasets(object):
-    def __init__(self, root_path, save_path, dataset_type=None):
+class create_paddle_ocr_datasets(object):
+    def __init__(self, root_path, save_path, dataset_type=None,year=""):
         self.root_path = root_path
+        self.year = year
+        if year:
+            self.root_path = os.path.join(root_path,year)
+        else:
+            if os.path.exists(save_path):
+                try:
+                    shutil.rmtree(save_path)
+                except:
+                    print("删除文件夹失败,文件夹为:{}".format(save_path))
         self.save_path = save_path
         self.conta_check_model = ContaNumber()
         self.dataset_type = dataset_type  ## 数据集类型,如车牌数据集,箱号数据集
         label_list = self.get_label_text_path()
-        if os.path.exists(save_path):
-            try:
-                shutil.rmtree(save_path)
-            except:
-                print("删除文件夹失败,文件夹为:{}".format(save_path))
+
         for label_path in label_list:
             self.createOCRDatasets(label_path)
 
@@ -304,13 +309,15 @@ class CreatePaddleOCRDatasets(object):
                 label_path_list.append(os.path.join(self.root_path, filename))
         return label_path_list
 
-    def createOCRDatasets(self, label_txt_path):
+
+    def write_datasets(self,label_txt_path,year=""):
         save_h_path = CreateSavePath(os.path.join(self.save_path, "OCRH"))
         save_v_path = CreateSavePath(os.path.join(self.save_path, "OCRV"))
+        privous_dir = GetPreviousDir(label_txt_path)
+
         istrain = False
         if "train" in label_txt_path:
             istrain = True
-        privous_dir = GetPreviousDir(label_txt_path)
         all_image_width = 0
         all_image_height = 0
         all_image_count = 0
@@ -319,9 +326,14 @@ class CreatePaddleOCRDatasets(object):
             index = 0
             processBar = ProgressBar(len(content_list))
             for content_byte in content_list:
-                content = str(content_byte,"utf-8").strip()
-                save_h_detail_path = CreateSavePath(os.path.join(save_h_path, content.split("/")[0]))
-                save_v_detail_path = CreateSavePath(os.path.join(save_v_path, content.split("/")[0]))
+                content = str(content_byte, "utf-8").strip()
+                if self.year:
+                    save_h_detail_path = CreateSavePath(os.path.join(save_h_path,self.year))
+                    save_v_detail_path = CreateSavePath(os.path.join(save_v_path,self.year))
+                else:
+                    save_h_detail_path = CreateSavePath(os.path.join(save_h_path, content.split("/")[0]))
+                    save_v_detail_path = CreateSavePath(os.path.join(save_v_path, content.split("/")[0]))
+
                 save_h_detail_train_path = CreateSavePath(os.path.join(save_h_detail_path, "train"))
                 save_h_detail_test_path = CreateSavePath(os.path.join(save_h_detail_path, "test"))
 
@@ -351,7 +363,7 @@ class CreatePaddleOCRDatasets(object):
                     txt = self.verification_rules(txt_orignal)
                     if txt:
                         if istrain is False:
-                            if h < w: ## 水平
+                            if h < w:  ## 水平
                                 cv2.imencode('.jpg', txt_img * 255)[1].tofile(
                                     os.path.join(save_h_detail_test_path, image_name))
                                 all_image_width = all_image_width + txt_img.shape[1]
@@ -399,7 +411,14 @@ class CreatePaddleOCRDatasets(object):
                 index = index + 1
                 processBar.update()
 
-        print("平均高度为:{},平均宽度为:{}".format(all_image_height / all_image_count,all_image_width / all_image_count))
+        print(
+            "平均高度为:{},平均宽度为:{}".format(all_image_height / all_image_count, all_image_width / all_image_count))
+
+    def createOCRDatasets(self, label_txt_path):
+        self.write_datasets(label_txt_path)
+
+
+
 
     def createDatasets(self, root_path):
         if os.path.exists(os.path.join(root_path, "rec_gt_train.txt")) is True:

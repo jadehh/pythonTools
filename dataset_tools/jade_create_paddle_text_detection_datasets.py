@@ -336,14 +336,19 @@ def CreateTextDetDatasets(root_path, save_root_path, split_rate=0.9,max_candidat
     createDatasets(save_root_path)
     return max_candidates
 
-def create_text_detection_datasets(root_path,save_path,split_rate=0.95):
-    if os.path.exists(save_path):
-        try:
-            shutil.rmtree(save_path)
-        except:
-            print("文件夹删除失败,文件夹名称为:{}".format(save_path))
+def create_text_detection_datasets(root_path,save_path,split_rate=0.95,year=""):
     file_list = os.listdir(root_path)
     max_candidates = 0
-    for file_name in file_list:
-        max_candidates = CreateTextDetDatasets(os.path.join(root_path, file_name),save_path,split_rate,max_candidates)
+    if year:
+        max_candidates = CreateTextDetDatasets(os.path.join(root_path,year), save_path, split_rate,
+                                               max_candidates)
+    else:
+        if os.path.exists(save_path):
+            try:
+                shutil.rmtree(save_path)
+            except:
+                print("文件夹删除失败,文件夹名称为:{}".format(save_path))
+        for file_name in file_list:
+            max_candidates = CreateTextDetDatasets(os.path.join(root_path, file_name), save_path, split_rate,
+                                                   max_candidates)
     print("\nmax_candidates ={}".format(max_candidates))
