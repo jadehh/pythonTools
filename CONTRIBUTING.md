@@ -1,12 +1,16 @@
 ### 更新日志
 
-#### JadeV2.0.9 - 2023-11-20
-* 拷贝config文件和压缩文件夹
+#### JadeV2.1.0 - 2023-11-20
+* 拷贝config文件和压缩文件夹,区分Linux和Windows
 ---
 
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV2.0.9 - 2023-11-20
+* 拷贝config文件和压缩文件夹
+---
 
 #### JadeV2.0.8 - 2023-09-21
 * 解决加密狗重复登录的bug
