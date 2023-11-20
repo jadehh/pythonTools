@@ -1,12 +1,16 @@
 ### 更新日志
 
-#### JadeV2.1.0 - 2023-11-20
-* 拷贝config文件和压缩文件夹,区分Linux和Windows
----
 
+#### JadeV2.1.0 - 2023-11-20
+* zip_package 压缩成压缩包文件名不能为中文,
+---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV2.1.0 - 2023-11-20
+* 拷贝config文件和压缩文件夹,区分Linux和Windows
+---
 
 #### JadeV2.0.9 - 2023-11-20
 * 拷贝config文件和压缩文件夹

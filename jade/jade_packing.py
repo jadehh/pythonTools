@@ -1019,9 +1019,9 @@ def zip_package(args):
     shutil.copy(os.path.join("config","config.ini"),os.path.join(install_path,"config"))
     output_path = CreateSavePath("Output")
     if getOperationSystem() == "Windows":
-        zip_file(install_path,"Output/{}-win32.zip".format(args.name + "V" + args.app_version))
+        zip_file(install_path,"Output/{}-win32.zip".format(args.app_name + "V" + args.app_version))
     elif getOperationSystem() == "Linux":
-        zip_file(install_path,"Output/{}-liunx.zip".format(args.name + "V" + args.app_version))
+        zip_file(install_path,"Output/{}-liunx.zip".format(args.app_name + "V" + args.app_version))
 
 
 if __name__ == '__main__':
