@@ -1013,6 +1013,17 @@ def zip_lib_package(args):
     if os.path.exists(os.path.join(install_path,args.app_name)):
         shutil.copy(os.path.join(install_path,args.app_name),os.path.join("Output/{}".format(args.app_name)))
 
+def zip_package(args):
+    install_path = "releases/{}/{}/".format(args.name + "V" + args.app_version, getOperationSystem())
+    CreateSavePath(os.path.join(install_path,"config"))
+    shutil.copy(os.path.join("config","config.ini"),os.path.join(install_path,"config"))
+    output_path = CreateSavePath("Output")
+    if getOperationSystem() == "Windows":
+        zip_file(install_path,"Output/{}-win32.zip".format(args.name + "V" + args.app_version))
+    elif getOperationSystem() == "":
+        zip_file(install_path,"Output/{}-liunx.zip".format(args.name + "V" + args.app_version))
+
+
 if __name__ == '__main__':
     import argparse
 
