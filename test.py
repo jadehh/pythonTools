@@ -26,14 +26,8 @@ def test_print_a():
     print(a.decode("utf-8"))
 
 
+def test_get_version():
+    write_version("jade")
+
 if __name__ == '__main__':
-    count = 0
-
-
-    def increase_count(count):
-        count += 1
-
-
-    print(count)  # 输出0
-    increase_count(count)
-    print(count)
+    test_get_version()
