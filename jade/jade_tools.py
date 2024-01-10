@@ -484,6 +484,10 @@ def generate_random_string(length):
 
     # 从字符集合中随机选取指定长度的字符并组合起来形成随机字符串
     return ''.join([random.choice(characters) for _ in range(length)])
+def get_file_size(filename):
+    size = os.path.getsize(filename)
+    return size
+
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
