@@ -1,12 +1,16 @@
 ### 更新日志
 
 
-#### JadeV2.1.2 - 2023-11-20
-* zip_package Linux生成文件名修改
+#### JadeV2.1.3 - 2024-01-10
+* 根据字符窜长度随机生成字符串
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### JadeV2.1.2 - 2023-11-20
+* zip_package Linux生成文件名修改
+---
 
 #### JadeV2.1.1 - 2023-11-20
 * zip_package 压缩成压缩包文件名不能为中文,

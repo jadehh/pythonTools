@@ -477,6 +477,13 @@ def ldk_release(ldkqueue,JadeLog=None):
     if ldkqueue.qsize() > 0:
         pyldk, handle = ldkqueue.get()
         pyldk.adapter.logout(handle)
+# 根据字符窜长度随机生成字符串
+def generate_random_string(length):
+    # 设置包含所有大小写字母、数字的字符集合
+    characters = string.ascii_letters + string.digits
+
+    # 从字符集合中随机选取指定长度的字符并组合起来形成随机字符串
+    return ''.join([random.choice(characters) for _ in range(length)])
 if __name__ == '__main__':
     key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
     #encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
