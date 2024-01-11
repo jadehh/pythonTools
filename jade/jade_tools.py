@@ -18,6 +18,7 @@ from cryptography.fernet import Fernet
 import zipfile
 import signal
 import string
+import random
 
 def zh_ch(string):
     """
