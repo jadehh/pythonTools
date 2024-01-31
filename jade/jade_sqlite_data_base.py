@@ -118,6 +118,8 @@ class JadeSqliteDataBase(object):
         try:
             self.cursor.execute(sql_str)
             self.db.commit()
+            self.cursor.execute("VACUUM")
+            self.db.commit()
         except Exception as e:
             self.JadeLog.ERROR("插入数据表失败,失败原因为{},sql语句为{}".format(e, sql_str))
 

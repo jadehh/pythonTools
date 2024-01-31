@@ -1,13 +1,18 @@
 ### 更新日志
 
+#### JadeV2.1.7 - 2024-01-31
+* 解决数据库清空的bug
+---
+
+
+
+<details onclose>
+<summary>查看更多更新日志</summary>
 
 #### JadeV2.1.6 - 2024-01-11
 * 解决随机字符串的bug
 ---
 
-
-<details onclose>
-<summary>查看更多更新日志</summary>
 
 #### JadeV2.1.5 - 2024-01-10
 * 解决随机字符串的bug
