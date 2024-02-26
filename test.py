@@ -14,8 +14,8 @@ JadeLog = JadeLogging()
 def test_adapter():
     index = 0
     pyldk = PyLdk(JadeLog=JadeLog)
-    status,feature_id = pyldk.login()
-    while status:
+    haspStruct,feature_id,login_status = pyldk.login()
+    while login_status:
         if pyldk.get_ldk(feature_id) is False:
             break
         else:
@@ -37,4 +37,4 @@ def test_login_multi_ldk():
 
 
 if __name__ == '__main__':
-    test_login_multi_ldk()
+    test_adapter()
