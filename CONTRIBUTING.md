@@ -1,12 +1,17 @@
 ### 更新日志
 
 
-#### OpencvToolsV1.2.8 - 2023-04-07
-* 新增cv_show方法
+#### OpencvToolsV1.2.9 - 2024-02-26
+* 解决PIL中的警告,使用textbbox替代textsize
 ---
+
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+
+#### OpencvToolsV1.2.8 - 2023-04-07
+* 新增cv_show方法
+---
 
 #### OpencvToolsV1.2.7 - 2023-03-13
 * CVShowBoxes支持线条尺寸参数
