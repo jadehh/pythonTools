@@ -1,11 +1,16 @@
 ### 更新日志
 
-#### DatasetToolsV1.1.5 - 2023-10-13
-* 支持新增数据集
+#### DatasetToolsV1.1.6 - 2024-02-26
+* 目标检测数据集支持单日期格式新增,支持所有日期格式新增
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+
+#### DatasetToolsV1.1.5 - 2023-10-13
+* 支持新增数据集
+---
 
 #### DatasetToolsV1.1.4 - 2023-09-27
 * 降低箱型校验标准
