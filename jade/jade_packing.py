@@ -606,7 +606,7 @@ def build(args):
         if len(specify_files) > 0:
             if file_name in specify_files:
                 cmd_str = "{}easycython {}/{}".format(scripts_path, "new_src", file_name)
-                result = subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                result = subprocess.run(cmd_str, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 progressBar.update()
                 need_to_build_file_list.append(file_name)
             else:
@@ -614,7 +614,7 @@ def build(args):
         else:
             cmd_str = "{}easycython {}/{}".format(scripts_path, "new_src", file_name)
             need_to_build_file_list.append(file_name)
-            subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd_str, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             progressBar.update()
 
     build_file_list = os.listdir()
@@ -840,7 +840,7 @@ def packSetup(args, exec_path, uuid,output_name=None):
         print("Inno Setup Path exists,dir:{}".format(inno_setup_path))
         cmd_str = "{} {}".format(os.path.join(inno_setup_path, "ISCC.exe"), os.path.join(os.getcwd(), issname))
         print("cmd str:{}".format(cmd_str))
-        subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(cmd_str, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove(os.path.join(os.getcwd(), issname))
 
 
@@ -934,7 +934,7 @@ def packAPP(args):
     if "Windows" == getOperationSystem():
         if str_to_bool(args.full) is False:
             cmd_str = "xcopy dist\\{} {} /s/y".format(get_app_name(args), save_bin_path)
-            subprocess.run(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd_str, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             shutil.copy("dist\\{}.exe".format(get_app_name(args)), "{}/".format(save_bin_path))
     else:
