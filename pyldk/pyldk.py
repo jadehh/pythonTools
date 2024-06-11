@@ -19,7 +19,10 @@ class PyLdk(object):
 
         else:
             libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib/{}/{}'.format(getOperationSystem(),self.get_system_arch())))
-        self.adapter = BaseAdapter(os.path.join(libs_dir,os.listdir(libs_dir)[0]),JadeLog)
+        try:
+            self.adapter = BaseAdapter(os.path.join(libs_dir,os.listdir(libs_dir)[0]),JadeLog)
+        except:
+            Exit(-1)
 
     def get_system_arch(self):
         return (platform.uname().processor)
