@@ -22,6 +22,7 @@ class PyLdk(object):
         try:
             self.adapter = BaseAdapter(os.path.join(libs_dir,os.listdir(libs_dir)[0]),JadeLog)
         except:
+            self.log("加密狗初始化失败,失败原因为:加密狗文件被删除")
             Exit(-1)
 
     def get_system_arch(self):
