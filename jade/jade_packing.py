@@ -932,9 +932,8 @@ def packAppImage(args):
                 "X-AppImage-Version=912fe1b\n\n\n"
                 "Name[zh_CN]={}".format("1.1", get_app_name(args), get_app_name(args), get_app_name(args)))
     os.system("chmod a+x  {}".format(os.path.join(save_path, get_app_name(args) + ".desktop")))
-    print("{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
-    os.system(
-        "{}/appimagetool-x86_64.AppImage {} {}.AppImage".format(os.path.expanduser("~"), "tmp", get_app_name(args)))
+    print("{}/appimagetool-{}.AppImage {} {}.AppImage".format(os.path.expanduser("~"), platform.machine(), "tmp", get_app_name(args)))
+    os.system("{}/appimagetool-{}.AppImage {} {}.AppImage".format(os.path.expanduser("~"),platform.machine(), "tmp", get_app_name(args)))
     os.system("chmod a+x  {}.AppImage".format(get_app_name(args)))
     return "{}.AppImage".format(get_app_name(args))
 

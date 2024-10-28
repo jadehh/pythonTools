@@ -1,11 +1,15 @@
 # 更新日志
 
-## JadeV2.3.2 - 2024-7-18
-* 输出easycython进程
+## JadeV2.3.3 - 2024-7-18
+* 支持aarch64 AppImage打包
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+## JadeV2.3.2 - 2024-7-18
+* 输出easycython进程
+---
 
 ## JadeV2.3.1 - 2024-06-18
 * 优化获取版本信息的方法
