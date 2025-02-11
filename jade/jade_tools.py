@@ -575,9 +575,3 @@ def get_exception_des(ex: Exception):
     """
     return "出错原因为 = {},发生异常文件:{},发生异常所在的行数:{}".format(ex, ex.__traceback__.tb_frame.f_globals["__file__"], ex.__traceback__.tb_lineno)
 
-
-if __name__ == '__main__':
-    key = "HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co="
-    # encryption_model("container_det_768-576_slim.onnx","HgEWN6tv_HeVqbh7M_Q-XT6NCVETFeIspgE17Xh30Co=")
-    model = decryption_model("container_det_768-576_slim_en.onnx", key=key, is_byte=True)
-    test_load_onnx(model)

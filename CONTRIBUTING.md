@@ -1,11 +1,15 @@
 # 更新日志
 
-## JadeV2.3.4 - 2025-02-11
-* 新增exception详情信息获取
+## JadeV2.3.5 - 2025-02-11
+* 删除jade_tools中的main函数
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+## JadeV2.3.4 - 2025-02-11
+* 新增exception详情信息获取
+---
 
 ## JadeV2.3.3 - 2024-7-18
 * 支持aarch64 AppImage打包
