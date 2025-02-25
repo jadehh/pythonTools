@@ -8,5 +8,13 @@
 # @Desc     :
 from dataset_tools.jade_create_object_dection_datasets import *
 
+
+def testCreateYearsDatasets():
+    """
+    制作Paddle Voc 数据集
+    """
+    CreateYearsDatasets(r"F:\数据集\VOC数据集\验残集装箱检测数据集",  save_path=r"E:\Data\VOC数据集\验残集装箱检测数据集")
+
+
 if __name__ == '__main__':
-    CreateYearsDatasets("F:\数据集\VOC数据集\箱门检测数据集\ContainVOC",year=None,save_path="E:\数据集\VOC数据集\箱门检测数据集\ContainVOC",rate=0.95)
+    testCreateYearsDatasets()
