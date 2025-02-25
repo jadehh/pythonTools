@@ -80,10 +80,11 @@ def draw_box(im, results,show_score=True,font_path=None,font_size=24):
         else:
             text = "{} ".format(labels_text[i,])
         font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
-        x1,y1,w,h = draw.textbbox((0, 0), text, font=font)
-        draw.rectangle(
-            [(xmin + x1, ymin - y1), (xmin + w , ymin)], fill=color)
-        draw.text((xmin, ymin - x1), text, fill=(255, 255, 255),font=font)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        draw.rectangle([(xmin + 1, ymin - text_height), (xmin + text_width + 1, ymin)], fill=color)
+        draw.text((xmin + 1, ymin - text_height), text, fill=(255, 255, 255),font=font)
     im = np.array(im)
     return im
 

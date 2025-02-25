@@ -1,13 +1,16 @@
 ### 更新日志
 
 
-#### OpencvToolsV1.2.9 - 2024-02-26
-* 解决PIL中的警告,使用textbbox替代textsize
+#### OpencvToolsV1.3.0 - 2024-02-26
+* 解决text box获取字体大小不正确的bug
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
 
+#### OpencvToolsV1.2.9 - 2024-02-26
+* 解决PIL中的警告,使用textbbox替代textsize
+---
 
 #### OpencvToolsV1.2.8 - 2023-04-07
 * 新增cv_show方法
