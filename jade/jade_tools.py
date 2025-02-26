@@ -87,7 +87,10 @@ def getConfig(config, section, configname, default_value=None, config_dic=None, 
             JadeLog.ERROR("读取{}参数异常,请检查参数是否正常".format(configname))
         else:
             pass
-        return default_value
+        if default_value is None:
+            raise  e
+        else:
+            return default_value
 
 
 def getBoolConfig(config, section, configname):
