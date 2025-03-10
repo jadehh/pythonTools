@@ -22,7 +22,7 @@ def main():
     save_path = "recording.mp4"  # 替换为所需的保存路径
     channel_number_index = 0  # 通道号索引
     nvr_client = NVRClient(nvr_ip, username, password, channel_number_index)
-    nvr_client.download_recording(save_path, start_time_str, end_time_str)  # 下载录像
+    nvr_client.download_recording(nvr_client.get_channel_numbers()[channel_number_index],save_path, start_time_str, end_time_str)  # 下载录像
     print(f"录像成功下载到 {save_path}。")  # 打印下载成功信息
 
 

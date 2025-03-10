@@ -99,6 +99,7 @@ class NVRClient:
         self.channel_number_index = channel_number_index
         self.user_id = -1
         self.device_info = NET_DVR_DEVICEINFO_V30()
+        self.is_connect = False
 
     def connect(self):
         # 初始化并连接到 NVR
@@ -121,16 +122,12 @@ class NVRClient:
         print(f"磁盘数量: {self.device_info.byDiskNum}")
         print(f"报警输入端口数量: {self.device_info.byAlarmInPortNum}")
         print(f"报警输出端口数量: {self.device_info.byAlarmOutPortNum}")
+        self.is_connect = True
 
-        return True
-
-    def download_recording(self, save_path, start_time_str, end_time_str):
+    def download_recording(self, channel_number,save_path, start_time_str, end_time_str):
         # 下载录像
-        if not self.connect():
+        if self.is_connect is False:
             return False
-
-        channels = self.get_channel_numbers()
-        channel_number = channels[self.channel_number_index]
 
         start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
         end_time = datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
@@ -167,7 +164,6 @@ class NVRClient:
 
         start = time.perf_counter()
         nprog = 0
-        print(f"开始下载,开始时间: ", start_time_str, "结束时间: ", end_time_str)
         while True:
             if nprog >= 100:
                 break
