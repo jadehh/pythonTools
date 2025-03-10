@@ -84,6 +84,7 @@ def test_download_file_from_file(file_path):
                     test_download_file_with_ie_time(ie_time, front_container_number, rear_container_number)
             else:
                 print(f"过卡时间为: {ie_time}, 硬盘录像机开始时间为: {nvr_start_time_str}, 硬盘录像机结束时间为: {nvr_end_time_str}, 不在硬盘录像机时间范围内。")
+
 if __name__ == "__main__":
-    test_download_file_from_file("过卡记录.txt")
-    # test_download_file_with_ie_time("2025-01-04 16:18:28.000","SEGU6713630","")
+    # test_download_file_from_file("过卡记录.txt")
+    test_download_file_with_ie_time("2025-01-04 16:18:28.000","SEGU6713630","")
