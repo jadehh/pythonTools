@@ -9,7 +9,11 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import shutil
 from datetime import datetime, timedelta
+
+import requests
+
 from src.nvr import NVRClient
 
 # 初始化 NVR 客户端
@@ -18,10 +22,10 @@ username = "admin"  # 替换为你的 NVR 用户名
 password = "samples456"  # 替换为你的 NVR 密码
 save_path = r"DVRVideo/"  # 保存路径
 channel_number_index = 0  # 通道号索引
-nvr_client = NVRClient(nvr_ip, username, password, channel_number_index)
-nvr_client.connect()
-channels = nvr_client.get_channel_numbers()
-channel_number = channels[channel_number_index]
+# nvr_client = NVRClient(nvr_ip, username, password, channel_number_index)
+# nvr_client.connect()
+# channels = nvr_client.get_channel_numbers()
+# channel_number = channels[channel_number_index]
 
 nvr_start_time_str = "2024-12-30 00:00:00.000"  # 硬盘录像机的开始时间
 nvr_end_time_str = "2025-01-15 14:16:07.000"  # 硬盘录像机的结束时间
@@ -65,8 +69,35 @@ def test_download_file_with_ie_time(ie_time, front_container_number, rear_contai
         raise ValueError("无效的开始时间格式。请使用 'YYYY-MM-DD HH:MM:SS.fff' 格式。") from e
 
 
+def test_write_container_number_to_file(path):
+    save_path = os.path.join(os.path.abspath(os.path.join(path, os.pardir)),"wrong")
+    if os.path.exists(save_path) is False:
+        os.mkdir(save_path)
+    kakou_container_number_list = os.listdir(path)
+    kakou_container_number_list = [cn for cn in kakou_container_number_list if  "UNRECOGNIZED" not in cn.upper()]
+    with open("pass_records.txt", 'r', encoding='utf-8') as file:
+        results = file.readlines()
+        for result in results:
+            container_number = result.split("\t")[3]
+            for kakou_container_name in kakou_container_number_list:
+                kakou_container_list = kakou_container_name.replace(".mp4","").split("_")
+                for kakou_container in kakou_container_list:
+                    if container_number == kakou_container.upper():
+                        kakou_container_number_list.remove(kakou_container_name)
+                        break
+
+    with open("wrong_records.txt", 'w', encoding='utf-8') as file:
+        for kakou_container_name in kakou_container_number_list:
+            kakou_container_list = kakou_container_name.replace(".mp4", "").split("_")
+            file.write(kakou_container_list[1].upper() + "\n")
+            if len(kakou_container_list) == 3:
+                file.write(kakou_container_list[2].upper() + "\n")
+            shutil.copy(os.path.join(path, kakou_container_name), os.path.join(save_path, kakou_container_name))
+
+
 def test_download_file_from_file(file_path):
     # 从文件中读取数据并下载录像
+    index = 0
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
         for line in lines:
@@ -84,7 +115,13 @@ def test_download_file_from_file(file_path):
                     test_download_file_with_ie_time(ie_time, front_container_number, rear_container_number)
             else:
                 print(f"过卡时间为: {ie_time}, 硬盘录像机开始时间为: {nvr_start_time_str}, 硬盘录像机结束时间为: {nvr_end_time_str}, 不在硬盘录像机时间范围内。")
+    print(f"共下载{index}个文件。")
+
+def test_request_webui():
+    resource = requests.get("http://192.168.29.156:3000")
+    print(resource)
 
 if __name__ == "__main__":
-    # test_download_file_from_file("过卡记录.txt")
-    test_download_file_with_ie_time("2025-01-04 16:18:28.000","SEGU6713630","")
+    test_request_webui()
+    # test_write_container_number_to_file(r"F:\视频数据集\箱号视频\侧相机新角度视频\2024123000000")
+    # test_download_file_with_ie_time("2025-01-04 16:18:28.000","SEGU6713630","")
