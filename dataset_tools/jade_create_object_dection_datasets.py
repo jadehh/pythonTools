@@ -14,12 +14,6 @@ import random
 import xml.etree.ElementTree as ET
 from dataset_tools.jade_voc_datasets import GetXmlClassesNames
 
-def CreateSavePath(save_path):
-    if os.path.exists(save_path):
-        return save_path
-    else:
-        os.makedirs(save_path)
-        return save_path
 
 def ProcessXml(xml_path):
     # Read the XML annotation file.
@@ -106,6 +100,85 @@ def CreateYearsDatasets(dir,year=None,save_path=None,rate=0.95):
                         f1.write(content + "\n")
         progressbar2.update()
     CreateLabelList(save_path)
+
+
+# VOC 数据集转换为Darknet数据集
+def CreateYearsDarknetVocDatasets(dir, year=None, save_path=None, rate=0.95,VOC_CLASSES=None):
+    years = os.listdir(dir)
+    if year is None:
+        progressBar1 = ProgressBar(len(years))
+    else:
+        progressBar1 = ProgressBar(1)
+    if os.path.exists(save_path):
+        pass
+    else:
+        os.makedirs(save_path)
+    if year is None:
+        for year in years:
+            if os.path.isdir(os.path.join(dir, year)):
+                if os.path.exists(os.path.join(dir, year, DIRECTORY_IMAGES)) and os.path.exists(
+                        os.path.join(dir, year, DIRECTORY_ANNOTATIONS)):
+                    CreateDarknetVocDatasets(os.path.join(dir, year), save_path, rate,VOC_CLASSES)
+            progressBar1.update()
+    else:
+        if os.path.isdir(os.path.join(dir, year)):
+            if os.path.exists(os.path.join(dir, year, DIRECTORY_IMAGES)) and os.path.exists(os.path.join(dir, year, DIRECTORY_ANNOTATIONS)):
+                CreateDarknetVocDatasets(os.path.join(dir, year), save_path, rate,VOC_CLASSES)
+        progressBar1.update()
+
+    with open(os.path.join(save_path,"classes.txt"),"wb") as f:
+        for class_name in VOC_CLASSES:
+            f.write((class_name+"\n").encode("utf-8"))
+
+
+def convert_voc_to_yolo(xml_dir, output_dir, classes):
+    tree = ET.parse(xml_dir)
+    root = tree.getroot()
+    img_w = int(root.find('size/width').text)
+    img_h = int(root.find('size/height').text)
+
+    with open(os.path.join(output_dir), 'w') as f:
+        for obj in root.findall('object'):
+            cls_name = obj.find('name').text
+            cls_id = classes.index(cls_name)
+            bbox = obj.find('bndbox')
+            x_center = (int(bbox.find('xmin').text) + int(bbox.find('xmax').text)) / 2 / img_w
+            y_center = (int(bbox.find('ymin').text) + int(bbox.find('ymax').text)) / 2 / img_h
+            width = (int(bbox.find('xmax').text) - int(bbox.find('xmin').text)) / img_w
+            height = (int(bbox.find('ymax').text) - int(bbox.find('ymin').text)) / img_h
+            f.write(f"{cls_id} {x_center} {y_center} {width} {height}\n")
+
+def CreateDarknetVocDataset(dir,save_path,image_files,dataset_type,remove_label="None",VOC_CLASSES=None):
+    save_image_path = CreateSavePath(os.path.join(save_path,"images",dataset_type,))
+    save_label_path = CreateSavePath(os.path.join(save_path,"labels",dataset_type))
+    for image_file in image_files:
+        with open(os.path.join(dir, DIRECTORY_IMAGES, image_file), "rb") as f2:
+            if len(f2.read()) == 0:
+                pass
+            else:
+                class_name_list = GetXmlClassesNames(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
+                if len(class_name_list) > 0 and remove_label not in class_name_list:
+                    shutil.copy(os.path.join(dir, DIRECTORY_IMAGES, image_file), save_image_path)
+                    convert_voc_to_yolo(os.path.join(dir,DIRECTORY_ANNOTATIONS,image_file[:-4] + ".xml"),os.path.join(save_label_path,image_file[:-4] + ".txt"),VOC_CLASSES)
+                else:
+                    print(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
+
+
+
+
+def CreateDarknetVocDatasets(dir,save_path,rate,VOC_CLASSES):
+    """
+    :param dir:
+    """
+    image_files = os.listdir(os.path.join(dir, DIRECTORY_IMAGES))
+    train_image_files = random.sample(image_files, int(len(image_files) *rate))
+    test_image_files = [file for file in image_files if file not in train_image_files]
+    CreateDarknetVocDataset(dir,save_path,train_image_files,"train",VOC_CLASSES=VOC_CLASSES)
+    CreateDarknetVocDataset(dir,save_path,test_image_files,"test",VOC_CLASSES=VOC_CLASSES)
+
+
+
+
 
 
 ##制作VOC数据集
