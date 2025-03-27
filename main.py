@@ -16,7 +16,7 @@ def test_create_paddle_years_datasets(args):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="制作数据集脚本")
-    parser.add_argument("--dataset_type", default='paddle', help="制作数据集的类型")
+    parser.add_argument("--dataset_type", default='paddle_detection', help="制作数据集的类型")
     parser.add_argument("--input_dataset_dir", default='test', help="数据集的地址")
     parser.add_argument("--save_dataset_dir", default='test/output_seals_01', help="保存数据集的地址")
     parser.add_argument("--voc_labels",  nargs='+',default="", help="类别")
