@@ -49,7 +49,7 @@ if __name__ == '__main__':
     package_data={'': ['*Run','*png']},
     include_package_data=True,
     platforms="any",
-    install_requires=["easycython","pyinstaller","cryptography==3.4.8","cffi","psutil"]  # 这个项目需要的第三方库
+    install_requires=["Cython==3.0.8","easycython","pyinstaller","cryptography==3.4.8","cffi","psutil"]  # 这个项目需要的第三方库
 )
 
 

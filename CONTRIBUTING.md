@@ -1,11 +1,15 @@
 # 更新日志
 
-## JadeV2.3.7 - 2025-05-06
-* 优化getConfig返回的异常信息
+## JadeV2.3.8 - 2025-05-06
+* 固定Cython版本,解决可执行文件运行失败的问题
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+## JadeV2.3.7 - 2025-05-06
+* 优化getConfig返回的异常信息
+---
 
 ## JadeV2.3.6 - 2025-02-26
 * get config 如果没有参数时，还是返回异常信息
