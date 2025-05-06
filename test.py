@@ -13,7 +13,8 @@ def testCreateYearsDatasets():
     """
     制作Paddle Voc 数据集
     """
-    CreateYearsDatasets(r"F:\数据集\VOC数据集\验残集装箱检测数据集",  save_path=r"E:\Data\VOC数据集\验残集装箱检测数据集")
+    VOC_CLASSES = ["FRONTEND","DOOREND","UPEND","slide","bromine_tank"]
+    CreateYearsDatasets(r"F:\数据集\VOC数据集\箱门检测数据集\ContainVOC",  save_path=r"E:\Data\VOC数据集\箱门检测数据集\ContainVOC")
 
 def testCreateYearsDarknetVocDatasets():
     # VOC_CLASSES = ["container"]
@@ -22,4 +23,4 @@ def testCreateYearsDarknetVocDatasets():
 
 
 if __name__ == '__main__':
-    testCreateYearsDarknetVocDatasets()
+    testCreateYearsDatasets()

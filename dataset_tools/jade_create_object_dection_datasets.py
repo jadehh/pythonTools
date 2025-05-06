@@ -161,7 +161,7 @@ def CreateDarknetVocDataset(dir,save_path,image_files,dataset_type,remove_label=
                     shutil.copy(os.path.join(dir, DIRECTORY_IMAGES, image_file), save_image_path)
                     convert_voc_to_yolo(os.path.join(dir,DIRECTORY_ANNOTATIONS,image_file[:-4] + ".xml"),os.path.join(save_label_path,image_file[:-4] + ".txt"),VOC_CLASSES)
                 else:
-                    print(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
+                    print("未找到类别:{}".format(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml")))
 
 
 
@@ -177,8 +177,38 @@ def CreateDarknetVocDatasets(dir,save_path,rate,VOC_CLASSES):
     CreateDarknetVocDataset(dir,save_path,test_image_files,"test",VOC_CLASSES=VOC_CLASSES)
 
 
-
-
+def generate_new_datasets(dir,dataset_name,root_path,image_file_list,no_pretrained_images_dir,output):
+    Main_path = os.path.join(root_path, "ImageSets", "Main")
+    for image_file in image_file_list:
+        is_success = False
+        img_file = dataset_name + "/" + DIRECTORY_IMAGES + "/" + image_file
+        xml_file = dataset_name + "/" + DIRECTORY_ANNOTATIONS + "/" + image_file[:-4] + ".xml"
+        with open(os.path.join(Main_path, output+".txt"), "a") as f:
+            # with open(os.path.join(Main_path, "train.txt"), "a") as f:
+            save_image_path = CreateSavePath(os.path.join(root_path,DIRECTORY_IMAGES))
+            save_xml_path = CreateSavePath(os.path.join(root_path,DIRECTORY_ANNOTATIONS))
+            with open(os.path.join(dir,DIRECTORY_IMAGES,image_file),"rb") as f2:
+                if len(f2.read()) == 0 and ReadChinesePath(os.path.join(dir,DIRECTORY_IMAGES,image_file)) != None:
+                    pass
+                else:
+                    class_name_list = GetXmlClassesNames(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
+                    if len(class_name_list) > 0:
+                        shutil.copy(os.path.join(dir, DIRECTORY_IMAGES, image_file), save_image_path)
+                        shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"), save_xml_path)
+                        is_success = True
+                        f.write(img_file + " " + xml_file + "\n")
+                    else:
+                        print("未找到类别:{}".format(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml")))
+        if is_success is False:
+            shutil.copy(os.path.join(dir, DIRECTORY_IMAGES, image_file),os.path.join(no_pretrained_images_dir, image_file))
+            try:
+                os.remove(os.path.join(dir, DIRECTORY_IMAGES, image_file))
+                os.remove(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
+            except Exception as e:
+                print("删除失败,{}".format(e))
+                pass
+            print("未找到类别:{}".format(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml")))
+        shutil.copy(os.path.join(Main_path, output+".txt"), os.path.join(Main_path, output+"_var.txt"))
 
 
 ##制作VOC数据集
@@ -190,106 +220,26 @@ def CreateVOCDataset(dir, datasetname,save_path=None,rate=0.95):
     :param rate:
     :return:
     """
+    no_pretrained_dir =  CreateSavePath(os.path.join(os.path.dirname(dir),"no_pretrained"))
+
     root_path = os.path.join(save_path,datasetname)
     dataset_name = datasetname
     Annotations = DIRECTORY_ANNOTATIONS
     JPEGImages = DIRECTORY_IMAGES
+    no_pretrained_images_dir = CreateSavePath(os.path.join(no_pretrained_dir,JPEGImages))
 
     if os.path.exists(os.path.join(root_path, "ImageSets", "Main")) is not True:
         os.makedirs(os.path.join(root_path, "ImageSets", "Main"))
     else:
         shutil.rmtree(os.path.join(root_path, "ImageSets", "Main"))
         os.makedirs(os.path.join(root_path, "ImageSets", "Main"))
-    Main_path = os.path.join(root_path, "ImageSets", "Main")
     image_files = os.listdir(os.path.join(dir, JPEGImages))
     train_image_files = random.sample(image_files, int(len(image_files) *rate))
     test_image_files = [file for file in image_files if file not in train_image_files]
 
-    for train_image_file in train_image_files:
-        with open(os.path.join(Main_path, "train_var.txt"), "a") as f:
-            # with open(os.path.join(Main_path, "train.txt"), "a") as f:
-            image_file = dataset_name + "/" + JPEGImages + "/" + train_image_file
-            xml_file = dataset_name + "/" + Annotations + "/" + train_image_file[:-4] + ".xml"
-            filename = train_image_file[:-4]
-            save_image_path = CreateSavePath(os.path.join(root_path,DIRECTORY_IMAGES))
-            save_xml_path = CreateSavePath(os.path.join(root_path,DIRECTORY_ANNOTATIONS))
-            with open(os.path.join(dir,JPEGImages,train_image_file),"rb") as f2:
-                if len(f2.read()) == 0:
-                    pass
-                else:
-                    class_name_list = GetXmlClassesNames(os.path.join(dir, DIRECTORY_ANNOTATIONS, train_image_file[:-4] + ".xml"))
-                    if len(class_name_list) > 0:
-                        shutil.copy(os.path.join(dir, JPEGImages, train_image_file), save_image_path)
-                        shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, train_image_file[:-4] + ".xml"), save_xml_path)
-                        f.write(filename + "\n")
-                    else:
-                        print(os.path.join(dir, DIRECTORY_ANNOTATIONS, train_image_file[:-4] + ".xml"))
-            # f.write(image_file + " " + xml_file + "\n")
+    generate_new_datasets(dir,dataset_name,root_path,train_image_files,no_pretrained_images_dir,"train")
+    generate_new_datasets(dir,dataset_name,root_path,test_image_files,no_pretrained_images_dir,"test")
 
-    for test_image_file in test_image_files:
-        with open(os.path.join(Main_path, "test_var.txt"), "a") as f:
-            # with open(os.path.join(Main_path, "test.txt"), "a") as f:
-            image_file = dataset_name + "/" + JPEGImages + "/" + test_image_file
-            xml_file = dataset_name + "/" + Annotations + "/" + test_image_file[:-4] + ".xml"
-            filename = test_image_file[:-4]
-            save_image_path = CreateSavePath(os.path.join(root_path, DIRECTORY_IMAGES))
-            save_xml_path = CreateSavePath(os.path.join(root_path, DIRECTORY_ANNOTATIONS))
-            with open(os.path.join(dir,JPEGImages,test_image_file),"rb") as f2:
-                if len(f2.read()) == 0:
-                    pass
-                else:
-                    class_name_list = GetXmlClassesNames(
-                        os.path.join(dir, DIRECTORY_ANNOTATIONS, test_image_file[:-4] + ".xml"))
-                    if len(class_name_list) > 0:
-                        shutil.copy(os.path.join(dir, JPEGImages, test_image_file), save_image_path)
-                        shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, test_image_file[:-4] + ".xml"), save_xml_path)
-                        f.write(filename + "\n")
-                    else:
-                        print(os.path.join(dir, DIRECTORY_ANNOTATIONS, test_image_file[:-4] + ".xml"))
-
-    for train_image_file in train_image_files:
-        with open(os.path.join(Main_path, "train.txt"), "a") as f:
-            # with open(os.path.join(Main_path, "train.txt"), "a") as f:
-            image_file = dataset_name + "/" + JPEGImages + "/" + train_image_file
-            xml_file = dataset_name + "/" + Annotations + "/" + train_image_file[:-4] + ".xml"
-            filename = train_image_file[:-4]
-            with open(os.path.join(dir,JPEGImages,train_image_file),"rb") as f2:
-                if len(f2.read()) == 0:
-                    pass
-                else:
-                    class_name_list = GetXmlClassesNames(
-                        os.path.join(dir, DIRECTORY_ANNOTATIONS, train_image_file[:-4] + ".xml"))
-                    if len(class_name_list) > 0:
-                        shutil.copy(os.path.join(dir, JPEGImages, train_image_file), save_image_path)
-                        shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, train_image_file[:-4] + ".xml"), save_xml_path)
-                        f.write(image_file + " " + xml_file + "\n")
-                    else:
-                        print(os.path.join(dir, DIRECTORY_ANNOTATIONS, train_image_file[:-4] + ".xml"))
-
-            # f.write(filename + "\n")
-
-
-    for test_image_file in test_image_files:
-        with open(os.path.join(Main_path, "test.txt"), "a") as f:
-            # with open(os.path.join(Main_path, "test.txt"), "a") as f:
-            image_file = dataset_name + "/" + JPEGImages + "/" + test_image_file
-            xml_file = dataset_name + "/" + Annotations + "/" + test_image_file[:-4] + ".xml"
-            filename = test_image_file[:-4]
-            with open(os.path.join(dir,JPEGImages,test_image_file),"rb") as f2:
-                if len(f2.read()) == 0:
-                    pass
-                else:
-                    class_name_list = GetXmlClassesNames(
-                        os.path.join(dir, DIRECTORY_ANNOTATIONS, test_image_file[:-4] + ".xml"))
-                    if len(class_name_list) > 0:
-                        shutil.copy(os.path.join(dir, JPEGImages, test_image_file), save_image_path)
-                        shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, test_image_file[:-4] + ".xml"),
-                                    save_xml_path)
-                        f.write(image_file + " " + xml_file + "\n")
-                    else:
-                        print(os.path.join(dir, DIRECTORY_ANNOTATIONS, test_image_file[:-4] + ".xml"))
-
-            # f.write(filename + "\n")
 
 def CreateLabelList(dir):
     """
