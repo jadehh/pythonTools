@@ -88,29 +88,24 @@ def getConfig(config, section, configname, default_value=None, config_dic=None, 
         else:
             pass
         if default_value is None:
-            raise  e
+            raise "读取{}参数异常,检查参数是否正常".format(configname)
         else:
             return default_value
 
 
-def getBoolConfig(config, section, configname):
+def getBoolConfig(config, section, configname, default_value=None,config_dic=None, JadeLog=None):
     """
     读取ini参数,强制返回Bool
     :param string:
     :return:
     """
-    try:
-        configparam = (config.get(section, configname)).split("#")[0].rstrip()
-    except:
-        print("读取{}参数异常,请检查参数是否正常".format(configname))
-        sys.exit()
+    configparam = getConfig(config,section,configname,default_value,config_dic,JadeLog)
     if configparam == "False":
         return False
     elif configparam == "True":
         return True
     else:
-        print("读取{}参数异常,参数内容为:{}错误,请检查参数是否正常".format(configname, configparam))
-        sys.exit()
+        raise "参数:{}值不合法,请检查参数是否正常,参数值为{}".format(configname,configparam)
 
 
 def getSectionsConfig(config, section_list, configname):
@@ -120,12 +115,7 @@ def getSectionsConfig(config, section_list, configname):
             configparam = (config.get(section, configname)).split("#")[0].rstrip()
             config_list.append(configparam)
         except Exception as e:
-            print("读取{}参数异常,请检查参数是否正常,出错原因为 = {},发生异常文件{},发生异常所在的行数{}".format(
-                configname.e,
-                e.__traceback__.tb_frame.f_globals[
-                    "__file__"],
-                e.__traceback__.tb_lineno))
-            sys.exit()
+            raise "读取{}参数异常,请检查参数是否正常".format(configname)
     return config_list
 
 
@@ -144,8 +134,7 @@ def getSectionConfigs(config, section):
         for item in itemList:
             configsList.append(item[1].split("#")[0].rstrip())
     except Exception as e:
-        print("读取{}参数异常,请检查参数是否正常,异常原因为{}".format(section, e))
-        sys.exit()
+        raise "读取{}参数异常,请检查参数是否正常".format(section)
     return configsList
 
 

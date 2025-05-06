@@ -1,11 +1,15 @@
 # 更新日志
 
-## JadeV2.3.6 - 2025-02-26
-* get config 如果没有参数时，还是返回异常信息
+## JadeV2.3.7 - 2025-05-06
+* 优化getConfig返回的异常信息
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+## JadeV2.3.6 - 2025-02-26
+* get config 如果没有参数时，还是返回异常信息
+---
 
 ## JadeV2.3.5 - 2025-02-11
 * 删除jade_tools中的main函数
