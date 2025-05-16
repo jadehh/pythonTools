@@ -11,7 +11,7 @@ from dataset_tools.jade_create_paddle_ocr_datasets import *
 from dataset_tools.jade_create_object_dection_datasets import CreateYearsDatasets
 
 def test_create_paddle_years_datasets(args):
-    CreateYearsDatasets(args.input_dataset_dir,None,save_path=args.save_dataset_dir,rate=0.8)
+    CreateYearsDatasets(args.input_dataset_dir,None,save_path=args.save_dataset_dir,rate=0.9)
 
 if __name__ == '__main__':
     import argparse
@@ -23,9 +23,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(list(args.voc_labels))
     if args.dataset_type == "paddle_detection":
-        CreateYearsDatasets(args.input_dataset_dir, None, save_path=args.save_dataset_dir, rate=0.8)
+        CreateYearsDatasets(args.input_dataset_dir, None, save_path=args.save_dataset_dir, rate=0.9)
     elif args.dataset_type == "yolo_detection":
-        CreateDarknetVocDatasets(args.input_dataset_dir,  save_path=args.save_dataset_dir, rate=0.8, VOC_CLASSES=args.voc_labels)
+        CreateDarknetVocDatasets(args.input_dataset_dir,  save_path=args.save_dataset_dir, rate=0.9, VOC_CLASSES=args.voc_labels)
 
     #removeNolabelDatasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集\2022-03-09")
     #create_text_detection_datasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集",r"E:\Data\字符检测识别数据集\定制版箱号关键点数据集",0.95)
