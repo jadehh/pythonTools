@@ -1,12 +1,16 @@
 ### 更新日志
 
 
-#### OpencvToolsV1.3.0 - 2024-02-26
-* 解决text box获取字体大小不正确的bug
+#### OpencvToolsV1.3.1 - 2025-05-16
+* 关键点支持修改颜色
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### OpencvToolsV1.3.0 - 2024-02-26
+* 解决text box获取字体大小不正确的bug
+---
 
 #### OpencvToolsV1.2.9 - 2024-02-26
 * 解决PIL中的警告,使用textbbox替代textsize
