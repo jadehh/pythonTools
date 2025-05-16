@@ -80,11 +80,10 @@ def draw_box(im, results,show_score=True,font_path=None,font_size=24):
         else:
             text = "{} ".format(labels_text[i,])
         font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
-        bbox = draw.textbbox((0, 0), text, font=font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-        draw.rectangle([(xmin + 1, ymin - text_height), (xmin + text_width + 1, ymin)], fill=color)
-        draw.text((xmin + 1, ymin - text_height), text, fill=(255, 255, 255),font=font)
+        tw, th = draw.textsize(text,font)
+        draw.rectangle(
+            [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
+        draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255),font=font)
     im = np.array(im)
     return im
 
@@ -475,7 +474,7 @@ def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=
         for (txt,pt,txt_color) in zip(label,pt1,color):
             draw.text(pt, txt, (int(txt_color[0]), int(txt_color[1]), int(txt_color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     else:
-        draw.text(pt1, label, (int(color[0]), int(color[1]), int(color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+        draw.text(pt1, label, (int(color[2]), int(color[1]), int(color[0])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
     cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return cv2charimg
 
@@ -546,9 +545,10 @@ def PltShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
     plt.close()
 
 
-def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="result"):
+def CVShowKeyPoints(image, keyPoints, classes=None,colors=None,fontSize=None, waiktKey=1, named_windows="result"):
     base = int(np.ceil(pow(len(keyPoints), 1. / 3)))
-    colors = [_to_color(x) for x in range(len(keyPoints))]
+    if colors is None:
+        colors = [_to_color(x) for x in range(len(keyPoints))]
     h, w = image.shape[0], image.shape[1]
     for i in range(len(keyPoints)):
         for j in range(len(keyPoints[i])):
@@ -565,12 +565,12 @@ def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="r
         point2 = (int(keyPoints[i][1][0]), int(keyPoints[i][1][1]))
         point3 = (int(keyPoints[i][2][0]), int(keyPoints[i][2][1]))
         point4 = (int(keyPoints[i][3][0]), int(keyPoints[i][3][1]))
-        image = cv2.line(image, point1, point2, colors[i], 2, 2)
-        image = cv2.line(image, point2, point3, colors[i], 2, 2)
-        image = cv2.line(image, point3, point4, colors[i], 2, 2)
-        image = cv2.line(image, point4, point1, colors[i], 2, 2)
+        image = cv2.line(image, point1, point2, colors[i], 2, 1)
+        image = cv2.line(image, point2, point3, colors[i], 2, 1)
+        image = cv2.line(image, point3, point4, colors[i], 2, 1)
+        image = cv2.line(image, point4, point1, colors[i], 2, 1)
         if classes:
-            image = Add_Chinese_Label(image, classes[i], point1, colors[i], 40)
+            image = Add_Chinese_Label(image, classes[i], point1, colors[i], fontSize)
 
     if waiktKey >= 0:
         cv2.namedWindow(named_windows, 0)
@@ -618,8 +618,7 @@ def CVShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
 
 
 #opencv显示boxes
-def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,waitkey=-1,named_windows="result",lineType = 3):
-
+def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,waitkey=-1,named_windows="result"):
     base = int(np.ceil(pow(num_classes, 1. / 3)))
     colors = [_to_color(x) for x in range(num_classes)]
     if type(image) == str:
@@ -637,7 +636,7 @@ def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,wai
             xmax = int(boxes[i][2])
             ymax = int(boxes[i][3])
         if boxes is not None:
-            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), lineType, lineType)
+            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
             if label_texts is not None:
                 if scores is not None:
                     image2 = Add_Chinese_Label(img=image2, label=label_texts[i] + ":" + str(int(scores[i] * 100)),
@@ -646,9 +645,9 @@ def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,wai
                     image2 = Add_Chinese_Label(img=image2, label=label_texts[i],
                                                pt1=(xmin, ymin))
                 if label_ids is not None:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(label_ids[i])], lineType, lineType)
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(label_ids[i])], 3, 3)
                 else:
-                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), lineType, lineType)
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
 
 
     if waitkey >= 0:
