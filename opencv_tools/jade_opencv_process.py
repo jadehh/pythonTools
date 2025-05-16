@@ -1,271 +1,513 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @File     : jade_opencv_process.py
-# @Author   : jade
-# @Date     : 2021/11/30 10:00
+# @File     : jade_visualize.py
+# @Author   : opencv_tools
+# @Date     : 2021/11/29 19:49
 # @Email    : jadehh@1ive.com
 # @Software : Samples
 # @Desc     :
-##旋转图片
-import cv2
-import numpy as np
-from jade import ProgressBar,getOperationSystem,Exit
-import threading
-import random
-import os
-import time
-import uuid
-from opencv_tools import DIRECTORY_IMAGES,DIRECTORY_ANNOTATIONS,DIRECTORY_PREANNOTATIONS
-import base64
 
-## opencv读取中文路径图片
-def imread_chinese_path(image_path):
-    image = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), -1)
+import numpy as np
+import cv2
+import math
+from PIL import Image, ImageFont, ImageDraw
+from opencv_tools.jade_opencv_process import GetRandomColor,ReadChinesePath
+from jade import getOperationSystem
+import random
+
+def _to_color(indx):
+    """ return (b, r, g) tuple"""
+    b = random.randint(1,10) / 10
+    g = random.randint(1,10) / 10
+    r = random.randint(1,10) / 10
+    return b * 255, r * 255, g * 255
+
+def get_color_map_list(num_classes):
+    """
+    Args:
+        num_classes (int): number of class
+    Returns:
+        color_map (list): RGB color list
+    """
+    color_map = num_classes * [0, 0, 0]
+    for i in range(0, num_classes):
+        j = 0
+        lab = i
+        while lab:
+            color_map[i * 3] |= (((lab >> 0) & 1) << (7 - j))
+            color_map[i * 3 + 1] |= (((lab >> 1) & 1) << (7 - j))
+            color_map[i * 3 + 2] |= (((lab >> 2) & 1) << (7 - j))
+            j += 1
+            lab >>= 3
+    color_map = [color_map[i:i + 3] for i in range(0, len(color_map), 3)]
+    return color_map
+
+def draw_box(im, results,show_score=True,font_path=None,font_size=24):
+    """
+    Args:
+        im (PIL.Image.Image): PIL image
+        np_boxes (np.ndarray): shape:[N,6], N: number of box,
+                               matix element:[class, score, x_min, y_min, x_max, y_max]
+        labels (list): labels:['class1', ..., 'classn']
+    Returns:
+        im (PIL.Image.Image): visualized image
+    """
+
+    np_boxes = results['boxes']
+    labels_text = results["labels"]
+    scores = results["scores"]
+    draw_thickness = min(im.size) // 320
+    draw = ImageDraw.Draw(im)
+    clsid2color = {}
+    color_list = get_color_map_list(len(np_boxes))
+
+    for i in range(np_boxes.shape[0]):
+        xmin, ymin, xmax, ymax = np_boxes[i,:]
+        w = float(xmax) - float(xmin)
+        h = float(ymax) - float(ymin)
+        if labels_text[i,] not in clsid2color:
+                clsid2color[labels_text[i,]] = color_list[i]
+        color = tuple(clsid2color[labels_text[i,]])
+
+        # draw bbox
+        draw.line(
+            [(xmin, ymin), (xmin, ymax), (xmax, ymax), (xmax, ymin),
+             (xmin, ymin)],
+            width=draw_thickness,
+            fill=color)
+        if show_score:
+            text = "{} {:.4f}".format(labels_text[i,], scores[i,])
+        else:
+            text = "{} ".format(labels_text[i,])
+        font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+        tw, th = draw.textsize(text,font)
+        draw.rectangle(
+            [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
+        draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255),font=font)
+    im = np.array(im)
+    return im
+
+
+def draw_segm(im,
+              np_segms,
+              np_label,
+              np_score,
+              labels,
+              alpha=0.7):
+    """
+    Draw segmentation on image
+    """
+    w_ratio = .4
+    color_list = get_color_map_list(len(labels))
+    im = np.array(im).astype('float32')
+    clsid2color = {}
+    np_segms = np_segms.astype(np.uint8)
+    for i in range(np_segms.shape[0]):
+        mask, score, clsid = np_segms[i], np_score[i], np_label[i] + 1
+        if clsid not in clsid2color:
+            clsid2color[clsid] = color_list[clsid]
+        color_mask = clsid2color[clsid]
+        for c in range(3):
+            color_mask[c] = color_mask[c] * (1 - w_ratio) + w_ratio * 255
+        idx = np.nonzero(mask)
+        color_mask = np.array(color_mask)
+        im[idx[0], idx[1], :] *= 1.0 - alpha
+        im[idx[0], idx[1], :] += alpha * color_mask
+        sum_x = np.sum(mask, axis=0)
+        x = np.where(sum_x > 0.5)[0]
+        sum_y = np.sum(mask, axis=1)
+        y = np.where(sum_y > 0.5)[0]
+        x0, x1, y0, y1 = x[0], x[-1], y[0], y[-1]
+        cv2.rectangle(im, (x0, y0), (x1, y1),
+                      tuple(color_mask.astype('int32').tolist()), 1)
+        bbox_text = '%s %.2f' % (labels[clsid], score)
+        t_size = cv2.getTextSize(bbox_text, 0, 0.3, thickness=1)[0]
+        cv2.rectangle(im, (x0, y0), (x0 + t_size[0], y0 - t_size[1] - 3),
+                      tuple(color_mask.astype('int32').tolist()), -1)
+        cv2.putText(
+            im,
+            bbox_text, (x0, y0 - 2),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.3, (0, 0, 0),
+            1,
+            lineType=cv2.LINE_AA)
+    return Image.fromarray(im.astype('uint8'))
+
+def draw_lmk(image, lmk_results):
+    draw = ImageDraw.Draw(image)
+    for lmk_decode in lmk_results:
+        for j in range(5):
+            x1 = int(round(lmk_decode[2 * j]))
+            y1 = int(round(lmk_decode[2 * j + 1]))
+            draw.ellipse(
+                (x1 - 2, y1 - 2, x1 + 3, y1 + 3), fill='green', outline='green')
+    return image
+def expand_boxes(boxes, scale=0.0):
+    """
+    Args:
+        boxes (np.ndarray): shape:[N,4], N:number of box,
+                            matix element:[x_min, y_min, x_max, y_max]
+        scale (float): scale of boxes
+    Returns:
+        boxes_exp (np.ndarray): expanded boxes
+    """
+    w_half = (boxes[:, 2] - boxes[:, 0]) * .5
+    h_half = (boxes[:, 3] - boxes[:, 1]) * .5
+    x_c = (boxes[:, 2] + boxes[:, 0]) * .5
+    y_c = (boxes[:, 3] + boxes[:, 1]) * .5
+    w_half *= scale
+    h_half *= scale
+    boxes_exp = np.zeros(boxes.shape)
+    boxes_exp[:, 0] = x_c - w_half
+    boxes_exp[:, 2] = x_c + w_half
+    boxes_exp[:, 1] = y_c - h_half
+    boxes_exp[:, 3] = y_c + h_half
+    return boxes_exp
+
+def draw_mask(im, np_boxes, np_masks, labels, resolution=14, threshold=0.5):
+    """
+    Args:
+        im (PIL.Image.Image): PIL image
+        np_boxes (np.ndarray): shape:[N,6], N: number of box,
+                               matix element:[class, score, x_min, y_min, x_max, y_max]
+        np_masks (np.ndarray): shape:[N, class_num, resolution, resolution]
+        labels (list): labels:['class1', ..., 'classn']
+        resolution (int): shape of a mask is:[resolution, resolution]
+        threshold (float): threshold of mask
+    Returns:
+        im (PIL.Image.Image): visualized image
+    """
+    color_list = get_color_map_list(len(labels))
+    scale = (resolution + 2.0) / resolution
+    im_w, im_h = im.size
+    w_ratio = 0.4
+    alpha = 0.7
+    im = np.array(im).astype('float32')
+    rects = np_boxes[:, 2:]
+    expand_rects = expand_boxes(rects, scale)
+    expand_rects = expand_rects.astype(np.int32)
+    clsid_scores = np_boxes[:, 0:2]
+    padded_mask = np.zeros((resolution + 2, resolution + 2), dtype=np.float32)
+    clsid2color = {}
+    for idx in range(len(np_boxes)):
+        clsid, score = clsid_scores[idx].tolist()
+        clsid = int(clsid)
+        xmin, ymin, xmax, ymax = expand_rects[idx].tolist()
+        w = xmax - xmin + 1
+        h = ymax - ymin + 1
+        w = np.maximum(w, 1)
+        h = np.maximum(h, 1)
+        padded_mask[1:-1, 1:-1] = np_masks[idx, int(clsid), :, :]
+        resized_mask = cv2.resize(padded_mask, (w, h))
+        resized_mask = np.array(resized_mask > threshold, dtype=np.uint8)
+        x0 = min(max(xmin, 0), im_w)
+        x1 = min(max(xmax + 1, 0), im_w)
+        y0 = min(max(ymin, 0), im_h)
+        y1 = min(max(ymax + 1, 0), im_h)
+        im_mask = np.zeros((im_h, im_w), dtype=np.uint8)
+        im_mask[y0:y1, x0:x1] = resized_mask[(y0 - ymin):(y1 - ymin), (
+            x0 - xmin):(x1 - xmin)]
+        if clsid not in clsid2color:
+            clsid2color[clsid] = color_list[clsid]
+        color_mask = clsid2color[clsid]
+        for c in range(3):
+            color_mask[c] = color_mask[c] * (1 - w_ratio) + w_ratio * 255
+        idx = np.nonzero(im_mask)
+        color_mask = np.array(color_mask)
+        im[idx[0], idx[1], :] *= 1.0 - alpha
+        im[idx[0], idx[1], :] += alpha * color_mask
+    return Image.fromarray(im.astype('uint8'))
+
+
+def visualize_box_mask(im, results, mask_resolution=14,show_score=True,font_path=None,font_size=12):
+    """
+    Args:
+        im (str/np.ndarray): path of image/np.ndarray read by cv2
+        results (dict): include 'boxes': np.ndarray: shape:[N,6], N: number of box,
+                        matix element:[class, score, x_min, y_min, x_max, y_max]
+                        MaskRCNN's results include 'masks': np.ndarray:
+                        shape:[N, class_num, mask_resolution, mask_resolution]
+        labels (list): labels:['class1', ..., 'classn']
+        mask_resolution (int): shape of a mask is:[mask_resolution, mask_resolution]
+        threshold (float): Threshold of score.
+    Returns:
+        im (PIL.Image.Image): visualized image
+    """
+    if isinstance(im, str):
+        im = Image.open(im).convert('RGB')
+    else:
+        im = Image.fromarray(im)
+    if 'masks' in results and 'boxes' in results:
+        im = draw_mask(
+            im,
+            results['boxes'],
+            results['masks'],
+            results["labels"],
+            resolution=mask_resolution)
+    if 'boxes' in results:
+        im = draw_box(im, results,show_score,font_path,font_size)
+    if 'segm' in results:
+        im = draw_segm(
+            im,
+            results['segm'],
+            results['label'],
+            results['score'],
+            results["labels"])
+    if 'landmark' in results:
+        im = draw_lmk(im, results['landmark'])
+    return im
+
+def cv_visualize(image,results,show_score=True,font_path=None,thickness=2,linetype=2,font_size=24):
+    if isinstance(image, str):
+        image = ReadChinesePath(image)
+    boxes = results["boxes"]
+    scores = results["scores"]
+    labels = results["labels"]
+    colors = [GetRandomColor()] * labels.shape[0]
+    for (box,score,label,color) in zip(boxes,scores,labels,colors):
+        if label != -1:
+            cv2.line(image, (int(box[0]), int(box[1])), (int(box[0]), int(box[1] + box[3])), color, thickness,
+                     thickness)
+            cv2.line(image, (int(box[0]), int(box[1] + box[3])), (int(box[2]), int(box[1] + box[3])), color, thickness,
+                     thickness)
+            cv2.line(image, (int(box[2]), int(box[1] + box[3])), (int(box[2]), int(box[1])), color, thickness,
+                     thickness)
+            cv2.line(image, (int(box[2]), int(box[1])), (int(box[0]), int(box[1])), color, thickness, thickness)
+            if show_score:
+                image = Add_Chinese_Label(image, label+" SCORE:{}".format("%.2f"%score), (int(box[0]), int(box[1])), color, font_size, font_path)
+            else:
+                image = Add_Chinese_Label(image, label, (int(box[0]), int(box[1])), color, font_size, font_path)
+
     return image
 
-## 图像压缩
-def Image_Resize(image,width=768):
-    return cv2.resize(image,(width,int(width/image.shape[1]*image.shape[0])))
-##旋转图片
-def Image_Roate(image, angle):
-    # 获取图像的尺寸
-    # 旋转中心
-    (h, w) = image.shape[:2]
-    (cx, cy) = (w / 2, h / 2)
 
-    # 设置旋转矩阵
-    M = cv2.getRotationMatrix2D((cx, cy), -angle, 1.0)
-    cos = np.abs(M[0, 0])
-    sin = np.abs(M[0, 1])
+def visualize(image_file,
+              results,
+              mask_resolution=14,
+              show_score=True,font_path=None,font_size=12):
+    # visualize the predict result
+    im = visualize_box_mask(
+        image_file,
+        results,
+        mask_resolution=mask_resolution,
+        show_score=show_score,
+        font_path=font_path,
+        font_size=font_size)
+    im = np.array(im)
 
-    # 计算图像旋转后的新边界
-    nW = int((h * sin) + (w * cos))
-    nH = int((h * cos) + (w * sin))
-
-    # 调整旋转矩阵的移动距离（t_{x}, t_{y}）
-    M[0, 2] += (nW / 2) - cx
-    M[1, 2] += (nH / 2) - cy
-
-    return cv2.warpAffine(image, M, (nW, nH))
+    return im
 
 
-def Video_Roate(video_path, save_video_path, angle, fps=20):
-    video_capture = cv2.VideoCapture(video_path)
-    ret, frame = video_capture.read()
-    roate_img = Image_Roate(frame, angle)
-    height = roate_img.shape[0]
-    width = roate_img.shape[1]
-    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-    videoWriter = cv2.VideoWriter(save_video_path, fourcc, fps, (width, height))
-    progressBar = ProgressBar(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    while True:
-        frame = Image_Roate(frame, angle)
-        videoWriter.write(frame)
-        ret, frame = video_capture.read()
-        progressBar.update()
-        if ret is not True:
-            break
-
-
-# 分割视频
-def split_video(input_video_path, output_video_path, start_time, end_time):
+def resize_img(img, input_size=600):
     """
-
-    :param input_video_path: 输入视频地址
-    :param output_video_path: 输出视频地址
-    :param start_time: 开始时间
-    :param end_time: 结束时间
-    :return:
+    resize img and limit the longest side of the image to input_size
     """
-    video_capture = cv2.VideoCapture(input_video_path)
-    ret, frame = video_capture.read()
-    fps = video_capture.get(cv2.CAP_PROP_FPS)
-    height = frame.shape[0]
-    width = frame.shape[1]
-    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-    if int(fps) == 0:
-        fps = 15
-    video_writer = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
-    index = 0
-    while True:
-        ret, frame = video_capture.read()
-        index = index + 1
-        current_time = index / fps
-        if current_time > start_time and current_time < end_time:
-            video_writer.write(frame)
-            print("Writing Videos")
-        if current_time > end_time:
-            break
-        if ret is False:
-            break
-
-
-class VideoCapture():
-    def __init__(self, cv_videocapture_param):
-        self.cv_videocapture_param = cv_videocapture_param
-        return
-
-    def handle(self):
-        # 开启线程，传入参数
-        _thread = threading.Thread(target=self.open)
-        _thread.setDaemon(True)
-        _thread.start()  # 启动线程
-        return
-
-    def open(self):
-        capture = cv2.VideoCapture(self.cv_videocapture_param)
-        ret, frame = capture.read()
-        while ret:
-            print("正在开启线程读取视频")
-            ret, frame = capture.read()
+    img = np.array(img)
+    im_shape = img.shape
+    im_size_max = np.max(im_shape[0:2])
+    im_scale = float(input_size) / float(im_size_max)
+    im = cv2.resize(img, None, None, fx=im_scale, fy=im_scale)
+    return im
 
 
 
+def str_count(s):
+    """
+    Count the number of Chinese characters,
+    a single English character and a single number
+    equal to half the length of Chinese characters.
 
-
-
-
-
-class processImage:
-    def __init__(self, img):
-        self.img = img
-
-    # RGB转BGR
-    def RGBTOBGR(self):
-        return cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
-
-    # BGR转RGB，一般用于图像不能显示正常的颜色
-    def BGRTORGB(self):
-        return cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
-
-    # 给图像画一个矩形框,默认为随机的颜色,bboxes为xmin/width
-    def RECTANGLE(self, bboxes):
-        shape = self.img.shape
-        width = shape[1]
-        height = shape[0]
-        color_R = random.randint(1, 254)
-        color_G = random.randint(1, 254)
-        color_B = random.randint(1, 255)
-        self.img = cv2.rectangle(self.img, (int(bboxes[1] * width), int(bboxes[0] * height)),
-                                 (int(bboxes[2] * width), int(bboxes[3] * height)), (color_R, color_G, color_B), 2, 2)
-        return self.img
-
-    # 图像画点
-    def CIRCLE(self, points):
-        color_R = random.randint(1, 254)
-        color_G = random.randint(1, 254)
-        color_B = random.randint(1, 255)
-        for point in points:
-            self.img = cv2.circle(self.img, point, 2, (color_R, color_G, color_B), 2, 2)
-        return self.img
-
-    # 高斯去噪
-    def Gaussian_Blur(self):
-        blurred = cv2.GaussianBlur(self.img, (9, 9), 0)
-        return blurred
-
-    # 高斯去噪后阈值分割,返回彩色图像
-    def Thresh_and_Blur(self):
-        img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(img, (9, 9), 0)
-        (thresh_value, thresh) = cv2.threshold(blurred, 0, 255, cv2.THRESH_OTSU)
-        for c in range(3):
-            self.img[:, :, c] = np.where(thresh[:, :, ] == 0,
-                                         0,
-                                         self.img[:, :, c])
-        return self.img
-
-    # otsu阈值分割,返回彩色图
-    def ThreshColor(self):
-        img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        (thresh_value, thresh) = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
-        for c in range(3):
-            self.img[:, :, c] = np.where(thresh[:, :, ] == 0,
-                                         0,
-                                         self.img[:, :, c])
-        return self.img
-
-    # ousu阈值分割，灰度图
-    def ThreshGray(self):
-        img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        (thresh_value, thresh) = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
-        return thresh
-
-    # 图像倾斜矫正,一般是图像分割后做倾斜矫正
-    def image_rectification(self):
-        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        gray = cv2.bitwise_not(gray)
-        thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU)[1]
-        coords = np.column_stack(np.where(thresh == 0))
-        angle = cv2.minAreaRect(coords)[-1]
-        # print(angle)
-        if angle < -45:
-            angle = -(90 + angle)
+    args:
+        s(string): the input of string
+    return(int):
+        the number of Chinese characters
+    """
+    import string
+    count_zh = count_pu = 0
+    s_len = len(s)
+    en_dg_count = 0
+    for c in s:
+        if c in string.ascii_letters or c.isdigit() or c.isspace():
+            en_dg_count += 1
+        elif c.isalpha():
+            count_zh += 1
         else:
-            angle = -angle
-        h = self.img.shape[0]
-        w = self.img.shape[1]
-        center = (w // 2, h // 2)
-        M = cv2.getRotationMatrix2D(center, angle, 1.0)
-        rotated = cv2.warpAffine(self.img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-        target_coords = np.where(rotated[:, :, 1] > 0)
-        if len(target_coords[0]) > 0:
-            rotated = rotated[min(target_coords[0]):max(target_coords[0]), min(target_coords[1]):max(target_coords[1]),
-                      :]
-        # 需要裁剪边框
-        return rotated
+            count_pu += 1
+    return s_len - math.ceil(en_dg_count / 2)
 
 
 
+# OCR识别结果
+def draw_ocr(image, boxes, txts, scores,font_path, draw_txt=True, drop_score=0.5):
+    """
+    Visualize the results of OCR detection and recognition
+    args:
+        image(Image|array): RGB image
+        boxes(list): boxes with shape(N, 4, 2)
+        txts(list): the texts
+        scores(list): txxs corresponding scores
+        draw_txt(bool): whether draw text or not
+        drop_score(float): only scores greater than drop_threshold will be visualized
+    return(array):
+        the visualized img
+    """
+    if scores is None:
+        scores = [1] * len(boxes)
+    for (box, score) in zip(boxes, scores):
+        if score < drop_score or math.isnan(score):
+            continue
+        box = np.reshape(np.array(box), [-1, 1, 2]).astype(np.int64)
+        image = cv2.polylines(np.array(image), [box], True, (255, 0, 0), 2)
 
+    if draw_txt:
+        img = np.array(resize_img(image, input_size=600))
+        txt_img = text_visual(
+            txts, scores,font_path ,img_h=img.shape[0], img_w=600, threshold=drop_score)
+        img = np.concatenate([np.array(img), np.array(txt_img)], axis=1)
+        return img
+    return image
 
+def text_visual(texts, scores,font_path, img_h=400, img_w=600, threshold=0.):
+    """
+    create new blank img and draw txt on it
+    args:
+        texts(list): the text will be draw
+        scores(list|None): corresponding score of each txt
+        img_h(int): the height of blank img
+        img_w(int): the width of blank img
+    return(array):
 
-# opencv 读取中文
-def ReadChinesePath(filePath):
-    cv_img = cv2.imdecode(np.fromfile(filePath, dtype=np.uint8), -1)
-    return cv_img
+    """
+    if scores is not None:
+        assert len(texts) == len(
+            scores), "The number of txts and corresponding scores must match"
 
-def WriteChienePath(file_path,image):
-    cv2.imencode('.jpg', image)[1].tofile(file_path)
+    def create_blank_img():
+        blank_img = np.ones(shape=[img_h, img_w], dtype=np.int8) * 255
+        blank_img[:, img_w - 1:] = 0
+        blank_img = Image.fromarray(blank_img).convert("RGB")
+        draw_txt = ImageDraw.Draw(blank_img)
+        return blank_img, draw_txt
 
-# 随机出一个颜色
-def GetRandomColor():
-    r1 = random.randint(0, 255)
-    r2 = random.randint(0, 255)
-    r3 = random.randint(0, 255)
-    return (r1, r2, r3)
+    blank_img, draw_txt = create_blank_img()
 
+    font_size = 20
+    txt_color = (0, 0, 0)
+    font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
 
-def opencv_to_base64(image):
-    image_byte = cv2.imencode('.jpg', image)[1].tobytes()
-    base64_str = str(base64.b64encode(image_byte), encoding='utf-8')
-    return base64_str
-
-
-
-
-
-# 图像裁剪边框
-def ImageRectification(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.bitwise_not(gray)
-    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU)[1]
-    coords = np.column_stack(np.where(thresh == 0))
-    angle = cv2.minAreaRect(coords)[-1]
-    # print(angle)
-    if angle < -45:
-        angle = -(90 + angle)
+    gap = font_size + 5
+    txt_img_list = []
+    count, index = 1, 0
+    for idx, txt in enumerate(texts):
+        index += 1
+        if scores[idx] < threshold or math.isnan(scores[idx]):
+            index -= 1
+            continue
+        first_line = True
+        while str_count(txt) >= img_w // font_size - 4:
+            tmp = txt
+            txt = tmp[:img_w // font_size - 4]
+            if first_line:
+                new_txt = str(index) + ': ' + txt
+                first_line = False
+            else:
+                new_txt = '    ' + txt
+            draw_txt.text((0, gap * count), new_txt, txt_color, font=font)
+            txt = tmp[img_w // font_size - 4:]
+            if count >= img_h // gap - 1:
+                txt_img_list.append(np.array(blank_img))
+                blank_img, draw_txt = create_blank_img()
+                count = 0
+            count += 1
+        if first_line:
+            new_txt = str(index) + ': ' + txt + '   ' + '%.3f' % (scores[idx])
+        else:
+            new_txt = "  " + txt + "  " + '%.3f' % (scores[idx])
+        draw_txt.text((0, gap * count), new_txt, txt_color, font=font)
+        # whether add new blank img or not
+        if count >= img_h // gap - 1 and idx + 1 < len(texts):
+            txt_img_list.append(np.array(blank_img))
+            blank_img, draw_txt = create_blank_img()
+            count = 0
+        count += 1
+    txt_img_list.append(np.array(blank_img))
+    if len(txt_img_list) == 1:
+        blank_img = np.array(txt_img_list[0])
     else:
-        angle = -angle
-    h = img.shape[0]
-    w = img.shape[1]
-    center = (w // 2, h // 2)
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-    target_coords = np.where(rotated[:, :, 1] > 0)
-    rotated = rotated[min(target_coords[0]):max(target_coords[0]), min(target_coords[1]):max(target_coords[1]), :]
-    # 需要裁剪边框
-    return rotated
+        blank_img = np.concatenate(txt_img_list, axis=1)
+    return np.array(blank_img)
+
+
+
+
+def draw_text_list(img,font_path, label_list, pt_list=[], color_list=[], font_size_list=[]):
+    cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
+    pilimg = Image.fromarray(cv2img)
+    # PIL图片上打印汉字
+    font_path = get_font_path(font_path)
+    draw = ImageDraw.Draw(pilimg)  # 图片上打印
+    for (label, pt, color, font_size) in zip(label_list, pt_list, color_list, font_size_list):
+        font = ImageFont.truetype(font_path, font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+        draw.text(pt, label, color, font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
+    return cv2charimg
+
+
+def get_font_path(font_path):
+    if font_path is None:
+        if getOperationSystem() == "Windows":
+            font_path = r'C:\Windows\Fonts\simhei.ttf'
+        else:
+            font_path = r'/usr/fonts/simhei.ttf'
+        return font_path
+    else:
+        return font_path
+
+# 添加中文label
+def Add_Chinese_Label(img, label, pt1=(0, 0), color=GetRandomColor(), font_size=24,font_path=None):
+    cv2img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # cv2和PIL中颜色的hex码的储存顺序不同
+    pilimg = Image.fromarray(cv2img)
+    # PIL图片上打印汉字
+    draw = ImageDraw.Draw(pilimg)  # 图片上打印
+    font = ImageFont.truetype(get_font_path(font_path), font_size, encoding="utf-8")  # 参数1：字体文件路径，参数2：字体大小
+    if type(label) == list:
+        for (txt,pt,txt_color) in zip(label,pt1,color):
+            draw.text(pt, txt, (int(txt_color[0]), int(txt_color[1]), int(txt_color[2])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    else:
+        draw.text(pt1, label, (int(color[2]), int(color[1]), int(color[0])), font=font)  # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+    cv2charimg = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
+    return cv2charimg
+
+# 图片加标题，有黑边
+def Add_Title_Image(image, title,font_path=None):
+    image_shape = image.shape
+    image1 = Image.new("RGB", (image_shape[1], image_shape[0]))
+    image2 = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    image2 = image2.resize((image_shape[1] - 5 * 2, image_shape[0] - 50 * 2), )
+    # image.thumbnail(size)
+    draw = ImageDraw.Draw(image1)
+    # use a truetype font
+    font = ImageFont.truetype(get_font_path(font_path), 40)
+    draw.text((100, 0), title, font=font)
+    bw, bh = image1.size
+    lw, lh = image2.size
+    image1.paste(image2, (bw - lw, int((bh - lh) / 2)))
+    img = cv2.cvtColor(np.asarray(image1), cv2.COLOR_RGB2BGR)
+    return img
+
+def draw_text_det_res(img, dt_boxes, txts=None,font_path=None):
+    if isinstance(img, str):
+        src_im = cv2.imread(img)
+    else:
+        src_im = img.copy()
+    if txts is None:
+        txts = [None] * len(dt_boxes)
+    for idx, (box, txt) in enumerate(zip(dt_boxes, txts)):
+        box = np.array(box).astype(np.int32).reshape(-1, 2)
+        if txt:
+            src_im = draw_text_list(src_im, font_path, [txt], pt_list = [(box[0, 0], box[3, 1])], color_list = [(0, 0, 255)], font_size_list = [54])
+        cv2.polylines(src_im, [box], True, color=(0, 0, 255), thickness=2)
+    return src_im
 
 
 # PLT显示图片关键点和矩形框
@@ -303,9 +545,10 @@ def PltShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
     plt.close()
 
 
-def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="result"):
+def CVShowKeyPoints(image, keyPoints, classes=None,colors=None,fontSize=None, waiktKey=1, named_windows="result"):
     base = int(np.ceil(pow(len(keyPoints), 1. / 3)))
-    colors = [_to_color(x) for x in range(len(keyPoints))]
+    if colors is None:
+        colors = [_to_color(x) for x in range(len(keyPoints))]
     h, w = image.shape[0], image.shape[1]
     for i in range(len(keyPoints)):
         for j in range(len(keyPoints[i])):
@@ -322,12 +565,12 @@ def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="r
         point2 = (int(keyPoints[i][1][0]), int(keyPoints[i][1][1]))
         point3 = (int(keyPoints[i][2][0]), int(keyPoints[i][2][1]))
         point4 = (int(keyPoints[i][3][0]), int(keyPoints[i][3][1]))
-        image = cv2.line(image, point1, point2, colors[i], 2, 2)
-        image = cv2.line(image, point2, point3, colors[i], 2, 2)
-        image = cv2.line(image, point3, point4, colors[i], 2, 2)
-        image = cv2.line(image, point4, point1, colors[i], 2, 2)
+        image = cv2.line(image, point1, point2, colors[i], 2, 1)
+        image = cv2.line(image, point2, point3, colors[i], 2, 1)
+        image = cv2.line(image, point3, point4, colors[i], 2, 1)
+        image = cv2.line(image, point4, point1, colors[i], 2, 1)
         if classes:
-            image = Add_Chinese_Label(image, classes[i], point1, colors[i], 40)
+            image = Add_Chinese_Label(image, classes[i], point1, colors[i], fontSize)
 
     if waiktKey >= 0:
         cv2.namedWindow(named_windows, 0)
@@ -338,36 +581,6 @@ def CVShowKeyPoints(image, keyPoints, classes=None, waiktKey=1, named_windows="r
 
         return image
 
-
-def file_to_base64(file_path):
-    if os.path.exists(file_path):
-        image = cv2.imdecode(np.fromfile(file_path, dtype=np.uint8), -1)
-        image_resize = image.copy()
-        image_resize = Image_Resize(image_resize, width=768)
-        image_resize_byte = cv2.imencode('.jpg', image_resize)[1].tobytes()
-        base64_str = str(base64.b64encode(image_resize_byte), encoding='utf-8')
-        return base64_str
-    else:
-        return ""
-
-# opencv 转 base64
-def cv2_base64(image):
-    base64_str = cv2.imencode('.jpg', image)[1].tostring()
-    base64_str = base64.b64encode(base64_str)
-    return str(base64_str, encoding="utf-8")
-
-# base64转opencv
-def base64_to_cv2(base_image):
-    image_bytes = base64.b64decode(base_image)
-    np_array = np.frombuffer(image_bytes, np.uint8)
-    image_cv2 = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
-    return image_cv2
-
-# base64转文件
-
-def base64_to_file(base_image,image_path):
-    with open(image_path, 'wb') as f:
-        f.write(base64.b64decode(base_image))
 
 # opencv显示关键点和矩形框
 def CVShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
@@ -404,552 +617,73 @@ def CVShowKeypointsBoxes(img_path, keypoints, bboxes=[], scores=[], waitkey=1):
     cv2.waitKey(waitkey)
 
 
-def _to_color(indx):
-    """ return (b, r, g) tuple"""
-    b = random.randint(1, 10) / 10
-    g = random.randint(1, 10) / 10
-    r = random.randint(1, 10) / 10
-    return b * 255, r * 255, g * 255
-
-
-# opencv显示points
-def CVShowPoints(img_path, points, waitkey=1):
-    if type(img_path) != list:
-        image = cv2.imread(img_path)
-    else:
-        image = img_path
+#opencv显示boxes
+def CVShowBoxes(image,boxes,label_texts,scores,label_ids=None,num_classes=90,waitkey=-1,named_windows="result"):
+    base = int(np.ceil(pow(num_classes, 1. / 3)))
+    colors = [_to_color(x) for x in range(num_classes)]
+    if type(image) == str:
+        image = cv2.imread(image)
     image2 = image.copy()
+    for i in range(len(boxes)):
+        if boxes[i][0] <= 1.1 and  boxes[i][1] <= 1.1 and boxes[i][2] <= 1.1 and boxes[i][3] <= 1.1:
+            xmin = int(boxes[i][0]*image.shape[1]) if int(boxes[i][0]*image.shape[1]) > 0  else 0
+            ymin = int(boxes[i][1]*image.shape[0]) if (int(boxes[i][1]*image.shape[0])) > 0 else 0
+            xmax = int(boxes[i][2]*image.shape[1]) if int(boxes[i][2]*image.shape[1]) > 0 else 0
+            ymax =  int(boxes[i][3]*image.shape[0]) if int(boxes[i][3]*image.shape[0]) > 0 else 0
+        else:
+            xmin = int(boxes[i][0])
+            ymin = int(boxes[i][1])
+            xmax = int(boxes[i][2])
+            ymax = int(boxes[i][3])
+        if boxes is not None:
+            image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
+            if label_texts is not None:
+                if scores is not None:
+                    image2 = Add_Chinese_Label(img=image2, label=label_texts[i] + ":" + str(int(scores[i] * 100)),
+                                               pt1=(xmin, ymin))
+                else:
+                    image2 = Add_Chinese_Label(img=image2, label=label_texts[i],
+                                               pt1=(xmin, ymin))
+                if label_ids is not None:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), colors[int(label_ids[i])], 3, 3)
+                else:
+                    image2 = cv2.rectangle(image2, (xmin, ymin), (xmax, ymax), GetRandomColor(), 3, 3)
 
-    for i in range(len(points)):
-        psts = []
-        points2 = points[i]
-        for j in range(len(points2)):
-            for z in range(len(points2[j])):
-                if z % 2 == 0 and z != 0:
-                    cv2.circle(image2, (int(points2[j][z - 1]), int(points2[j][z])), 2, (255, 255, 255), 2, 1)
 
-    cv2.imshow("resukt", image2)
-    cv2.waitKey(waitkey * 1000)
-
-
-# PLT显示关键点
-def PltShowKeypoints(img_path, keypoints, waitkey=1):
-    if type(img_path) != list:
-        im = plt.imread(img_path)
+    if waitkey >= 0:
+        cv2.namedWindow(named_windows, 0)
+        # cv2.resizeWindow("result", 840, 680)
+        cv2.imshow(named_windows,image2)
+        cv2.waitKey(waitkey)
     else:
-        im = img_path
-    edges = [[0], [1, 3], [3, 5], [2, 4], [4, 6]]
-    plt.imshow(im)
-    plt.axis("off")
-    pts = np.array(keypoints)
-    for i in range(len(pts)):
-        points2 = pts[i]
-        for j in range(len(points2)):
-            for z in range(len(points2[j])):
-                if z % 2 == 0 and z != 0:
-                    plt.plot(int(points2[j][z - 1]), int(points2[j][z]), 'r.')
-                    plt.text(int(points2[j][z - 1]), int(points2[j][z]), '{0}'.format(j))
+        return image2
 
-        # for ie, e in enumerate(edges):
-        #     rgb = matplotlib.colors.hsv_to_rgb([ie / float(len(edges)), 1.0, 1.0])
-        #     if len(points2) == 7:
-        #         plt.plot(points2[e, 1], points2[e, 2], color=rgb)
-    plt.ion()
-    plt.pause(waitkey)  # 显示的时间
-    plt.close()
+# OCR识别结果
+def draw_ocr(image, boxes, txts, scores=None, draw_txt=True, drop_score=0.5):
+    """
+    Visualize the results of OCR detection and recognition
+    args:
+        image(Image|array): RGB image
+        boxes(list): boxes with shape(N, 4, 2)
+        txts(list): the texts
+        scores(list): txxs corresponding scores
+        draw_txt(bool): whether draw text or not
+        drop_score(float): only scores greater than drop_threshold will be visualized
+    return(array):
+        the visualized img
+    """
+    if scores is None:
+        scores = [1] * len(boxes)
+    for (box, score) in zip(boxes, scores):
+        if score < drop_score or math.isnan(score):
+            continue
+        box = np.reshape(np.array(box), [-1, 1, 2]).astype(np.int64)
+        image = cv2.polylines(np.array(image), [box], True, (255, 0, 0), 2)
 
-
-# 合并图片
-def CombinedImages(images, img_per_row=3, columns=3):
-    inputs = []
-    for img in images:
-        # img = cv2.cvtColor(img,cv2.COLOR_RGB2BGR)
-        inputs.append(Image.fromarray(img.astype('uint8')).convert('RGB'))
-
-    width, height = inputs[0].size
-    img = Image.new(inputs[0].mode, (width * img_per_row, height * columns))
-    idx = 0
-    for row in range(img_per_row):
-        for col in range(columns):
-            if idx > len(images) - 1:
-                break
-            img.paste(inputs[idx], box=(row * width, col * height))
-            idx = idx + 1
-
-    img = np.array(img)
-    return img
-
-
-# 裁剪目标框
-def CutImageWithBox(image, bbox,expand_size=20):
-    xmin = (int(bbox[0] - expand_size), 0)[int(bbox[0] - expand_size) < 0]
-    ymin = (int(bbox[1] - expand_size), 0)[int(bbox[1] - expand_size) < 0]
-    xmax = (int(bbox[2] + expand_size), 0)[int(bbox[2] + expand_size) < 0]
-    ymax = (int(bbox[3] + expand_size), 0)[int(bbox[3] + expand_size) < 0]
-    cut_image = image[ymin:ymax, xmin:xmax, :]
-    return cut_image
-
-
-def CutImageWithBoxes(image, bboxes, convert_rgb2bgr=False):
-    cut_images = []
-    for i in range(len(bboxes)):
-        bbox = bboxes[i]
-        cut_image = CutImageWithBox(image, bbox)
-        cut_images.append(cut_image)
-        # cut_images.append(cv2.resize(cut_image,(256,256)))
-
-    return cut_images
-
-
-def GetLabelAndImagePath(root_path):
-    image_labels = {}
-    labels = os.listdir(root_path)
-    for label in labels:
-        image_paths = GetAllImagesPath(os.path.join(root_path, label))
-        for image_path in image_paths:
-            image_labels.update({GetLastDir(image_path)[:-4]: label})
-    return image_labels
-
-
-# VOC数据集裁剪目标框
-def CutImagesWithVoc(xml_path):
-    imagename, shape, bboxes, labels, labels_text, difficult, truncated = ProcessXml(xml_path)
-    root_path = GetPreviousDir(GetPreviousDir(xml_path))
-    image_path = os.path.join(root_path, DIRECTORY_IMAGES, GetLastDir(xml_path)[:-4] + ".jpg")
-    image = cv2.imread(image_path)
-    images = CutImageWithBoxes(image, bboxes)
-    return images, labels
-
-
-# 读取自定义标注的MASK
-def LoadEraseMask(image_path):
-    if type(image_path) == str:
-        img = cv2.imread(image_path)
-    else:
-        img = image_path
-    img = cv2.resize(img, (JADE_RESIZE_SIZE, JADE_RESIZE_SIZE))
-    input_height = img.shape[1]
-    input_width = img.shape[0]
-
-    # mouse callback function
-    def erase_rect(event, x, y, flags, param):
-        global ix, iy, JADE_DRAWING
-        if event == cv2.EVENT_LBUTTONDOWN:
-            JADE_DRAWING = True
-            if JADE_DRAWING == True:
-                # cv2.circle(img,(x,y),10,(255,255,255),-1)
-                cv2.rectangle(img, (x - JADE_SIZE, y - JADE_SIZE), (x + JADE_SIZE, y + JADE_SIZE), JADE_COLOR, -1)
-                cv2.rectangle(mask, (x - JADE_SIZE, y - JADE_SIZE), (x + JADE_SIZE, y + JADE_SIZE), JADE_COLOR, -1)
-
-        elif event == cv2.EVENT_MOUSEMOVE:
-            if JADE_DRAWING == True:
-                # cv2.circle(img,(x,y),10,(255,255,255),-1)
-                cv2.rectangle(img, (x - JADE_SIZE, y - JADE_SIZE), (x + JADE_SIZE, y + JADE_SIZE), JADE_COLOR, -1)
-                cv2.rectangle(mask, (x - JADE_SIZE, y - JADE_SIZE), (x + JADE_SIZE, y + JADE_SIZE), JADE_COLOR, -1)
-        elif event == cv2.EVENT_LBUTTONUP:
-            JADE_DRAWING = False
-            # cv2.circle(img,(x,y),10,(255,255,255),-1)
-            cv2.rectangle(img, (x - JADE_SIZE, y - JADE_SIZE), (x + JADE_SIZE, y + JADE_SIZE), JADE_COLOR, -1)
-            cv2.rectangle(mask, (x - JADE_SIZE, y - JADE_SIZE), (x + JADE_SIZE, y + JADE_SIZE), JADE_COLOR, -1)
-
-    mask = np.zeros(img.shape)
-    test_mask = cv2.resize(mask, (input_height, input_width))
-    test_mask = test_mask.astype(np.uint8)
-    test_mask = cv2.cvtColor(test_mask, cv2.COLOR_RGB2GRAY)
-    cv2.destroyAllWindows()
-
-    cv2.namedWindow('image', 0)
-    cv2.setMouseCallback('image', erase_rect)
-    # cv2.namedWindow('mask')
-    #
-    mask = np.zeros(img.shape, dtype=np.uint8)
-
-    while (1):
-        img_show = img
-        cv2.imshow('image', img_show)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-
-    test_img = cv2.resize(img, (input_height, input_width))
-    test_mask = cv2.resize(mask, (input_height, input_width))
-    test_mask = cv2.cvtColor(test_mask, cv2.COLOR_RGB2GRAY)
-    return test_mask
-
-
-# 从mask文件夹随机读取mask文件
-def LoadRandomMask(mask_count=100):
-    mask_path = "/home/jade/Data/mask/testing_mask_dataset"
-    mask_list = GetAllImagesPath(mask_path)
-    mask_list = mask_list[5000:10000]
-    masks = random.sample(mask_list, mask_count)
-    return masks
-
-
-# 在图片中添加Mask区域
-def MixImageAndMask(image, mask):
-    if type(mask) == str:
-        mask = cv2.imread(mask)
-    image = cv2.resize(image, (512, 512))
-    mask = mask > 0
-    image[mask] = 255
+    if draw_txt:
+        img = np.array(resize_img(image, input_size=600))
+        txt_img = text_visual(
+            txts, scores,font_path=get_font_path(None), img_h=img.shape[0], img_w=600, threshold=drop_score)
+        img = np.concatenate([np.array(img), np.array(txt_img)], axis=1)
+        return img
     return image
-
-
-# 旋转图片
-def RotateBound(image, angle):
-    # grab the dimensions of the image and then determine the
-    # center
-    (h, w) = image.shape[:2]
-    (cX, cY) = (w // 2, h // 2)
-
-    # grab the rotation matrix (applying the negative of the
-    # angle to rotate clockwise), then grab the sine and cosine
-    # (i.e., the rotation components of the matrix)
-    M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
-    cos = np.abs(M[0, 0])
-    sin = np.abs(M[0, 1])
-
-    # compute the new bounding dimensions of the image
-    nW = int((h * sin) + (w * cos))
-    nH = int((h * cos) + (w * sin))
-
-    # adjust the rotation matrix to take into account translation
-    M[0, 2] += (nW / 2) - cX
-    M[1, 2] += (nH / 2) - cY
-
-    # perform the actual rotation and return the image
-    return cv2.warpAffine(image, M, (nW, nH))
-
-
-# 鱼眼矫正
-def get_K_and_D(checkerboard, imgsPath):
-    CHECKERBOARD = checkerboard
-    subpix_criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-    calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_CHECK_COND + cv2.fisheye.CALIB_FIX_SKEW
-    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
-    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
-    _img_shape = None
-    objpoints = []
-    imgpoints = []
-    images = glob.glob(imgsPath + '/*.jpg')
-    for fname in images:
-        print(fname)
-        img = cv2.imread(fname)
-        if _img_shape == None:
-            _img_shape = img.shape[:2]
-        else:
-            assert _img_shape == img.shape[:2], "All images must share the same size."
-        # cv2.namedWindow("result",0)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # cv2.imshow("result",gray)
-        # cv2.waitKey(0)
-        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,
-                                                 cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
-        if ret == True:
-            objpoints.append(objp)
-            cv2.cornerSubPix(gray, corners, (3, 3), (-1, -1), subpix_criteria)
-            imgpoints.append(corners)
-    N_OK = len(objpoints)
-    K = np.zeros((3, 3))
-    D = np.zeros((4, 1))
-    rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
-    tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
-
-    rms, _, _, _, _ = \
-        cv2.fisheye.calibrate(
-            objpoints,
-            imgpoints,
-            gray.shape[::-1],
-            K,
-            D,
-            rvecs,
-            tvecs,
-            calibration_flags,
-            (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
-        )
-    DIM = _img_shape[::-1]
-    return DIM, K, D
-
-
-# 裁剪矫正
-def undistort1(img_path, DIM=(1920, 1080), K=np.array([[9.10274325e+02, 0.00000000e+00, 1.03283696e+03],
-                                                       [0.00000000e+00, 9.13958936e+02, 5.80558859e+02],
-                                                       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
-               D=np.array([[-0.06510345], [-0.01617996], [0.18211916], [-0.15394744]])):
-    img = cv2.imread(img_path)
-    img = cv2.resize(img, DIM)
-    map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, DIM, cv2.CV_16SC2)
-    undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-    return undistorted_img
-    # cv2.destroyAllWindows()
-
-
-# 无裁剪矫正
-def undistort2(img_path, DIM=(1920, 1080), K=np.array([[9.10274325e+02, 0.00000000e+00, 1.03283696e+03],
-                                                       [0.00000000e+00, 9.13958936e+02, 5.80558859e+02],
-                                                       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
-               D=np.array([[-0.06510345], [-0.01617996], [0.18211916], [-0.15394744]]), balance=0.6, dim2=None,
-               dim3=None):
-    img = cv2.imread(img_path)
-    dim1 = img.shape[:2][::-1]  # dim1 is the dimension of input image to un-distort
-    assert dim1[0] / dim1[1] == DIM[0] / DIM[
-        1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
-    if not dim2:
-        dim2 = dim1
-    if not dim3:
-        dim3 = dim1
-    scaled_K = K * dim1[0] / DIM[0]  # The values of K is to scale with image dimension.
-    scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
-    # This is how scaled_K, dim2 and balance are used to determine the final K used to un-distort image. OpenCV document failed to make this clear!
-    new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(scaled_K, D, dim2, np.eye(3), balance=balance)
-    map1, map2 = cv2.fisheye.initUndistortRectifyMap(scaled_K, D, np.eye(3), new_K, dim3, cv2.CV_16SC2)
-    undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-    return undistorted_img
-
-
-
-# 坐标旋转
-def BoxRotated(image_path, bboxes):
-    image1 = cv2.imread(image_path)
-    height, width, C = image1.shape
-    new_bboxes = []
-    for i in range(len(bboxes)):
-        bbox2 = [width - bboxes[i][0], height - bboxes[i][1], width - bboxes[i][2], height - bboxes[i][3]]
-        new_bboxes.append(bbox2)
-    return new_bboxes
-
-
-def ImShow(images, key=0):
-    if type(images) == list:
-        for i in range(len(images)):
-            if type(images[i]) == str:
-                image = cv2.imread(images[i])
-            else:
-                image = images[i]
-            name = "result_" + str(i)
-            cv2.namedWindow(name, 0)
-            cv2.imshow(name, image)
-    else:
-        if type(images) == str:
-            image = cv2.imread(images)
-        else:
-            image = images
-        name = "result_0"
-        cv2.namedWindow(name, 0)
-        cv2.imshow(name, image)
-    cv2.waitKey(key)
-
-
-def compose_gif(image_path_list, output_path, fps=1):
-    import imageio
-    gif_images = []
-    for path in image_path_list:
-        gif_images.append(imageio.imread(path))
-    imageio.mimsave(output_path, gif_images, fps=fps)
-
-
-def overlay_image(image_path1,image_path2,boxes):
-    background_image = ReadChinesePath(image_path1)
-    image = ReadChinesePath(image_path2)
-    image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
-    width = boxes[3]
-    height = boxes[2]
-    background_image[boxes[0]:boxes[0]+boxes[2],boxes[1]:boxes[1]+boxes[3],:] = cv2.resize(image,(width,height))
-    cv2.namedWindow("result",0)
-    cv2.imshow("result",background_image)
-    cv2.waitKey(0)
-    return background_image
-
-"""
-图片扩充
-"""
-def PadImage(image,width=10):
-    image_pad = cv2.copyMakeBorder(image, width, width, width, width,
-                           cv2.BORDER_CONSTANT, value=[255, 255, 255])
-    return image_pad
-
-
-class VideoCaptureBaseProcess(threading.Thread):
-    def __init__(self,video_path,camera_type,use_gpu_decode,camera_reopen_times=30,JadeLog=None,device=None,acl_resource=None,show_window=False):
-        self.video_path = video_path
-        self.history_status = self.check_video_path()
-        self.camera_type = camera_type
-        self.use_gpu_decode = use_gpu_decode
-        self.camera_reopen_times = camera_reopen_times
-        self.reopen_times = 0
-        self.device = device
-        self.JadeLog = JadeLog
-        self.show_window = show_window
-        self.capture = None
-        super(VideoCaptureBaseProcess, self).__init__()
-
-    def download_frame(self,frame):
-        if self.use_gpu_decode:
-            frame = frame.download()
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
-        if self.device == "ascend":
-            pass
-        return frame
-
-    def package_data(self,ret,frame):
-        frame = self.download_frame(frame)
-        if self.show_window:
-            cv2.namedWindow("result",0)
-            cv2.imshow("result",frame)
-            cv2.waitKey(1)
-
-    def camera_abnormal(self,exception):
-        pass
-
-    def check_video_path(self):
-        if os.path.exists(self.video_path):
-            return True
-        else:
-            return False
-
-    def open_gpu_capture(self):
-        if (hasattr(cv2, "cudacodec")):
-            try:
-                self.JadeLog.INFO("相机类型为:{},使用GPU解码,准备打开相机".format(self.camera_type))
-                self.capture = cv2.cudacodec.createVideoReader(self.video_path)
-                if self.capture.nextFrame()[0]:
-                    self.reopen_times = 0
-                    self.JadeLog.INFO(
-                        "相机类型为:{},相机打开成功,使用GPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
-                    return True
-                else:
-                    self.reopen_times = self.reopen_times + 1
-                    self.capture = None
-                    self.JadeLog.ERROR(
-                        "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
-                    self.camera_abnormal(None)
-                    return False
-
-            except Exception as e:
-                self.camera_abnormal(str(e))
-                if "CUDA_ERROR_FILE_NOT_FOUND" in str(e):
-                    self.reopen_times = self.reopen_times + 1
-                    self.capture = None
-                    self.JadeLog.ERROR(
-                        "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type,self.reopen_times,self.video_path))
-                    return False
-                elif "CUDA_ERROR_INVALID_DEVICE" in str(e):
-                    self.JadeLog.ERROR("相机类型为:{},不支持该显卡,请检查显卡驱动环境,或者使用CPU解码,程序退出".format(self.camera_type))
-                    Exit(0)
-                elif "CUDA_ERROR_NO_DEVICE" in str(e):
-                    self.JadeLog.ERROR("相机类型为:{},请确认显卡驱动环境是否为440.82,尝试更换显卡驱动,或者使用CPU解码,程序退出".format(self.camera_type))
-                    Exit(0)
-                else:
-                    self.JadeLog.ERROR("相机类型为:{},不支持GPU解码,请使用CPU视频流解码,程序退出,出错原因为:{},程序退出".format(self.camera_type, str(e)))
-                    Exit(0)
-        else:
-            self.JadeLog.ERROR("相机类型为:{},没有GPU解码功能,请重新编译,或者使用CPU解码,程序退出".format(self.camera_type))
-            Exit(0)
-
-    def opencv_cpu_capture(self):
-        if self.device == "ascend":
-            from acllite import videocapture
-            if self.capture is None:
-                import acl
-                from acllite import acllite_utils  as utils
-                self._context, ret = acl.rt.create_context(0)
-                utils.check_ret("acl.rt.create_context", ret)
-            else:
-                self.JadeLog.DEBUG("相机类型为:{},释放相机资源".format(self.camera_type))
-            try:
-                self.capture = videocapture.VideoCapture(self.video_path)
-                self.JadeLog.INFO("相机类型为:{},使用Ascend芯片解码,准备打开相机".format(self.camera_type))
-            except Exception as e:
-                self.JadeLog.ERROR("相机类型为:{},相机打开失败,失败原因为:{}".format(self.camera_type,e))
-                self.capture = None
-                self.capture = videocapture.VideoCapture(self.video_path)
-        else:
-            if self.capture is None:
-                pass
-            else:
-                self.JadeLog.DEBUG("相机类型为:{},释放相机资源".format(self.camera_type))
-                self.capture.release()
-            self.capture = cv2.VideoCapture(self.video_path)
-            self.JadeLog.INFO("相机类型为:{},使用CPU解码,准备打开相机".format(self.camera_type))
-        if self.device == "ascend":
-            ret,frame = self.capture.read()
-            if ret == 0 and frame is not None:
-                self.reopen_times = 0
-                self.JadeLog.INFO(
-                    "相机类型为:{},相机打开成功,使用Ascend芯片解码,相机地址为:{}".format(self.camera_type, self.video_path))
-                return True
-            else:
-                self.reopen_times = self.reopen_times + 1
-                self.capture = None
-                self.JadeLog.ERROR(
-                    "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
-                self.camera_abnormal(None)
-                return False
-        else:
-            if self.capture.isOpened():
-                self.reopen_times = 0
-                self.JadeLog.INFO(
-                    "相机类型为:{},相机打开成功,使用CPU对视频解码,相机地址为:{}".format(self.camera_type, self.video_path))
-                return True
-            else:
-                self.reopen_times = self.reopen_times + 1
-                self.capture = None
-                self.JadeLog.ERROR(
-                    "相机类型为:{},相机第{}次打开失败,相机地址为:{}".format(self.camera_type, self.reopen_times, self.video_path))
-                self.camera_abnormal(None)
-                return False
-
-
-    def judge_capture_reader(self):
-        if self.use_gpu_decode:
-            return self.open_gpu_capture()
-        else:
-            return self.opencv_cpu_capture()
-
-    def capture_reader(self):
-        while True:
-            if self.judge_capture_reader():
-                while True:
-                    try:
-                        if self.use_gpu_decode:
-                            ret, frame = self.capture.nextFrame()
-                        else:
-                            ret, frame = self.capture.read()
-                        if self.device == "ascend":
-                            if ret == 0:
-                                ret = True
-                            else:
-                                ret = False
-
-                        if ret is False:
-                            self.JadeLog.WARNING(
-                                "相机类型为:{},相机中途断开,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
-                            time.sleep(self.camera_reopen_times)
-                            self.judge_capture_reader()
-                        else:
-                            self.package_data(ret, frame)
-                        if self.history_status:
-                            time.sleep(0.04)
-                    except Exception as e:
-                        self.JadeLog.ERROR(
-                            "相机类型为:{},相机解码失败,失败原因为:{},发生异常文件{},发生异常所在的行数{},等待{}s,尝试重连".format(self.camera_type,e ,
-                                                                         e.__traceback__.tb_frame.f_globals["__file__"],e.__traceback__.tb_lineno,self.camera_reopen_times))
-                        time.sleep(self.camera_reopen_times)
-                        self.judge_capture_reader()
-            else:
-                self.JadeLog.WARNING(
-                    "相机类型为:{},相机打开失败,请确认相机是否在线,或参数是否正常,等待{}s,尝试重连".format(self.camera_type, self.camera_reopen_times))
-                time.sleep(self.camera_reopen_times)
-
-    def run(self):
-        self.capture_reader()
-
-def cv2_show(image,window_name="result",waitKey=0):
-    cv2.namedWindow(window_name,0)
-    cv2.imshow(window_name,image)
-    cv2.waitKey(waitKey)
-if __name__ == '__main__':
-    from jade import JadeLogging
-    JadeLog = JadeLogging("log",Level="DEBUG")
-    videoCaptureThread = VideoCaptureBaseProcess("rtsp://admin:samples123@192.168.29.181:554/h264/ch1/main/av_stream","top",False,30,JadeLog)
-    videoCaptureThread.start()
