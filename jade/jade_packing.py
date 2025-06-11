@@ -74,8 +74,8 @@ def writePyContent(args,src_path,new_src_path,src_path_list,src_import_list,impo
     for file_name in os.listdir(src_path):
         if os.path.isfile(os.path.join(src_path, file_name)):
             file_name_suffix = re.search(r"\.(\w+)$", file_name).group(1)
-            if file_name_suffix == "py":
-                if "__init__.py" == file_name :
+            if file_name_suffix == "py" and file_name not in str_to_list(args.remove_specify_files):
+                if "__init__.py" == file_name  :
                     if src_path not in src_path_list :
                         with open(os.path.join(new_src_path, GetLastDir(src_path)) + ".py", "wb") as f1:
                             with open(os.path.join(src_path, file_name), "rb") as f:
