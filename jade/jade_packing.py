@@ -633,7 +633,7 @@ def build(args):
         lib_suffix = "so"
 
     specify_files = str_to_list(args.specify_files)
-
+    remove_specify_files = str_to_list(args.remove_specify_files)
     if len(specify_files) > 0:
         progressBar = ProgressBar(len(specify_files))
     else:
@@ -647,7 +647,7 @@ def build(args):
     need_to_build_file_list = []
     for file_name in file_list:
         if len(specify_files) > 0:
-            if file_name in specify_files:
+            if file_name in specify_files and file_name not in remove_specify_files:
                 cmd_str = "{}easycython {}/{}".format(scripts_path, "new_src", file_name)
                 result = subprocess.run(cmd_str, shell=True)
                 progressBar.update()
@@ -655,10 +655,11 @@ def build(args):
             else:
                 pass
         else:
-            cmd_str = "{}easycython {}/{}".format(scripts_path, "new_src", file_name)
-            need_to_build_file_list.append(file_name)
-            subprocess.run(cmd_str, shell=True)
-            progressBar.update()
+            if file_name not in remove_specify_files:
+                cmd_str = "{}easycython {}/{}".format(scripts_path, "new_src", file_name)
+                need_to_build_file_list.append(file_name)
+                subprocess.run(cmd_str, shell=True)
+                progressBar.update()
 
     build_file_list = os.listdir()
     build_success_file_list = []
@@ -1095,6 +1096,7 @@ if __name__ == '__main__':
                         default="False")  ## 是否打包成AppImage
     parser.add_argument('--is_qt', type=str, default="False")  ## 是否为Qt
     parser.add_argument("--specify_files", type=str, default="")
+    parser.add_argument("--remove_specify_files", type=str, default="")
     parser.add_argument('--lib_path', type=str, default="conta_service_lib64")  ## 是否lib包分开打包
 
     args = parser.parse_args()
