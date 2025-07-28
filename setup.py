@@ -32,11 +32,7 @@ from setuptools import setup, find_packages
 import sys
 from jade import get_app_version,write_version,CreateSavePath
 if __name__ == '__main__':
-    dependencies = ["easycython","pyinstaller","cryptography==3.4.8","cffi","psutil"]
-    if sys.platform == 'win32':
-        dependencies.append('Cython==0.29.33')
-    elif sys.platform == 'linux':
-        dependencies.append('Cython==3.0.8')
+    dependencies = ["psutil"]
     pack_list = [package_name]
     CreateSavePath("Ouput")
     find_packages(package_name, pack_list)
