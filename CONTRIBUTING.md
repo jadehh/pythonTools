@@ -1,11 +1,16 @@
 # 更新日志
+## JadeV2.4.1 - 2025-06-11
+* 区分操作系统的依赖
+---
+
+
+<details onclose>
+<summary>查看更多更新日志</summary>
 
 ## JadeV2.4.0 - 2025-06-11
 * 去除不编译的文件，包括其import的环境也不写入
 ---
 
-<details onclose>
-<summary>查看更多更新日志</summary>
 
 ## JadeV2.3.9 - 2025-06-11
 * 支持编译时不编译某个文件
