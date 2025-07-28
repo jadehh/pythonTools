@@ -1,11 +1,16 @@
 ### 更新日志
 
-#### DatasetToolsV1.1.8 - 2024-10-31
-* 去除pyinstaller依赖
+#### DatasetToolsV1.1.9 - 2024-10-31
+* 去除easycython依赖
 ---
 
 <details onclose>
 <summary>查看更多更新日志</summary>
+
+#### DatasetToolsV1.1.8 - 2024-10-31
+* 去除pyinstaller依赖
+---
+
 
 #### DatasetToolsV1.1.7 - 2024-04-16
 * 优化目标检测数据集制作方法

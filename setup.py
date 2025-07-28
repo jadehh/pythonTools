@@ -43,6 +43,6 @@ if __name__ == '__main__':
     package_data={'': ['*.Run']},
     include_package_data=True,
     platforms="any",
-    install_requires=["easycython==1.0.7","pycocotools"]  # 这个项目需要的第三方库
+    install_requires=["pycocotools"]  # 这个项目需要的第三方库
 )
 
