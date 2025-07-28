@@ -32,7 +32,7 @@ from setuptools import setup, find_packages
 import sys
 from jade import get_app_version,write_version,CreateSavePath
 if __name__ == '__main__':
-    dependencies = ["psutil","cryptography"]
+    dependencies = ["easycython","psutil","cryptography"]
     pack_list = [package_name]
     CreateSavePath("Ouput")
     find_packages(package_name, pack_list)
