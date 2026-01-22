@@ -18,6 +18,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="制作数据集脚本")
     parser.add_argument("--dataset_type", default='paddle_detection', help="制作数据集的类型")
+    parser.add_argument("--dataset_name", default='paddle_detection', help="箱号数据集")
     parser.add_argument("--input_dataset_dir", default='test', help="数据集的地址")
     parser.add_argument("--save_dataset_dir", default='test/output_seals_01', help="保存数据集的地址")
     parser.add_argument("--voc_labels",  nargs='+',default="", help="类别")
@@ -29,6 +30,8 @@ if __name__ == '__main__':
         CreateDarknetVocDatasets(args.input_dataset_dir,  save_path=args.save_dataset_dir, rate=0.9, VOC_CLASSES=args.voc_labels)
     elif args.dataset_type == "paddle_text_detection":
         create_text_detection_datasets(args.input_dataset_dir, args.save_dataset_dir, split_rate=0.95)
+    elif args.dataset_type == "paddle_ocr":
+        create_paddle_ocr_datasets(root_path=args.input_dataset_dir, save_path=args.save_dataset_dir,dataset_type=args.dataset_name)
 
     #removeNolabelDatasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集\2022-03-09")
     #create_text_detection_datasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集",r"E:\Data\字符检测识别数据集\定制版箱号关键点数据集",0.95)

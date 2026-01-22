@@ -411,8 +411,7 @@ class create_paddle_ocr_datasets(object):
                 index = index + 1
                 processBar.update()
 
-        print(
-            "平均高度为:{},平均宽度为:{}".format(all_image_height / all_image_count, all_image_width / all_image_count))
+        print( "平均高度为:{},平均宽度为:{}".format(all_image_height / all_image_count, all_image_width / all_image_count))
 
     def createOCRDatasets(self, label_txt_path):
         self.write_datasets(label_txt_path)
