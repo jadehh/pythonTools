@@ -30,7 +30,7 @@ if __name__ == '__main__':
         CreateDarknetVocDatasets(args.input_dataset_dir,  save_path=args.save_dataset_dir, rate=0.9, VOC_CLASSES=args.voc_labels)
     elif args.dataset_type == "paddle_text_detection":
         create_text_detection_datasets(args.input_dataset_dir, args.save_dataset_dir, split_rate=0.95)
-    elif args.dataset_type == "paddle_ocr":
+    elif args.dataset_type == "paddle_text_recognize":
         create_paddle_ocr_datasets(root_path=args.input_dataset_dir, save_path=args.save_dataset_dir,dataset_type=args.dataset_name)
 
     #removeNolabelDatasets(r"F:\数据集\关键点检测数据集\定制版箱号关键点数据集\2022-03-09")
