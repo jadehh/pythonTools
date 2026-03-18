@@ -22,10 +22,10 @@ if __name__ == '__main__':
     parser.add_argument("--input_dataset_dir", default='test', help="数据集的地址")
     parser.add_argument("--save_dataset_dir", default='test/output_seals_01', help="保存数据集的地址")
     parser.add_argument("--voc_labels",  nargs='+',default="", help="类别")
+    parser.add_argument("--remove_classes", nargs='+', default="", help="需要删除的类别")
     args = parser.parse_args()
-    print(list(args.voc_labels))
     if args.dataset_type == "paddle_detection":
-        CreateYearsDatasets(args.input_dataset_dir, None, save_path=args.save_dataset_dir, rate=0.9)
+        CreateYearsDatasets(args.input_dataset_dir, None, save_path=args.save_dataset_dir, rate=0.9, remove_classes=args.remove_classes)
     elif args.dataset_type == "yolo_detection":
         CreateDarknetVocDatasets(args.input_dataset_dir,  save_path=args.save_dataset_dir, rate=0.9, VOC_CLASSES=args.voc_labels)
     elif args.dataset_type == "paddle_text_detection":

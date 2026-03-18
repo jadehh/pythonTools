@@ -12,7 +12,7 @@ from jade import ProgressBar,GetLastDir,CreateSavePath
 import shutil
 import random
 import xml.etree.ElementTree as ET
-from dataset_tools.jade_voc_datasets import GetXmlClassesNames
+from dataset_tools.jade_voc_datasets import GetXmlClassesNames,GenerateXml
 
 
 def ProcessXml(xml_path):
@@ -54,7 +54,7 @@ def ProcessXml(xml_path):
     imagename = GetLastDir(xml_path)[:-4]+'.jpg'
     return imagename,shape, bboxes, labels_text,labels, difficult, truncated
 
-def CreateYearsDatasets(dir,year=None,save_path=None,rate=0.95):
+def CreateYearsDatasets(dir,year=None,save_path=None,rate=0.95,remove_classes=None):
     years = os.listdir(dir)
     if os.path.exists(os.path.join(save_path,"train.txt")):
         os.remove(os.path.join(save_path,"train.txt"))
@@ -73,13 +73,13 @@ def CreateYearsDatasets(dir,year=None,save_path=None,rate=0.95):
             if os.path.isdir(os.path.join(dir, year)):
                 if os.path.exists(os.path.join(dir, year, DIRECTORY_IMAGES)) and os.path.exists(
                         os.path.join(dir, year, DIRECTORY_ANNOTATIONS)):
-                    CreateVOCDataset(os.path.join(dir, year), year, save_path, rate)
+                    CreateVOCDataset(os.path.join(dir, year), year, save_path, rate,remove_classes)
             progressBar1.update()
     else:
         if os.path.isdir(os.path.join(dir, year)):
             if os.path.exists(os.path.join(dir, year, DIRECTORY_IMAGES)) and os.path.exists(
                     os.path.join(dir, year, DIRECTORY_ANNOTATIONS)):
-                CreateVOCDataset(os.path.join(dir, year), year, save_path, rate)
+                CreateVOCDataset(os.path.join(dir, year), year, save_path, rate,remove_classes)
 
     years = os.listdir(save_path)
     with open(os.path.join(save_path, "train.txt"), "w") as f1:
@@ -177,12 +177,13 @@ def CreateDarknetVocDatasets(dir,save_path,rate,VOC_CLASSES):
     CreateDarknetVocDataset(dir,save_path,test_image_files,"test",VOC_CLASSES=VOC_CLASSES)
 
 
-def generate_new_datasets(dir,dataset_name,root_path,image_file_list,no_pretrained_images_dir,output):
+def generate_new_datasets(dir,dataset_name,root_path,image_file_list,no_pretrained_images_dir,output,remove_classes=None):
     Main_path = os.path.join(root_path, "ImageSets", "Main")
     for image_file in image_file_list:
         is_success = False
         img_file = dataset_name + "/" + DIRECTORY_IMAGES + "/" + image_file
         xml_file = dataset_name + "/" + DIRECTORY_ANNOTATIONS + "/" + image_file[:-4] + ".xml"
+        is_remove = False
         with open(os.path.join(Main_path, output+".txt"), "a") as f:
             # with open(os.path.join(Main_path, "train.txt"), "a") as f:
             save_image_path = CreateSavePath(os.path.join(root_path,DIRECTORY_IMAGES))
@@ -191,10 +192,17 @@ def generate_new_datasets(dir,dataset_name,root_path,image_file_list,no_pretrain
                 if len(f2.read()) == 0 and ReadChinesePath(os.path.join(dir,DIRECTORY_IMAGES,image_file)) != None:
                     pass
                 else:
-                    class_name_list = GetXmlClassesNames(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
-                    if len(class_name_list) > 0:
+                    imagename,shape, bboxes, labels_text,labels, difficult, truncated = ProcessXml(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"))
+                    for class_name in labels_text:
+                        if class_name in remove_classes:
+                            is_remove = True
+                    if len(labels) > 0:
+                        if is_remove:
+                            print("删除类别:{}".format(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml")))
+                            GenerateXml(image_file[:-4] ,shape,[],[], save_xml_path)
+                        else:
+                            shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"),save_xml_path)
                         shutil.copy(os.path.join(dir, DIRECTORY_IMAGES, image_file), save_image_path)
-                        shutil.copy(os.path.join(dir, DIRECTORY_ANNOTATIONS, image_file[:-4] + ".xml"), save_xml_path)
                         is_success = True
                         f.write(img_file + " " + xml_file + "\n")
                     else:
@@ -212,7 +220,7 @@ def generate_new_datasets(dir,dataset_name,root_path,image_file_list,no_pretrain
 
 
 ##制作VOC数据集
-def CreateVOCDataset(dir, datasetname,save_path=None,rate=0.95):
+def CreateVOCDataset(dir, datasetname,save_path=None,rate=0.95,remove_classes=None):
     """
 
     :param dir:
@@ -237,8 +245,8 @@ def CreateVOCDataset(dir, datasetname,save_path=None,rate=0.95):
     train_image_files = random.sample(image_files, int(len(image_files) *rate))
     test_image_files = [file for file in image_files if file not in train_image_files]
 
-    generate_new_datasets(dir,dataset_name,root_path,train_image_files,no_pretrained_images_dir,"train")
-    generate_new_datasets(dir,dataset_name,root_path,test_image_files,no_pretrained_images_dir,"test")
+    generate_new_datasets(dir,dataset_name,root_path,train_image_files,no_pretrained_images_dir,"train",remove_classes)
+    generate_new_datasets(dir,dataset_name,root_path,test_image_files,no_pretrained_images_dir,"test",remove_classes)
 
 
 def CreateLabelList(dir):

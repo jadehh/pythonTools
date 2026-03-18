@@ -2,6 +2,7 @@
 
 #### DatasetToolsV1.1.9 - 2024-10-31
 * 去除easycython依赖
+* 创建目标检测数据集支持传参去除某个类别，并将标准文件内容置为空
 ---
 
 <details onclose>
